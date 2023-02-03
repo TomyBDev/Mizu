@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mizu", "Mizu\Mizu.vcxproj", "{8A17897C-764E-8A0D-1F3B-70100B51060F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Dist|x64 = Dist|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8A17897C-764E-8A0D-1F3B-70100B51060F}.Debug|x64.ActiveCfg = Debug|x64
+		{8A17897C-764E-8A0D-1F3B-70100B51060F}.Debug|x64.Build.0 = Debug|x64
+		{8A17897C-764E-8A0D-1F3B-70100B51060F}.Dist|x64.ActiveCfg = Dist|x64
+		{8A17897C-764E-8A0D-1F3B-70100B51060F}.Dist|x64.Build.0 = Dist|x64
+		{8A17897C-764E-8A0D-1F3B-70100B51060F}.Release|x64.ActiveCfg = Release|x64
+		{8A17897C-764E-8A0D-1F3B-70100B51060F}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
