@@ -1,32 +1,56 @@
 #include "mzpch.h"
 
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+		case WM_CLOSE:
+			PostQuitMessage(69);
+			break;
+
+		default:
+			return DefWindowProc(hWnd, msg, wParam, lParam);
+	}
+}
+
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	WNDCLASSW windowClass = { 0 };
+	// Create and setup Window Class
+	WNDCLASSEX windowClass = { 0 };
 
-	HICON hIcon;
-	hIcon = (HICON)LoadImage(hInstance, L"Content/mizu.ico", IMAGE_ICON,
-		0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
-
+	windowClass.cbSize = sizeof(windowClass);
 	windowClass.style = CS_OWNDC;
-	windowClass.lpfnWndProc = DefWindowProcW;
+	windowClass.lpfnWndProc = WndProc;
 	windowClass.cbClsExtra = 0;
 	windowClass.cbWndExtra = 0;
 	windowClass.hInstance = hInstance;
-	windowClass.hIcon = hIcon;
+	windowClass.hIcon = nullptr;
 	windowClass.hCursor = nullptr;
 	windowClass.hbrBackground = nullptr;
 	windowClass.lpszMenuName = nullptr;
 	windowClass.lpszClassName = L"MizuClass";
+	windowClass.hIconSm = nullptr;
 
-	RegisterClassW(&windowClass);
+	RegisterClassEx(&windowClass);
 
-	HWND hWnd = CreateWindowExW(0, L"MizuClass", L"Mizu", WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, 200, 200, 640, 640, nullptr, nullptr, hInstance, nullptr);
+	//Create and show window
+	HWND hWnd = CreateWindowEx(0, L"MizuClass", L"Mizu", WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, 200, 200, 640, 640, nullptr, nullptr, hInstance, nullptr);
 
 	ShowWindow(hWnd, SW_SHOW);
 
-	while (true);
+	//Setup handling of window messages.
+	MSG message;
+	BOOL gResult;
+	while ((gResult = GetMessage(&message, nullptr, 0, 0)) > 0)
+	{
+		TranslateMessage(&message);
+		DispatchMessage(&message);
+	}
 
-	return 0;
+	if (gResult == -1)
+		return -1;
+
+	return message.wParam;
 }
 

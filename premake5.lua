@@ -30,7 +30,8 @@ project "Mizu"
     includedirs
     {
         "%{prj.name}/src",
-        "%{prj.name}/vendor/spdlog/include"
+        "%{prj.name}/vendor/spdlog/include",
+        "$(SolutionDir)/vendor/ImGui"
     }
     
     filter "system:windows"
