@@ -12,7 +12,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 project "Mizu"
     location "Mizu"
-    kind "ConsoleApp"
+    kind "WindowedApp"
     language "C++"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")

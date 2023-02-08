@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
+# Visual Studio Version 16
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mizu", "Mizu\Mizu.vcxproj", "{8A17897C-764E-8A0D-1F3B-70100B51060F}"
 EndProject
 Global

@@ -1,6 +1,12 @@
 #include "mzpch.h"
 
-extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+std::wstring StringToWide(std::string str)
+{
+	std::wstring wide_string(str.begin(), str.end());
+	return wide_string;
+}
+
+//extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -9,9 +15,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			PostQuitMessage(69);
 			break;
 
-		default:
-			return DefWindowProc(hWnd, msg, wParam, lParam);
+		case WM_KEYDOWN:
+			if (wParam == 'F')
+				SetWindowText(hWnd, L"F Was Pressed");
+			break;
+
+		case WM_KEYUP:
+			if (wParam == 'F')
+				SetWindowText(hWnd, L"F Was Released");
+			break;
+		case WM_LBUTTONDOWN:
+			POINTS pt = MAKEPOINTS(lParam);
+			std::ostringstream oss;
+			oss << "(" << pt.x << ", " << pt.y << ")";
+			SetWindowText(hWnd, (LPCWSTR)StringToWide(oss.str().c_str()).c_str());
+			break;
 	}
+
+	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)

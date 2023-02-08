@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <sstream>
 
 // ImGui
 #include <imgui.h>
