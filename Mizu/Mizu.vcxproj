@@ -135,12 +135,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\mzpch.h" />
+    <ClInclude Include="src\System\RenderWindow.h" />
+    <ClInclude Include="src\Tools\StringConvertor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Source.cpp" />
     <ClCompile Include="src\mzpch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\System\RenderWindow.cpp" />
+    <ClCompile Include="src\Tools\StringConvertor.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
