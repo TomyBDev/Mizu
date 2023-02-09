@@ -6,6 +6,9 @@
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	//Initialise Logger
+	Log::Init();
+
 	RenderWindow renderWindow(hInstance);
 	InputManager inputManager;
 	Application app(&inputManager);

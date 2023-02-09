@@ -2,8 +2,10 @@
 
 #include <iostream>
 #include <sstream>
+#include <memory.h>
 
 #include <Tools/StringConvertor.h>
+#include <Tools/Log.h>
 
 // ImGui
 #include <imgui.h>

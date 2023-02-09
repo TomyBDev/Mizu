@@ -30,7 +30,7 @@ project "Mizu"
     includedirs
     {
         "%{prj.name}/src",
-        "%{prj.name}/vendor/spdlog/include",
+        "$(SolutionDir)/vendor/spdlog/include",
         "$(SolutionDir)/vendor/ImGui"
     }
     

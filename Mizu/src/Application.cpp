@@ -30,7 +30,8 @@ void Application::HandleInput()
 
 	if (inputManager->GetMouse()->IsLeftDown())
 	{
-		OutputDebugString(L"Left Mouse Is Down\n");
+		Log::GetLogger()->trace("Left Mouse Is Down");
+		//OutputDebugString(L"Left Mouse Is Down\n");
 	}
 
 	if (inputManager->GetMouse()->IsRightDown())
