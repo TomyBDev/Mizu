@@ -1,16 +1,23 @@
 #pragma once
 
+class InputManager;
+
 class RenderWindow
 {
 public:
-	RenderWindow(HINSTANCE hInst)
-		: hInstance(hInst) {}
+	RenderWindow(HINSTANCE hInst, int w = 1280, int h = 720, std::wstring winName = L"Mizu")
+		: hInstance(hInst),
+		width(w),
+		height(h),
+		windowName(winName) {}
 
 	~RenderWindow();
 
-	void Initialize();
+	void Initialize(InputManager* input);
 
-	BOOL Update();
+	void WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+	bool Update();
 
 	void CreateRenderWindow();
 	void CreateWinClass();
@@ -19,4 +26,10 @@ private:
 	HINSTANCE hInstance;
 	MSG message;
 	BOOL gResult;
+
+	int width;
+	int height;
+	std::wstring windowName;
+
+	InputManager* inputManager;
 };
