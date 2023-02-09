@@ -3,6 +3,7 @@
 
 #include <Input/InputManager.h>
 
+#include "Input/Keyboard.h"
 #include "Input/Mouse.h"
 
 //extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -48,11 +49,11 @@ void RenderWindow::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		//Keyboard
 	case WM_KEYDOWN:
-		inputManager->GetKeyboard();
+		inputManager->GetKeyboard()->OnPressed(wParam);
 		break;
 
 	case WM_KEYUP:
-		inputManager->GetKeyboard();
+		inputManager->GetKeyboard()->OnReleased(wParam);
 		break;
 
 		//Mouse

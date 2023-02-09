@@ -3,6 +3,7 @@
 
 #include <Input/InputManager.h>
 
+#include "Input/Keyboard.h"
 #include "Input/Mouse.h"
 
 Application::Application(InputManager* input)
@@ -40,5 +41,25 @@ void Application::HandleInput()
 	if (inputManager->GetMouse()->IsMiddleDown())
 	{
 		OutputDebugString(L"Middle Mouse Is Down\n");
+	}
+
+	if (inputManager->GetKeyboard()->IsKeyDown(0x57))
+	{
+		OutputDebugString(L"W\n");
+	}
+
+	if (inputManager->GetKeyboard()->IsKeyDown(0x41))
+	{
+		OutputDebugString(L"A\n");
+	}
+
+	if (inputManager->GetKeyboard()->IsKeyDown(0x53))
+	{
+		OutputDebugString(L"S\n");
+	}
+
+	if (inputManager->GetKeyboard()->IsKeyDown(0x44))
+	{
+		OutputDebugString(L"D\n");
 	}
 }
