@@ -5,6 +5,9 @@
 #include <sstream>
 #include <memory>
 
+// Resources
+#include <Resources/resource.h>
+
 // Time
 #include <ctime>
 

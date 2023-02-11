@@ -131,12 +131,12 @@ void RenderWindow::CreateWinClass()
 	windowClass.cbClsExtra = 0;
 	windowClass.cbWndExtra = 0;
 	windowClass.hInstance = hInstance;
-	windowClass.hIcon = nullptr;
+	windowClass.hIcon = static_cast<HICON>(LoadImage(hInstance, MAKEINTRESOURCE(IDI_MIZUICON),IMAGE_ICON,32,32,0));
 	windowClass.hCursor = nullptr;
 	windowClass.hbrBackground = nullptr;
 	windowClass.lpszMenuName = nullptr;
 	windowClass.lpszClassName = windowName.c_str();
-	windowClass.hIconSm = nullptr;
+	windowClass.hIconSm = static_cast<HICON>(LoadImage(hInstance, MAKEINTRESOURCE(IDI_MIZUICON), IMAGE_ICON, 32, 32, 0));
 
 	if (!RegisterClassEx(&windowClass))
 	{
