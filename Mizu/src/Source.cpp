@@ -23,6 +23,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	{
 		app.Update(0.166f);
 		app.Render();
+		LOG_FLUSH();
 	}
 
 	return 0;

@@ -22,11 +22,13 @@ private:
 #define LOG_WARN(...) ::Log::GetLogger()->warn(__VA_ARGS__)
 #define LOG_ERROR(...) ::Log::GetLogger()->error(__VA_ARGS__)
 #define LOG_CRITICAL(...) ::Log::GetLogger()->critical(__VA_ARGS__)
+#define LOG_FLUSH() ::Log::GetLogger()->flush()
 #else
 #define LOG_TRACE()
 #define LOG_INFO()
 #define LOG_WARN()
 #define LOG_ERROR()
 #define LOG_CRITICAL()
+#define LOG_FLUSH()
 #endif
 

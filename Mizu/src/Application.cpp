@@ -30,6 +30,7 @@ void Application::HandleInput()
 
 	if (inputManager->GetMouse()->IsLeftDown())
 	{
+		LOG_TRACE("Good Morning");
 		OutputDebugString(L"Mouse1\n");
 	}
 
