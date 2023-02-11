@@ -2,6 +2,7 @@
 #include <Application.h>
 
 #include <Input/InputManager.h>
+#include <spdlog/logger.h>
 
 #include "Input/Keyboard.h"
 #include "Input/Mouse.h"

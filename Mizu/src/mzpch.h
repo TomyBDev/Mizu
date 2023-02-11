@@ -2,7 +2,10 @@
 
 #include <iostream>
 #include <sstream>
-#include <memory.h>
+#include <memory>
+
+// Time
+#include <ctime>
 
 #include <Tools/StringConvertor.h>
 #include <Tools/Log.h>
