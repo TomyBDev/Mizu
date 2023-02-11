@@ -5,7 +5,7 @@ class InputManager;
 class Application
 {
 public:
-	Application(InputManager* input);
+	Application(InputManager* input, class Graphics* gfx);
 	~Application();
 
 	void Update(float dt);
@@ -14,4 +14,5 @@ private:
 	void HandleInput();
 
 	InputManager* inputManager;
+	Graphics* graphics;
 };

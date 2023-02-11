@@ -32,6 +32,11 @@ project "Mizu"
         "$(SolutionDir)/vendor/spdlog/include",
         "$(SolutionDir)/vendor/ImGui"
     }
+
+    links
+    {
+        "d3d11"
+    }
     
     filter "system:windows"
         cppdialect "C++20"

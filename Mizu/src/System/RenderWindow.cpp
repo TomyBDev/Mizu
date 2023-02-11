@@ -3,6 +3,7 @@
 
 #include <Input/InputManager.h>
 
+#include "Graphics/Graphics.h"
 #include "Input/Keyboard.h"
 #include "Input/Mouse.h"
 
@@ -116,6 +117,10 @@ void RenderWindow::CreateRenderWindow()
 	ShowWindow(hWnd, SW_SHOW);
 
 	LOG_INFO("Window class created.");
+
+	LOG_INFO("Starting creation of graphics object...");
+	graphics = new Graphics(hWnd);
+	LOG_INFO("Graphics object created.");
 }
 
 void RenderWindow::CreateWinClass()

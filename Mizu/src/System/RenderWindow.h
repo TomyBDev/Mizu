@@ -22,6 +22,8 @@ public:
 	void CreateRenderWindow();
 	void CreateWinClass();
 
+	class Graphics* GetGraphics() { return graphics; }
+
 private:
 	HINSTANCE hInstance;
 	MSG message;
@@ -32,4 +34,5 @@ private:
 	std::wstring windowName;
 
 	InputManager* inputManager;
+	Graphics* graphics;
 };

@@ -16,6 +16,9 @@
 #include <Tools/Log.h>
 #include <spdlog/spdlog.h>
 
+// D3D11
+#include <d3d11.h>
+
 // ImGui
 #include <imgui.h>
 #include <imgui_impl_dx11.h>

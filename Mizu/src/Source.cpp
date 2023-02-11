@@ -12,11 +12,12 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	// Create objects for window, input, and application.
 	RenderWindow renderWindow(hInstance);
 	InputManager inputManager;
-	Application app(&inputManager);
 
 	LOG_INFO("Started Initilaising Render Window...");
 	renderWindow.Initialize(&inputManager);
 	LOG_INFO("Render window initialised.");
+
+	Application app(&inputManager, renderWindow.GetGraphics());
 
 	// Main Loop
 	while (renderWindow.Update())

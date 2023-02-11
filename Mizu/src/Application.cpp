@@ -3,11 +3,13 @@
 
 #include <Input/InputManager.h>
 
+#include <Graphics/Graphics.h>
 #include "Input/Keyboard.h"
 #include "Input/Mouse.h"
 
-Application::Application(InputManager* input)
-	: inputManager(input)
+Application::Application(InputManager* input, Graphics* gfx)
+	: inputManager(input),
+	graphics(gfx)
 {
 }
 
@@ -23,6 +25,12 @@ void Application::Update(float dt)
 
 void Application::Render()
 {
+	if (graphics)
+	{
+		graphics->ClearBuffer(1, 0, 0);
+		graphics->EndFrame();
+	}
+		
 }
 
 void Application::HandleInput()
