@@ -31,17 +31,19 @@ void Application::HandleInput()
 
 	if (inputManager->GetMouse()->IsLeftDown())
 	{
-		Log::GetLogger()->trace("Left Mouse Is Down");
-		//OutputDebugString(L"Left Mouse Is Down\n");
+		LOG_ERROR("AAAAAAAAAAA");
+		OutputDebugString(L"Left Mouse Is Down\n");
 	}
 
 	if (inputManager->GetMouse()->IsRightDown())
 	{
+		LOG_WARN("B");
 		OutputDebugString(L"Right Mouse Is Down\n");
 	}
 
 	if (inputManager->GetMouse()->IsMiddleDown())
 	{
+		LOG_INFO("C");
 		OutputDebugString(L"Middle Mouse Is Down\n");
 	}
 
