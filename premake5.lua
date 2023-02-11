@@ -4,8 +4,7 @@ workspace "Mizu"
     configurations
     {
         "Debug",
-        "Release",
-        "Dist"
+        "Release"
     }
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
@@ -50,8 +49,4 @@ project "Mizu"
 
     filter "configurations:Release"
         defines "MZ_RELEASE"
-        optimize "On"
-
-    filter "configurations:Dist"
-        defines "MZ_DIST"
         optimize "On"

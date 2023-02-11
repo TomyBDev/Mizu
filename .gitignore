@@ -6,3 +6,6 @@ logs/
 
 # Files
 *.user
+*.sln
+*.filters
+*.vcxproj
