@@ -100,14 +100,28 @@ bool RenderWindow::Update()
 
 void RenderWindow::CreateRenderWindow()
 {
-	//Create and show window
+	LOG_INFO("Started creating window class...");
+
+	//Create window using window class.
 	HWND hWnd = CreateWindowEx(0, windowName.c_str(), windowName.c_str(), WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, 200, 200, width, height, nullptr, nullptr, hInstance, this);
 
+	// If Window Creation Failed, exit and log error.
+	if (hWnd == NULL)
+	{
+		LOG_CRITICAL(StringConverter::GetLastErrorAsString());
+		exit(-1);
+	}
+
+	// Show the created window.
 	ShowWindow(hWnd, SW_SHOW);
+
+	LOG_INFO("Window class created.");
 }
 
 void RenderWindow::CreateWinClass()
 {
+	LOG_INFO("Started registering window class...");
+
 	// Create and setup Window Class
 	WNDCLASSEX windowClass = { 0 };
 
@@ -124,5 +138,11 @@ void RenderWindow::CreateWinClass()
 	windowClass.lpszClassName = windowName.c_str();
 	windowClass.hIconSm = nullptr;
 
-	RegisterClassEx(&windowClass);
+	if (!RegisterClassEx(&windowClass))
+	{
+		LOG_CRITICAL(StringConverter::GetLastErrorAsString());
+		exit(-1);
+	}
+
+	LOG_INFO("Window class registered.");
 }

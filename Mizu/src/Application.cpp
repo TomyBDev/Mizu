@@ -2,7 +2,6 @@
 #include <Application.h>
 
 #include <Input/InputManager.h>
-#include <spdlog/logger.h>
 
 #include "Input/Keyboard.h"
 #include "Input/Mouse.h"
@@ -31,20 +30,12 @@ void Application::HandleInput()
 
 	if (inputManager->GetMouse()->IsLeftDown())
 	{
-		LOG_ERROR("AAAAAAAAAAA");
-		OutputDebugString(L"Left Mouse Is Down\n");
+		OutputDebugString(L"Mouse1\n");
 	}
 
 	if (inputManager->GetMouse()->IsRightDown())
 	{
-		LOG_WARN("B");
-		OutputDebugString(L"Right Mouse Is Down\n");
-	}
-
-	if (inputManager->GetMouse()->IsMiddleDown())
-	{
-		LOG_INFO("C");
-		OutputDebugString(L"Middle Mouse Is Down\n");
+		OutputDebugString(L"Mouse2\n");
 	}
 
 	if (inputManager->GetKeyboard()->IsKeyDown(0x57))
