@@ -7,9 +7,12 @@
 #include "Input/Keyboard.h"
 #include "Input/Mouse.h"
 
-//extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+		return true;
+
 	RenderWindow* pThis = nullptr;
 
 	if (msg == WM_NCCREATE)
@@ -121,6 +124,15 @@ void RenderWindow::CreateRenderWindow()
 	LOG_INFO("Starting creation of graphics object...");
 	graphics = new Graphics(hWnd);
 	LOG_INFO("Graphics object created.");
+
+	LOG_INFO("Starting initialisation of ImGui...");
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	ImGui_ImplWin32_Init(hWnd);
+	ImGui_ImplDX11_Init(graphics->GetDevice().Get(), graphics->GetDeviceContext().Get());
+	ImGui::StyleColorsDark();
+	LOG_INFO("ImGui initialised.");
 }
 
 void RenderWindow::CreateWinClass()

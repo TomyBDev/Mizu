@@ -13,6 +13,8 @@ public:
 private:
 	void HandleInput();
 
+	void Imgui();
+
 	InputManager* inputManager;
 	Graphics* graphics;
 };

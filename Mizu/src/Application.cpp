@@ -30,7 +30,7 @@ void Application::Render()
 		graphics->ClearBuffer(1, 0, 0);
 
 		graphics->DrawTriangle();
-
+		Imgui();
 		graphics->EndFrame();
 	}
 		
@@ -69,4 +69,26 @@ void Application::HandleInput()
 	{
 		OutputDebugString(L"D\n");
 	}
+}
+
+void Application::Imgui()
+{
+	// Start the Dear ImGui frame
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+
+	/** Initialise the ImGui Window Size. */
+	ImGui::SetNextWindowSize(ImVec2(500.f, 540.f));
+
+	/** Begin Menu */
+	ImGui::Begin("Settings:");
+
+	ImGui::Text("Hello, world!");
+
+	/** End of ImGui Rendering. */
+	ImGui::End();
+
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }

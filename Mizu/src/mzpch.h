@@ -19,6 +19,7 @@
 
 // D3D11
 #include <d3d11.h>
+#include <d3dcompiler.h>
 
 // ImGui
 #include <imgui.h>
