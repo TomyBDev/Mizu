@@ -28,6 +28,9 @@ void Application::Render()
 	if (graphics)
 	{
 		graphics->ClearBuffer(1, 0, 0);
+
+		graphics->DrawTriangle();
+
 		graphics->EndFrame();
 	}
 		

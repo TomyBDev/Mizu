@@ -1,6 +1,8 @@
 #include <mzpch.h>
 #include <Graphics/Graphics.h>
 
+using namespace Microsoft::WRL;
+
 Graphics::Graphics(HWND hWnd)
 {
 	DXGI_SWAP_CHAIN_DESC sd = {};
@@ -34,34 +36,10 @@ Graphics::Graphics(HWND hWnd)
 		nullptr, 
 		&deviceContext);
 
-	ID3D11Resource* backBuffer = nullptr;
-	swapChain->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&backBuffer));
-	device->CreateRenderTargetView(backBuffer, nullptr, &renderTarget);
+	ComPtr<ID3D11Resource> backBuffer = nullptr;
+	swapChain->GetBuffer(0, __uuidof(ID3D11Resource), &backBuffer);
+	device->CreateRenderTargetView(backBuffer.Get(), nullptr, &renderTarget);
 	backBuffer->Release();
-}
-
-Graphics::~Graphics()
-{
-	if (device != nullptr)
-	{
-		device->Release();
-	}
-
-	if (swapChain != nullptr)
-	{
-		swapChain->Release();
-	}
-
-	if (deviceContext != nullptr)
-	{
-		deviceContext->Release();
-	}
-
-	if (renderTarget != nullptr)
-	{
-		renderTarget->Release();
-	}
-		
 }
 
 void Graphics::EndFrame()
@@ -71,6 +49,41 @@ void Graphics::EndFrame()
 
 void Graphics::ClearBuffer(float r, float g, float b) noexcept
 {
-	const float color[] = { r,g,b,1.0f };
-	deviceContext->ClearRenderTargetView(renderTarget, color);
+	const float color[] = { r, g, b, 1.0f };
+	deviceContext->ClearRenderTargetView(renderTarget.Get(), color);
+}
+
+void Graphics::DrawTriangle()
+{
+	struct Vertex
+	{
+		float x;
+		float y;
+	};
+
+	const Vertex vertices[] =
+	{
+		{0.5f, 0.5f},
+		{1.0f, -0.5f},
+		{0.0f, -0.5f},
+	};
+
+	ComPtr<ID3D11Buffer> vertexBuffer;
+	D3D11_BUFFER_DESC bufferDesc = {};
+	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bufferDesc.CPUAccessFlags = 0u;
+	bufferDesc.MiscFlags = 0u;
+	bufferDesc.ByteWidth = sizeof(vertices);
+	bufferDesc.StructureByteStride = sizeof(Vertex);
+	D3D11_SUBRESOURCE_DATA subresourceData = {};
+	subresourceData.pSysMem = vertices;
+
+
+	device->CreateBuffer(&bufferDesc, &subresourceData, &vertexBuffer);
+	const UINT stride = sizeof(Vertex);
+	const UINT offset = 0u;
+	deviceContext->IASetVertexBuffers(0u, 0u, &vertexBuffer, &stride, &offset);
+	deviceContext->Draw(3u, 0u);
+
 }
