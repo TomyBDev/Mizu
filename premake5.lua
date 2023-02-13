@@ -24,7 +24,8 @@ project "Mizu"
     {
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp",
-        "$(SolutionDir)/vendor/ImGui/**.cpp"
+        "%{prj.name}/src/**.hlsl",
+        "vendor/ImGui/**.cpp"
     }
 
     includedirs
@@ -57,3 +58,6 @@ project "Mizu"
     filter "configurations:Release"
         defines "MZ_RELEASE"
         optimize "On"
+
+    filter "files:vendor/ImGui/**.cpp"
+        flags {"NoPCH"}
