@@ -90,7 +90,7 @@ void Graphics::DrawTriangle()
 
 	ComPtr<ID3D11PixelShader> pixelShader;
 	ComPtr<ID3DBlob> blob;
-	D3DReadFileToBlob(L"../bin/Debug-windows-x86_64/Mizu/ps_TriangleShader.cso", &blob);
+	D3DReadFileToBlob(L"../bin/Debug-windows-x86_64/Mizu/TriangleShader_ps.cso", &blob);
 	device->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &pixelShader);
 
 	deviceContext->PSSetShader(pixelShader.Get(), nullptr, 0u);
@@ -98,7 +98,7 @@ void Graphics::DrawTriangle()
 	//Vertex
 
 	ComPtr<ID3D11VertexShader> vertexShader;
-	D3DReadFileToBlob(L"../bin/Debug-windows-x86_64/Mizu/vs_TriangleShader.cso", &blob);
+	D3DReadFileToBlob(L"../bin/Debug-windows-x86_64/Mizu/TriangleShader_vs.cso", &blob);
 	device->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &vertexShader);
 
 	deviceContext->VSSetShader(vertexShader.Get(), nullptr, 0u);
