@@ -24,6 +24,7 @@ project "Mizu"
     {
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp",
+        "$(SolutionDir)/vendor/ImGui/**.cpp"
     }
 
     includedirs
