@@ -27,7 +27,7 @@ void Application::Render()
 {
 	if (graphics)
 	{
-		graphics->ClearBuffer(1, 0, 0);
+		graphics->ClearBuffer(0.4f, 0.6f, 0.9f);
 
 		graphics->DrawTriangle();
 		Imgui();
