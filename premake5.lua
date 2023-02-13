@@ -61,3 +61,9 @@ project "Mizu"
 
     filter "files:vendor/ImGui/**.cpp"
         flags {"NoPCH"}
+
+   filter("files:**_ps.hlsl")
+      shadertype("Pixel")
+
+   filter("files:**_vs.hlsl")
+      shadertype("Vertex")
