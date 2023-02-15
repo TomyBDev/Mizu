@@ -17,4 +17,7 @@ private:
 
 	InputManager* inputManager;
 	Graphics* graphics;
+
+	class TriangleMesh* triangleMesh;
+	class NormalShader* normalShader;
 };

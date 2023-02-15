@@ -7,10 +7,15 @@
 #include "Input/Keyboard.h"
 #include "Input/Mouse.h"
 
+#include <Geometry/TriangleMesh.h>
+#include <Graphics/Shaders/NormalShader.h>
+
 Application::Application(InputManager* input, Graphics* gfx)
 	: inputManager(input),
 	graphics(gfx)
 {
+	triangleMesh = new TriangleMesh(gfx->GetDevice());
+	normalShader = new NormalShader(gfx->GetDevice(), gfx->GetDeviceContext());
 }
 
 Application::~Application()
@@ -28,8 +33,12 @@ void Application::Render()
 	if (graphics)
 	{
 		graphics->ClearBuffer(0.4f, 0.6f, 0.9f);
+		graphics->SetRenderTarget();
 
-		graphics->DrawTriangle();
+		triangleMesh->SendData(graphics->GetDeviceContext());
+		normalShader->Render(triangleMesh->GetIndexCount());
+
+
 		Imgui();
 		graphics->EndFrame();
 	}

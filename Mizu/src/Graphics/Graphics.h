@@ -10,10 +10,12 @@ public:
 
 	void EndFrame();
 	void ClearBuffer(float r, float g, float b) noexcept;
-	void DrawTriangle();
+	void SetRenderTarget();
+
 private:
 	Microsoft::WRL::ComPtr<ID3D11Device> device = nullptr;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain = nullptr;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext = nullptr;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTarget = nullptr;
+	D3D11_VIEWPORT viewport;
 };

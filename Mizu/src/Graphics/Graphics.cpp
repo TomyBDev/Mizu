@@ -40,6 +40,13 @@ Graphics::Graphics(HWND hWnd)
 	swapChain->GetBuffer(0, __uuidof(ID3D11Resource), &backBuffer);
 	device->CreateRenderTargetView(backBuffer.Get(), nullptr, &renderTarget);
 	backBuffer->Release();
+
+	viewport.Width = 1280;
+	viewport.Height = 720;
+	viewport.MinDepth = 0;
+	viewport.MaxDepth = 1;
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
 }
 
 void Graphics::EndFrame()
@@ -53,89 +60,8 @@ void Graphics::ClearBuffer(float r, float g, float b) noexcept
 	deviceContext->ClearRenderTargetView(renderTarget.Get(), color);
 }
 
-void Graphics::DrawTriangle()
+void Graphics::SetRenderTarget()
 {
-	struct Vertex
-	{
-		float x;
-		float y;
-	};
-
-	const Vertex vertices[] =
-	{
-		{0.0f, 0.5f},
-		{0.5f, -0.5f},
-		{-0.5f, -0.5f},
-	};
-
-
-	ComPtr<ID3D11Buffer> vertexBuffer;
-	D3D11_BUFFER_DESC bufferDesc = {};
-	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bufferDesc.CPUAccessFlags = 0u;
-	bufferDesc.MiscFlags = 0u;
-	bufferDesc.ByteWidth = sizeof(vertices);
-	bufferDesc.StructureByteStride = sizeof(Vertex);
-	D3D11_SUBRESOURCE_DATA subresourceData = {};
-	subresourceData.pSysMem = vertices;
-
-
-	device->CreateBuffer(&bufferDesc, &subresourceData, &vertexBuffer);
-	const UINT stride = sizeof(Vertex);
-	const UINT offset = 0u;
-	deviceContext->IASetVertexBuffers(0u, 1u, vertexBuffer.GetAddressOf(), &stride, &offset);
-
-	//Pixel
-
-	ComPtr<ID3D11PixelShader> pixelShader;
-	ComPtr<ID3DBlob> blob;
-	D3DReadFileToBlob(L"../bin/Debug-windows-x86_64/Mizu/TriangleShader_ps.cso", &blob);
-	device->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &pixelShader);
-
-	deviceContext->PSSetShader(pixelShader.Get(), nullptr, 0u);
-
-	//Vertex
-
-	ComPtr<ID3D11VertexShader> vertexShader;
-	D3DReadFileToBlob(L"../bin/Debug-windows-x86_64/Mizu/TriangleShader_vs.cso", &blob);
-	device->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &vertexShader);
-
-	deviceContext->VSSetShader(vertexShader.Get(), nullptr, 0u);
-
-	ComPtr<ID3D11InputLayout> inputLayout;
-	const D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
-	{
-		{"Position",
-			0,
-			DXGI_FORMAT_R32G32_FLOAT,
-			0,
-			0,
-			D3D11_INPUT_PER_VERTEX_DATA,
-			0},
-	};
-	device->CreateInputLayout(
-		inputElementDesc,
-		(UINT)std::size(inputElementDesc),
-		blob->GetBufferPointer(),
-		blob->GetBufferSize(),
-		&inputLayout);
-
-	deviceContext->IASetInputLayout(inputLayout.Get());
-
 	deviceContext->OMSetRenderTargets(1u, renderTarget.GetAddressOf(), nullptr);
-
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	D3D11_VIEWPORT viewport;
-	viewport.Width = 1280;
-	viewport.Height = 720;
-	viewport.MinDepth = 0;
-	viewport.MaxDepth = 1;
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
 	deviceContext->RSSetViewports(1u, &viewport);
-
-	deviceContext->Draw(std::size(vertices), 0u);
-
 }
