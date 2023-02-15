@@ -50,7 +50,7 @@ void Shader::Render(int indexCount)
 	deviceContext->VSSetShader(vertexShader, NULL, 0);
 	deviceContext->PSSetShader(pixelShader, NULL, 0);
 
-	deviceContext->Draw(indexCount, 0);
+	deviceContext->DrawIndexed(indexCount, 0, 0);
 }
 
 void Shader::LoadVertexShader(const wchar_t* fileName)
@@ -63,7 +63,7 @@ void Shader::LoadVertexShader(const wchar_t* fileName)
 	{
 		{"Position",
 			0,
-			DXGI_FORMAT_R32G32_FLOAT,
+			DXGI_FORMAT_R32G32B32_FLOAT,
 			0,
 			0,
 			D3D11_INPUT_PER_VERTEX_DATA,

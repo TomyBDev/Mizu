@@ -102,7 +102,7 @@ void Camera::Update()
 
 	right.m128_f32[0] = cosf(yaw);
 	right.m128_f32[1] = 0;
-	right.m128_f32[2] = -sin(yaw);
+	right.m128_f32[2] = -sinf(yaw);
 
 	up.m128_f32[0] = sinf(pitch) * sinf(yaw);
 	up.m128_f32[1] = cosf(pitch);

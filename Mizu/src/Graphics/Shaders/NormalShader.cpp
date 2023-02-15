@@ -6,6 +6,9 @@ NormalShader::NormalShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::
 	LoadVertexShader(L"../bin/Debug-windows-x86_64/Mizu/TriangleShader_vs.cso");
 	LoadPixelShader(L"../bin/Debug-windows-x86_64/Mizu/TriangleShader_ps.cso");
 
+	//LoadVertexShader(L"TriangleShader_vs.cso");
+	//LoadPixelShader(L"TriangleShader_ps.cso");
+
 	D3D11_BUFFER_DESC matrixBufferDesc;
 	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
