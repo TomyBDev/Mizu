@@ -5,9 +5,9 @@ TriangleMesh::TriangleMesh(Microsoft::WRL::ComPtr<ID3D11Device> device)
 {
 	const Vertex vertices[] =
 	{
-		{0.0f, 0.5f},
-		{0.5f, -0.5f},
-		{-0.5f, -0.5f},
+		{0.0f, 0.5f, 0.0f, 0.0f },
+		{0.5f, -0.5f, 0.0f, 0.0f },
+		{-0.5f, -0.5f, 0.0f, 0.0f },
 	};
 
 	D3D11_BUFFER_DESC bufferDesc = {};

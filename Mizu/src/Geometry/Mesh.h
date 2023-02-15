@@ -8,6 +8,8 @@ public:
 	{
 		float x;
 		float y;
+		float z;
+		float w;
 	};
 
 	void SendData(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext);

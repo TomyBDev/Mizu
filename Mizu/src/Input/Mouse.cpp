@@ -50,6 +50,7 @@ void Mouse::OnMouseMove(int x, int y)
 {
 	xPos = x;
 	yPos = y;
+	bMouseMoving = true;
 }
 
 bool Mouse::IsLeftDown()
@@ -65,4 +66,25 @@ bool Mouse::IsMiddleDown()
 bool Mouse::IsRightDown()
 {
 	return RightMouseDown;
+}
+
+bool Mouse::IsMouseMoving()
+{
+	if (bMouseMoving)
+	{
+		bMouseMoving = false;
+		return true;
+	}
+
+	return false;
+}
+
+float Mouse::GetMouseX()
+{
+	return xPos;
+}
+
+float Mouse::GetMouseY()
+{
+	return yPos;
 }

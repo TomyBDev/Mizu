@@ -27,9 +27,15 @@ public:
 	bool IsMiddleDown();
 	bool IsRightDown();
 
+	bool IsMouseMoving();
+
+	float GetMouseX();
+	float GetMouseY();
+
 private:
 	bool LeftMouseDown;
 	bool MiddleMouseDown;
 	bool RightMouseDown;
+	bool bMouseMoving;
 	int xPos, yPos;
 };

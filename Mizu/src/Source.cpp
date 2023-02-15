@@ -25,7 +25,6 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	QueryPerformanceCounter((LARGE_INTEGER*)&clock_last_frame_);
 
 
-
 	// Main Loop
 	while (renderWindow.Update())
 	{

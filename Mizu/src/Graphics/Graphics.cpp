@@ -3,8 +3,10 @@
 
 using namespace Microsoft::WRL;
 
-Graphics::Graphics(HWND hWnd)
+Graphics::Graphics(HWND hwnd)
 {
+	hWnd = hwnd;
+
 	DXGI_SWAP_CHAIN_DESC sd = {};
 	sd.BufferDesc.Width = 0;
 	sd.BufferDesc.Height = 0;
@@ -47,6 +49,14 @@ Graphics::Graphics(HWND hWnd)
 	viewport.MaxDepth = 1;
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
+
+	//(0 == no vsync)
+	swapChain->Present(0, 0);
+
+	worldMatrix = DirectX::XMMatrixIdentity();
+
+	// Create the projection matrix for 3D rendering.
+	projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.1415/2.f, viewport.Width / viewport.Height, 0.1f, 200.f);
 }
 
 void Graphics::EndFrame()

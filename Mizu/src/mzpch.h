@@ -16,6 +16,7 @@
 #include <Tools/StringConvertor.h>
 #include <Tools/Log.h>
 #include <spdlog/spdlog.h>
+#include <DirectXMath.h>
 
 // D3D11
 #include <d3d11.h>

@@ -11,15 +11,17 @@ public:
 	void Update(float dt);
 	void Render();
 private:
-	void HandleInput();
+	void HandleInput(float dt);
 
 	void Imgui();
 
 	InputManager* inputManager;
 	Graphics* graphics;
+	class Camera* camera;
 
 	class TriangleMesh* triangleMesh;
 	class NormalShader* normalShader;
 
 	float frameRate = 0;
+	float cameraSpeed = 10.f;
 };
