@@ -92,14 +92,16 @@ void RenderWindow::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 bool RenderWindow::Update()
 {
-	if(GetMessage(&message, nullptr, 0, 0) > 0)
+	if(PeekMessage(&message, nullptr, 0, 0, 1) >0)
 	{
 		TranslateMessage(&message);
 		DispatchMessage(&message);
-		return true;
 	}
 
-	return false;
+	if (message.message == WM_QUIT)
+		return false;
+
+	return true;
 }
 
 void RenderWindow::CreateRenderWindow()

@@ -19,10 +19,22 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	Application app(&inputManager, renderWindow.GetGraphics());
 
+	// calculate the time between updates
+	
+	UINT64 clock, clock_frequency, clock_last_frame_;
+	QueryPerformanceCounter((LARGE_INTEGER*)&clock_last_frame_);
+
+
+
 	// Main Loop
 	while (renderWindow.Update())
 	{
-		app.Update(0.166f);
+		QueryPerformanceCounter((LARGE_INTEGER*)&clock);
+		QueryPerformanceFrequency((LARGE_INTEGER*)&clock_frequency);
+		UINT32 cycles = (UINT32)(clock - clock_last_frame_);
+		clock_last_frame_ = clock;
+
+		app.Update((float)cycles / (float)clock_frequency);
 		app.Render();
 		LOG_FLUSH();
 	}

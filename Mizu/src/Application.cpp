@@ -24,8 +24,9 @@ Application::~Application()
 
 void Application::Update(float dt)
 {
-	HandleInput();
+	frameRate = 1.f / dt;
 
+	HandleInput();
 }
 
 void Application::Render()
@@ -93,7 +94,7 @@ void Application::Imgui()
 	/** Begin Menu */
 	ImGui::Begin("Settings:");
 
-	ImGui::Text("Hello, world!");
+	ImGui::Text("Framerate: %f", frameRate);
 
 	/** End of ImGui Rendering. */
 	ImGui::End();

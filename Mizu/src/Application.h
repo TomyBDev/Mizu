@@ -20,4 +20,6 @@ private:
 
 	class TriangleMesh* triangleMesh;
 	class NormalShader* normalShader;
+
+	float frameRate = 0;
 };
