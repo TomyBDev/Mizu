@@ -15,8 +15,10 @@ Application::Application(InputManager* input, Graphics* gfx)
 	: inputManager(input),
 	graphics(gfx)
 {
+	LOG_INFO("Initilaising camera...");
 	camera = new Camera(gfx->GetHWND());
 	camera->SetSpeed(cameraSpeed);
+	LOG_INFO("Camera initialised.");
 
 	triangleMesh = new TriangleMesh(gfx->GetDevice());
 	normalShader = new NormalShader(gfx->GetDevice(), gfx->GetDeviceContext());

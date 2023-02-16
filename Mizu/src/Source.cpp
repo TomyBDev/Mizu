@@ -17,14 +17,16 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	renderWindow.Initialize(&inputManager);
 	LOG_INFO("Render window initialised.");
 
+	LOG_INFO("Initilaising Application...");
 	Application app(&inputManager, renderWindow.GetGraphics());
+	LOG_INFO("Application initialised.");
 
 	// calculate the time between updates
-	
 	UINT64 clock, clock_frequency, clock_last_frame_;
 	QueryPerformanceCounter((LARGE_INTEGER*)&clock_last_frame_);
 
-
+	LOG_INFO("Program has loaded sucessfully! Now running application.");
+	LOG_FLUSH();
 	// Main Loop
 	while (renderWindow.Update())
 	{
