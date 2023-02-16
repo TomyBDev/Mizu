@@ -87,7 +87,7 @@ void Application::Imgui()
 	/** Begin Menu */
 	ImGui::Begin("Settings:");
 
-	ImGui::Text("Framerate: %f", frameRate);
+	ImGui::Text("Framerate: %.1f", frameRate);
 
 	ImGui::Text("Camera Pos: x: %.1f, y: %.1f, z: %.1f", camera->GetPosition().m128_f32[0], camera->GetPosition().m128_f32[1], camera->GetPosition().m128_f32[2]);
 	ImGui::Text("Camera Rot: x: %.1f, y: %.1f, z: %.1f", camera->GetRotation().m128_f32[0], camera->GetRotation().m128_f32[1], camera->GetRotation().m128_f32[2]);
