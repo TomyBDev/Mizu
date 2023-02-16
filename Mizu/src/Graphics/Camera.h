@@ -32,8 +32,8 @@ public:
 	void TurnLeft(float dx, float dt);
 
 private:
-	XMVECTOR position = { 0,0,0 };
-	XMVECTOR rotation = { 0,0,0 };
+	XMVECTOR position = { -50.f,0,0 };
+	XMVECTOR rotation = { 90.f,0,0 };
 	XMVECTOR forward = { 0,0,0 };
 	XMVECTOR up = { 0,0,0 };
 	XMVECTOR right = { 0,0,0 };
@@ -45,5 +45,5 @@ private:
 	bool bTurningEnabled;
 
 	float speed = 10.f;
-	float sensitivity = 10.f;
+	float sensitivity = 12.f;
 };

@@ -5,9 +5,9 @@ TriangleMesh::TriangleMesh(Microsoft::WRL::ComPtr<ID3D11Device> device)
 {
 	const DirectX::XMFLOAT3 vertices[] =
 	{
-		{0.0f, 0.5f, 0.0f },
-		{0.5f, -0.5f, 0.0f },
-		{-0.5f, -0.5f, 0.0f },
+		{0.0f, 0.5f, 50.0f },
+		{0.5f, -0.5f, 50.0f },
+		{-0.5f, -0.5f, 50.0f },
 	};
 	indexCount = std::size(vertices);
 	vertexCount = indexCount;

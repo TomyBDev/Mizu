@@ -23,5 +23,5 @@ private:
 	class NormalShader* normalShader;
 
 	float frameRate = 0;
-	float cameraSpeed = 10.f;
+	float cameraSpeed = 100.f;
 };

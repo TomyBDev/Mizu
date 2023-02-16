@@ -76,9 +76,10 @@ void Camera::HandleInput(InputManager* input, float dt)
 		if (x > 0)
 			TurnRight(x, dt);
 		if (y < 0)
-			TurnUp(y, dt);
-		if (y > 0)
 			TurnDown(y, dt);
+		if (y > 0)
+			TurnUp(y, dt);
+			
 
 		
 		cursor.x = 1280.f / 2;
@@ -90,25 +91,36 @@ void Camera::HandleInput(InputManager* input, float dt)
 
 void Camera::Update()
 {
-	XMVECTOR lookAtPos;
+	XMVECTOR lookAtPos = { 0,0,0,1 };
+	up = { 0,1,0,1 };
+	right = { 1, 0,0,1 };
+	forward = { 0,0, 1, 1 };
 
 	const float yaw = XMConvertToRadians(rotation.m128_f32[0]);
 	const float pitch = XMConvertToRadians(rotation.m128_f32[1]);
 	const float roll = XMConvertToRadians(rotation.m128_f32[2]);
 
-	forward.m128_f32[0] = cosf(yaw);
-	forward.m128_f32[1] = -sinf(pitch);
-	forward.m128_f32[2] = cosf(pitch)*cosf(yaw);
+	XMMATRIX rotMat = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
 
-	right.m128_f32[0] = cosf(yaw);
-	right.m128_f32[1] = 0;
-	right.m128_f32[2] = -sinf(yaw);
-
-	up.m128_f32[0] = sinf(pitch) * sinf(yaw);
-	up.m128_f32[1] = cosf(pitch);
-	up.m128_f32[2] = sinf(pitch) * cosf(yaw);
+	forward = XMVector3TransformCoord(forward, rotMat);
+	right = XMVector3TransformCoord(right, rotMat);
+	up = XMVector3TransformCoord(up, rotMat);
 
 	lookAtPos = position + forward;
+
+	//forward.m128_f32[0] = cosf(yaw);
+	//forward.m128_f32[1] = -sinf(pitch);
+	//forward.m128_f32[2] = cosf(pitch)*cosf(yaw);
+
+	//right.m128_f32[0] = cosf(yaw);
+	//right.m128_f32[1] = 0;
+	//right.m128_f32[2] = -sinf(yaw);
+
+	//up.m128_f32[0] = sinf(pitch) * sinf(yaw);
+	//up.m128_f32[1] = cosf(pitch);
+	//up.m128_f32[2] = sinf(pitch) * cosf(yaw);
+
+	//lookAtPos = position + forward;
 
 	viewMatrix = XMMatrixLookAtLH(position, lookAtPos, up);
 }
@@ -150,7 +162,7 @@ void Camera::MoveDown(float dt)
 
 void Camera::TurnDown(float dy, float dt)
 {
-	rotation.m128_f32[1] -= dy * sensitivity * dt;
+	rotation.m128_f32[1] += dy * sensitivity * dt;
 
 	if (rotation.m128_f32[1] < -90.f)
 		rotation.m128_f32[1] = -90.f;
@@ -158,7 +170,7 @@ void Camera::TurnDown(float dy, float dt)
 
 void Camera::TurnUp(float dy, float dt)
 {
-	rotation.m128_f32[1] -= dy * sensitivity * dt;
+	rotation.m128_f32[1] += dy * sensitivity * dt;
 
 	if (rotation.m128_f32[1] > 90.f)
 		rotation.m128_f32[1] = 90.f;

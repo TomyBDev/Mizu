@@ -16,6 +16,7 @@ Application::Application(InputManager* input, Graphics* gfx)
 	graphics(gfx)
 {
 	camera = new Camera(gfx->GetHWND());
+	camera->SetSpeed(cameraSpeed);
 
 	triangleMesh = new TriangleMesh(gfx->GetDevice());
 	normalShader = new NormalShader(gfx->GetDevice(), gfx->GetDeviceContext());
