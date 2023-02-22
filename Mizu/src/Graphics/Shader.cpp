@@ -61,13 +61,20 @@ void Shader::LoadVertexShader(const wchar_t* fileName)
 
 	const D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
 	{
-		{"Position",
+		{"POSITION",
 			0,
 			DXGI_FORMAT_R32G32B32_FLOAT,
 			0,
 			0,
 			D3D11_INPUT_PER_VERTEX_DATA,
-			0},
+			0},		
+		{"NORMALS",
+			1,
+			DXGI_FORMAT_R32G32B32_FLOAT,
+			0,
+			0,
+			D3D11_INPUT_PER_VERTEX_DATA,
+			0}
 	};
 
 	device->CreateInputLayout(

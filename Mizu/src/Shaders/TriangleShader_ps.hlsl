@@ -1,4 +1,10 @@
-float4 main() : SV_Target
+struct PS_Input
 {
-    return float4(1.0f, 1.0f, 1.0, 1.0f);
+    float4 pos : Position;
+    float4 normals : Normals;
+};
+
+float4 main(PS_Input input) : SV_Target
+{
+    return input.normals;
 }

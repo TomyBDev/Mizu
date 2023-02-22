@@ -5,14 +5,30 @@ cbuffer MatrixBuffer : register(b0)
     matrix projectionMatrix;
 };
 
-float4 main(float4 pos : Position) : SV_Position
+struct VS_Input
 {
-    float4 position = {0,0,0,1};
+    float3 pos : POSITION;
+    float3 normals : NORMALS;
+};
+
+struct VS_Output
+{
+    float4 pos : SV_POSITION;
+    float4 normals : Normals1;
+};
+
+VS_Output main(VS_Input input)
+{
+    VS_Output output;
+    float4 position = float4(input.pos.x, input.pos.y, input.pos.z, 0.f);
+    output.normals = float4(0.f, 0.f, 0.f, 0.f);
 
 	// Calculate the position of the vertex against the world, view, and projection matrices.
-    position = mul(pos, worldMatrix);
-    position = mul(position, viewMatrix);
-    position = mul(position, projectionMatrix);
+    output.pos = mul(position, worldMatrix);
+    output.pos = mul(output.pos, viewMatrix);
+    output.pos = mul(output.pos, projectionMatrix);
 
-    return position;
+    output.normals.xyz = input.normals.xyz;
+
+    return output;
 }

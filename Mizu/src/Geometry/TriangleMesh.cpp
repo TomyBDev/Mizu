@@ -3,13 +3,13 @@
 
 TriangleMesh::TriangleMesh(Microsoft::WRL::ComPtr<ID3D11Device> device)
 {
-	const DirectX::XMFLOAT3 vertices[] =
+	const Data data[] =
 	{
-		{0.0f, 0.5f, 50.0f },
-		{0.5f, -0.5f, 50.0f },
-		{-0.5f, -0.5f, 50.0f },
+		{DirectX::XMFLOAT3(0.0f, 1.f, 50.f ), DirectX::XMFLOAT3(0.f, 0.f, -1.f )},
+		{DirectX::XMFLOAT3(1.f, -1.f, 50.f ), DirectX::XMFLOAT3(0.f, 0.f, -1.f )},
+		{DirectX::XMFLOAT3(- 1.f, -1.f, 50.f), DirectX::XMFLOAT3(0.f, 0.f, -1.f)}
 	};
-	indexCount = std::size(vertices);
+	indexCount = std::size(data);
 	vertexCount = indexCount;
 	unsigned long* indices;
 	indices = new unsigned long[indexCount];
@@ -22,10 +22,10 @@ TriangleMesh::TriangleMesh(Microsoft::WRL::ComPtr<ID3D11Device> device)
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufferDesc.CPUAccessFlags = 0u;
 	vertexBufferDesc.MiscFlags = 0u;
-	vertexBufferDesc.ByteWidth = sizeof(vertices);
-	vertexBufferDesc.StructureByteStride = sizeof(Vertex);
+	vertexBufferDesc.ByteWidth = sizeof(data);
+	vertexBufferDesc.StructureByteStride = sizeof(Data);
 	D3D11_SUBRESOURCE_DATA vertexData = {};
-	vertexData.pSysMem = vertices;
+	vertexData.pSysMem = data;
 
 	device->CreateBuffer(&vertexBufferDesc, &vertexData, &vertexBuffer);
 
@@ -38,6 +38,7 @@ TriangleMesh::TriangleMesh(Microsoft::WRL::ComPtr<ID3D11Device> device)
 	indexBufferDesc.CPUAccessFlags = 0;
 	indexBufferDesc.MiscFlags = 0;
 	indexBufferDesc.StructureByteStride = 0;
+
 	// Give the subresource structure a pointer to the index data.
 	D3D11_SUBRESOURCE_DATA indexData = {};
 	indexData.pSysMem = indices;

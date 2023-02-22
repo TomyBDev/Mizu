@@ -32,8 +32,8 @@ public:
 	void TurnLeft(float dx, float dt);
 
 private:
-	XMVECTOR position = { -50.f,0,0 };
-	XMVECTOR rotation = { 90.f,0,0 };
+	XMVECTOR position = { 0.f,0.f,-5.f };
+	XMVECTOR rotation = { 0.f,0,0 };
 	XMVECTOR forward = { 0,0,0 };
 	XMVECTOR up = { 0,0,0 };
 	XMVECTOR right = { 0,0,0 };

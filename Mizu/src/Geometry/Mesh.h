@@ -4,12 +4,10 @@ class Mesh
 {
 public:
 
-	struct Vertex
+	struct Data
 	{
-		float x;
-		float y;
-		float z;
-		float w;
+		DirectX::XMFLOAT3 vertexs;
+		DirectX::XMFLOAT3 normals;
 	};
 
 	void SendData(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext);
