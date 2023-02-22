@@ -23,7 +23,7 @@ PlaneMesh::PlaneMesh(Microsoft::WRL::ComPtr<ID3D11Device> device)
 	vertexBufferDesc.CPUAccessFlags = 0u;
 	vertexBufferDesc.MiscFlags = 0u;
 	vertexBufferDesc.ByteWidth = sizeof(vertices);
-	vertexBufferDesc.StructureByteStride = sizeof(Vertex);
+	vertexBufferDesc.StructureByteStride = sizeof(DirectX::XMFLOAT3);
 	D3D11_SUBRESOURCE_DATA vertexData = {};
 	vertexData.pSysMem = vertices;
 

@@ -1,10 +1,10 @@
 struct PS_Input
 {
-    float4 pos : Position;
-    float4 normals : Normals;
+    float4 pos : SV_POSITION;
+    float3 normals : NORMALS;
 };
 
-float4 main(PS_Input input) : SV_Target
+float4 main(PS_Input input) : SV_TARGET
 {
-    return input.normals;
+    return float4(1.f,0.f,0.f,1.f);
 }

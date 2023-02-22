@@ -42,7 +42,7 @@ void Application::Render()
 	if (graphics)
 	{
 		graphics->ClearBuffer(0.4f, 0.6f, 0.9f);
-		graphics->SetRenderTarget();
+		//graphics->SetRenderTarget();
 
 		XMMATRIX worldMatrix = graphics->GetWorldMatrix();
 		XMMATRIX viewMatrix = camera->GetViewMatrix();

@@ -56,7 +56,10 @@ Graphics::Graphics(HWND hwnd)
 	worldMatrix = DirectX::XMMatrixIdentity();
 
 	// Create the projection matrix for 3D rendering.
-	projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.1415/2.f, viewport.Width / viewport.Height, 0.1f, 200.f);
+	projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.1415f/2.f, viewport.Width / viewport.Height, 0.1f, 200.f);
+
+	deviceContext->OMSetRenderTargets(1u, renderTarget.GetAddressOf(), nullptr);
+	deviceContext->RSSetViewports(1u, &viewport);
 }
 
 void Graphics::EndFrame()
@@ -68,10 +71,4 @@ void Graphics::ClearBuffer(float r, float g, float b) noexcept
 {
 	const float color[] = { r, g, b, 1.0f };
 	deviceContext->ClearRenderTargetView(renderTarget.Get(), color);
-}
-
-void Graphics::SetRenderTarget()
-{
-	deviceContext->OMSetRenderTargets(1u, renderTarget.GetAddressOf(), nullptr);
-	deviceContext->RSSetViewports(1u, &viewport);
 }
