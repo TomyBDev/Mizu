@@ -61,18 +61,7 @@ void Application::Render()
 
 void Application::HandleInput(float dt)
 {
-
-	if (inputManager->GetMouse()->IsLeftDown())
-	{
-		LOG_TRACE("Good Morning");
-		OutputDebugString(L"Mouse1\n");
-	}
-
-	if (inputManager->GetMouse()->IsRightDown())
-	{
-		OutputDebugString(L"Mouse2\n");
-	}
-
+	//Handles the input responses for the camera.
 	camera->HandleInput(inputManager, dt);
 }
 
