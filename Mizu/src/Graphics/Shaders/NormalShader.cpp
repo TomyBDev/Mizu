@@ -3,7 +3,7 @@
 
 NormalShader::NormalShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) : Shader(dev, context)
 {
-	if (true)
+	if (false)
 	{
 		LoadVertexShader(L"../bin/Debug-windows-x86_64/Mizu/TriangleShader_vs.cso");
 		LoadPixelShader(L"../bin/Debug-windows-x86_64/Mizu/TriangleShader_ps.cso");
@@ -22,6 +22,15 @@ NormalShader::NormalShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::
 	matrixBufferDesc.MiscFlags = 0;
 	matrixBufferDesc.StructureByteStride = 0;
 	device->CreateBuffer(&matrixBufferDesc, NULL, &matrixBuffer);
+
+	D3D11_BUFFER_DESC timeBufferDesc;
+	timeBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	timeBufferDesc.ByteWidth = sizeof(TimeBufferType);
+	timeBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	timeBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	timeBufferDesc.MiscFlags = 0;
+	timeBufferDesc.StructureByteStride = 0;
+	device->CreateBuffer(&timeBufferDesc, NULL, &timeBuffer);
 }
 
 NormalShader::~NormalShader()
@@ -32,6 +41,12 @@ NormalShader::~NormalShader()
 		matrixBuffer = NULL;
 	}
 
+	if (timeBuffer)
+	{
+		timeBuffer->Release();
+		timeBuffer = NULL;
+	}
+
 	if (sampleState)
 	{
 		sampleState->Release();
@@ -39,7 +54,7 @@ NormalShader::~NormalShader()
 	}
 }
 
-void NormalShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection)
+void NormalShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, float timeElapsed)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
@@ -57,4 +72,12 @@ void NormalShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContex
 	dataPtr->projection = tproj;
 	deviceContext->Unmap(matrixBuffer, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, &matrixBuffer);
+
+	TimeBufferType* timePtr;
+	deviceContext->Map(timeBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	timePtr = (TimeBufferType*)mappedResource.pData;
+	timePtr->time = timeElapsed;
+	timePtr->padding = { 0,0,0 };
+	deviceContext->Unmap(timeBuffer, 0);
+	deviceContext->VSSetConstantBuffers(1, 1, &timeBuffer);
 }

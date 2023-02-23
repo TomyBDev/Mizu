@@ -19,9 +19,10 @@ private:
 	Graphics* graphics;
 	class Camera* camera;
 
-	class TriangleMesh* triangleMesh;
+	class PlaneMesh* planeMesh;
 	class NormalShader* normalShader;
 
 	float frameRate = 0;
 	float cameraSpeed = 10.f;
+	float timeElapsed = 0;
 };

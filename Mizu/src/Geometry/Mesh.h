@@ -6,7 +6,7 @@ public:
 
 	struct Data
 	{
-		DirectX::XMFLOAT3 vertexs;
+		DirectX::XMFLOAT3 position;
 		DirectX::XMFLOAT3 normals;
 	};
 

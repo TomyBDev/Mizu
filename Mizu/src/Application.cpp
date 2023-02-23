@@ -8,7 +8,7 @@
 #include "Input/Mouse.h"
 #include <Graphics/Camera.h>
 
-#include <Geometry/TriangleMesh.h>
+#include <Geometry/PlaneMesh.h>
 #include <Graphics/Shaders/NormalShader.h>
 
 Application::Application(InputManager* input, Graphics* gfx)
@@ -20,7 +20,7 @@ Application::Application(InputManager* input, Graphics* gfx)
 	camera->SetSpeed(cameraSpeed);
 	LOG_INFO("Camera initialised.");
 
-	triangleMesh = new TriangleMesh(gfx->GetDevice());
+	planeMesh = new PlaneMesh(gfx->GetDevice(), 100, 100);
 	normalShader = new NormalShader(gfx->GetDevice(), gfx->GetDeviceContext());
 }
 
@@ -31,6 +31,7 @@ Application::~Application()
 void Application::Update(float dt)
 {
 	frameRate = 1.f / dt;
+	timeElapsed += dt;
 
 	HandleInput(dt);
 
@@ -42,16 +43,14 @@ void Application::Render()
 	if (graphics)
 	{
 		graphics->ClearBuffer(0.4f, 0.6f, 0.9f);
-		//graphics->SetRenderTarget();
 
 		XMMATRIX worldMatrix = graphics->GetWorldMatrix();
 		XMMATRIX viewMatrix = camera->GetViewMatrix();
 		XMMATRIX projectionMatrix = graphics->GetProjectionMatrix();
 
-		triangleMesh->SendData(graphics->GetDeviceContext());
-		normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix);
-		normalShader->Render(triangleMesh->GetIndexCount());
-
+		planeMesh->SendData(graphics->GetDeviceContext());
+		normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, timeElapsed);
+		normalShader->Render(planeMesh->GetIndexCount());
 
 		Imgui();
 		graphics->EndFrame();
