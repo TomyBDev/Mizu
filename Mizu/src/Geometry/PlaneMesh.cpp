@@ -9,37 +9,46 @@ PlaneMesh::PlaneMesh(Microsoft::WRL::ComPtr<ID3D11Device> device, int width, int
 	Data* data = new Data[vertexCount];
 
 	int index = 0;
-
+	float u = 0;
+	float v = 0;
+	float uInc = 1.f / static_cast<float>(width);
+	float vInc = 1.f / static_cast<float>(height);
 	for (int i = 0; i < (width - 1); i++)
 	{
 		for (int j = 0; j < (height - 1); j++)
 		{
 			data[index].position = DirectX::XMFLOAT3(i, 0.f, j + 1);
+			data[index].texture = DirectX::XMFLOAT2(u, v + vInc);
 			data[index].normals = DirectX::XMFLOAT3(0.f, 1.f, 0.f);
 			indices[index] = index;
 			index++;
 
 			data[index].position = DirectX::XMFLOAT3(i + 1, 0.f, j + 1);
+			data[index].texture = DirectX::XMFLOAT2(u + uInc, v + vInc);
 			data[index].normals = DirectX::XMFLOAT3(0.f, 1.f, 0.f);
 			indices[index] = index;
 			index++;
 
 			data[index].position = DirectX::XMFLOAT3(i, 0.f, j);
+			data[index].texture = DirectX::XMFLOAT2(u, v);
 			data[index].normals = DirectX::XMFLOAT3(0.f, 1.f, 0.f);
 			indices[index] = index;
 			index++;
 
 			data[index].position = DirectX::XMFLOAT3(i + 1, 0.f, j + 1);
+			data[index].texture = DirectX::XMFLOAT2(u + uInc, v + vInc);
 			data[index].normals = DirectX::XMFLOAT3(0.f, 1.f, 0.f);
 			indices[index] = index;
 			index++;
 
 			data[index].position = DirectX::XMFLOAT3(i + 1, 0.f, j);
+			data[index].texture = DirectX::XMFLOAT2(u + uInc, v);
 			data[index].normals = DirectX::XMFLOAT3(0.f, 1.f, 0.f);
 			indices[index] = index;
 			index++;
 
 			data[index].position = DirectX::XMFLOAT3(i, 0.f, j);
+			data[index].texture = DirectX::XMFLOAT2(u, v);
 			data[index].normals = DirectX::XMFLOAT3(0.f, 1.f, 0.f);
 			indices[index] = index;
 			index++;

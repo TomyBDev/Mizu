@@ -15,22 +15,20 @@ cbuffer TimeBuffer : register(b1)
 struct VS_Input
 {
     float4 pos : POSITION;
-    float2 tex : TEXTURE;
+    float2 tex : TEXCOORD0;
     float3 normals : NORMALS;
 };
 
 struct VS_Output
 {
     float4 pos : SV_POSITION;
-    float2 tex : TEXTURE;
+    float2 tex : TEXCOORD0;
     float3 normals : NORMALS;
 };
 
 VS_Output main(VS_Input input)
 {
     VS_Output output;
-
-    input.pos.y = input.pos.y + sin(0.1f*input.pos.x + time) * sin(0.1f*input.pos.z + time);
 
 	// Calculate the position of the vertex against the world, view, and projection matrices.
     output.pos = mul(input.pos, worldMatrix);

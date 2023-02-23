@@ -5,9 +5,9 @@ TriangleMesh::TriangleMesh(Microsoft::WRL::ComPtr<ID3D11Device> device)
 {
 	const Data data[] =
 	{
-		{DirectX::XMFLOAT3(2.5f, 5.f, 0.f ), DirectX::XMFLOAT3(0.f, 0.f, -1.f )},
-		{DirectX::XMFLOAT3(5.f, 0.f, 0.f), DirectX::XMFLOAT3(0.f, 0.f, -1.f )},
-		{DirectX::XMFLOAT3(0.f, 0.f, 0.f), DirectX::XMFLOAT3(0.f, 0.f, -1.f)}
+		{DirectX::XMFLOAT3(2.5f, 5.f, 0.f ), DirectX::XMFLOAT2(0.5f,0.f), DirectX::XMFLOAT3(0.f, 0.f, -1.f )},
+		{DirectX::XMFLOAT3(5.f, 0.f, 0.f), DirectX::XMFLOAT2(1.f,1.f), DirectX::XMFLOAT3(0.f, 0.f, -1.f )},
+		{DirectX::XMFLOAT3(0.f, 0.f, 0.f), DirectX::XMFLOAT2(0.f,1.f), DirectX::XMFLOAT3(0.f, 0.f, -1.f)}
 	};
 	indexCount = std::size(data);
 	vertexCount = indexCount;

@@ -7,6 +7,9 @@ Graphics::Graphics(HWND hwnd)
 {
 	hWnd = hwnd;
 
+	const UINT width = 1280u;
+	const UINT height = 720u;
+
 	DXGI_SWAP_CHAIN_DESC sd = {};
 	sd.BufferDesc.Width = 0;
 	sd.BufferDesc.Height = 0;
@@ -43,8 +46,8 @@ Graphics::Graphics(HWND hwnd)
 	device->CreateRenderTargetView(backBuffer.Get(), nullptr, &renderTarget);
 	backBuffer->Release();
 
-	viewport.Width = 1280;
-	viewport.Height = 720;
+	viewport.Width = width;
+	viewport.Height = height;
 	viewport.MinDepth = 0;
 	viewport.MaxDepth = 1;
 	viewport.TopLeftX = 0;
@@ -56,9 +59,45 @@ Graphics::Graphics(HWND hwnd)
 	worldMatrix = DirectX::XMMatrixIdentity();
 
 	// Create the projection matrix for 3D rendering.
-	projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.1415f/2.f, viewport.Width / viewport.Height, 0.1f, 200.f);
+	projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.1415f/2.f, static_cast<float>(width) / static_cast<float>(height), 0.1f, 200.f);
 
-	deviceContext->OMSetRenderTargets(1u, renderTarget.GetAddressOf(), nullptr);
+	// Create depth stencil
+	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+	depthStencilDesc.DepthEnable = true;
+	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	device->CreateDepthStencilState(&depthStencilDesc, &depthStencilState);
+
+	// Create no depth stencil
+	depthStencilDesc.DepthEnable = false;
+	device->CreateDepthStencilState(&depthStencilDesc, &noDepthStencilState);
+
+	// Bind depth state
+	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 1u);
+
+	// Create depth Stencil texture
+	ComPtr<ID3D11Texture2D> depthStencilTexture;
+	D3D11_TEXTURE2D_DESC depthDesc = {};
+	depthDesc.Width = width;
+	depthDesc.Height = height;
+	depthDesc.MipLevels = 1u;
+	depthDesc.ArraySize = 1u;
+	depthDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	depthDesc.SampleDesc.Count = 1u;
+	depthDesc.SampleDesc.Quality = 0u;
+	depthDesc.Usage = D3D11_USAGE_DEFAULT;
+	depthDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	device->CreateTexture2D(&depthDesc, nullptr, &depthStencilTexture);
+
+	// Create Depth Stencil View
+	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
+	depthStencilViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	depthStencilViewDesc.Texture2D.MipSlice = 0u;
+	device->CreateDepthStencilView(depthStencilTexture.Get(), &depthStencilViewDesc, &depthStencilView);
+
+	// Bind depth stencil view
+	deviceContext->OMSetRenderTargets(1u, renderTarget.GetAddressOf(), depthStencilView.Get());
 	deviceContext->RSSetViewports(1u, &viewport);
 }
 
@@ -71,4 +110,22 @@ void Graphics::ClearBuffer(float r, float g, float b) noexcept
 {
 	const float color[] = { r, g, b, 1.0f };
 	deviceContext->ClearRenderTargetView(renderTarget.Get(), color);
+	deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0u);
+}
+
+void Graphics::SetZBuffer(bool b)
+{
+	if (b)
+	{
+		deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 1u);
+		return;
+	}
+
+	deviceContext->OMSetDepthStencilState(noDepthStencilState.Get(), 1u);
+	
+}
+
+void Graphics::SetBackBufferRenderTarget()
+{
+	deviceContext->OMSetRenderTargets(1u, renderTarget.GetAddressOf(), depthStencilView.Get());
 }

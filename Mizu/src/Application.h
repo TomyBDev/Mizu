@@ -13,6 +13,8 @@ public:
 private:
 	void HandleInput(float dt);
 
+	void SolverPass();
+
 	void Imgui();
 
 	InputManager* inputManager;
@@ -25,4 +27,6 @@ private:
 	float frameRate = 0;
 	float cameraSpeed = 10.f;
 	float timeElapsed = 0;
+
+	bool bFirstFrame = true;
 };

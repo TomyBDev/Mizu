@@ -36,7 +36,6 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		clock_last_frame_ = clock;
 
 		app.Update((float)cycles / (float)clock_frequency);
-		app.Render();
 		LOG_FLUSH();
 	}
 

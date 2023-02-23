@@ -36,32 +36,62 @@ void Application::Update(float dt)
 	HandleInput(dt);
 
 	camera->Update();
+
+	//SolverPass();
+
+	Render();
 }
 
 void Application::Render()
 {
-	if (graphics)
-	{
-		graphics->ClearBuffer(0.4f, 0.6f, 0.9f);
+	if (!graphics)
+		return;
 
-		XMMATRIX worldMatrix = graphics->GetWorldMatrix();
-		XMMATRIX viewMatrix = camera->GetViewMatrix();
-		XMMATRIX projectionMatrix = graphics->GetProjectionMatrix();
+	graphics->ClearBuffer(0.4f, 0.6f, 0.9f);
 
-		planeMesh->SendData(graphics->GetDeviceContext());
-		normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, timeElapsed);
-		normalShader->Render(planeMesh->GetIndexCount());
+	XMMATRIX worldMatrix = graphics->GetWorldMatrix();
+	XMMATRIX viewMatrix = camera->GetViewMatrix();
+	XMMATRIX projectionMatrix = graphics->GetProjectionMatrix();
 
-		Imgui();
-		graphics->EndFrame();
-	}
-		
+	planeMesh->SendData(graphics->GetDeviceContext());
+	normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, timeElapsed);
+	normalShader->Render(planeMesh->GetIndexCount());
+
+	Imgui();
+	graphics->EndFrame();
+	
 }
 
 void Application::HandleInput(float dt)
 {
 	//Handles the input responses for the camera.
 	camera->HandleInput(inputManager, dt);
+}
+
+void Application::SolverPass()
+{
+	/*if (!graphics)
+		return;
+
+	newRenderTexture->setRenderTarget(renderer->getDeviceContext());
+	newRenderTexture->clearRenderTarget(renderer->getDeviceContext(), 0.f, 0.f, 0.f, 1.0f);
+
+	XMMATRIX worldMatrix = graphics->GetWorldMatrix();
+	XMMATRIX orthoMatrix = graphics->GetOrthoMatrix();
+	XMMATRIX orthoViewMatrix = camera->GetOrthoViewMatrix();
+
+	graphics->SetZBuffer(false);
+
+	orthoMesh->sendData(renderer->getDeviceContext());
+	if (bFirstFrame)
+		solverShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, textureMgr->getTexture(L"StartingCondition"), timeElapsed, sWidth, bFirstFrame);
+	else
+		solverShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, oldRenderTexture->getShaderResourceView(), timeElapsed, sWidth, bFirstFrame);
+	solverShader->render(renderer->getDeviceContext(), orthoMesh->getIndexCount());
+
+
+	graphics->SetZBuffer(false);
+	graphics->SetBackBufferRenderTarget();*/
 }
 
 void Application::Imgui()

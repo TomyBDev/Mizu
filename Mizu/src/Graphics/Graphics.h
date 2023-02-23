@@ -15,15 +15,17 @@ public:
 
 	void EndFrame();
 	void ClearBuffer(float r, float g, float b) noexcept;
+	void SetZBuffer(bool b);
+	void SetBackBufferRenderTarget();
 
 private:
 	Microsoft::WRL::ComPtr<ID3D11Device> device = nullptr;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain = nullptr;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext = nullptr;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTarget = nullptr;
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> depthStencilBuffer = nullptr;
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState = nullptr;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> noDepthStencilState = nullptr;
 	D3D11_VIEWPORT viewport;
 	HWND hWnd;
 

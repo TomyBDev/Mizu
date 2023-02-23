@@ -7,6 +7,7 @@ public:
 	struct Data
 	{
 		DirectX::XMFLOAT3 position;
+		DirectX::XMFLOAT2 texture;
 		DirectX::XMFLOAT3 normals;
 	};
 
