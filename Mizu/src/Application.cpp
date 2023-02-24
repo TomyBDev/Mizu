@@ -9,7 +9,10 @@
 #include <Graphics/Camera.h>
 
 #include <Geometry/PlaneMesh.h>
+#include <Geometry/OrthoMesh.h>
+
 #include <Graphics/Shaders/NormalShader.h>
+#include <Graphics/Shaders/SolverShader.h>
 
 Application::Application(InputManager* input, Graphics* gfx)
 	: inputManager(input),
@@ -21,7 +24,10 @@ Application::Application(InputManager* input, Graphics* gfx)
 	LOG_INFO("Camera initialised.");
 
 	planeMesh = new PlaneMesh(gfx->GetDevice(), 100, 100);
+	orthoMesh = new OrthoMesh(gfx->GetDevice(), 100, 100, -(1280 / 2) + (100 / 2), (-720 / 2) - (100 / 2));
+
 	normalShader = new NormalShader(gfx->GetDevice(), gfx->GetDeviceContext());
+	solverShader = new SolverShader(gfx->GetDevice(), gfx->GetDeviceContext());
 }
 
 Application::~Application()
@@ -73,8 +79,8 @@ void Application::SolverPass()
 	/*if (!graphics)
 		return;
 
-	newRenderTexture->setRenderTarget(renderer->getDeviceContext());
-	newRenderTexture->clearRenderTarget(renderer->getDeviceContext(), 0.f, 0.f, 0.f, 1.0f);
+	newRenderTexture->setRenderTarget(graphics->GetDeviceContext());
+	newRenderTexture->clearRenderTarget(graphics->GetDeviceContext(), 0.f, 0.f, 0.f, 1.0f);
 
 	XMMATRIX worldMatrix = graphics->GetWorldMatrix();
 	XMMATRIX orthoMatrix = graphics->GetOrthoMatrix();
@@ -82,12 +88,12 @@ void Application::SolverPass()
 
 	graphics->SetZBuffer(false);
 
-	orthoMesh->sendData(renderer->getDeviceContext());
+	orthoMesh->SendData(graphics->GetDeviceContext());
 	if (bFirstFrame)
-		solverShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, textureMgr->getTexture(L"StartingCondition"), timeElapsed, sWidth, bFirstFrame);
+		solverShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, textureMgr->getTexture(L"StartingCondition"), bFirstFrame);
 	else
-		solverShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, oldRenderTexture->getShaderResourceView(), timeElapsed, sWidth, bFirstFrame);
-	solverShader->render(renderer->getDeviceContext(), orthoMesh->getIndexCount());
+		solverShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, oldRenderTexture->getShaderResourceView(), bFirstFrame);
+	solverShader->Render(orthoMesh->GetIndexCount());
 
 
 	graphics->SetZBuffer(false);

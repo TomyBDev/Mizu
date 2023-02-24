@@ -3,7 +3,6 @@ SamplerState sampler0 : register(s0);
 
 cbuffer dataBuffer : register(b0)
 {
-    int width;
     bool bFirstFrame;
     bool pad[3];
 };
@@ -14,11 +13,6 @@ struct PS_Input
     float2 tex : TEXCOORD0;
     float3 normals : NORMALS;
 };
-
-float4 SampleHM(float u, int offset)
-{
-    return texture0.Sample(sampler0, float2(u * 0.084459459f + (width * offset), 0.f));
-}
 
 float4 main(PS_Input input) : SV_TARGET
 {

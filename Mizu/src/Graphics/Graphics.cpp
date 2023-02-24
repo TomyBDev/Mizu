@@ -61,6 +61,9 @@ Graphics::Graphics(HWND hwnd)
 	// Create the projection matrix for 3D rendering.
 	projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.1415f/2.f, static_cast<float>(width) / static_cast<float>(height), 0.1f, 200.f);
 
+	// Create the ortho matrix for 2D Rendering.
+	orthoMatrix = DirectX::XMMatrixOrthographicLH(static_cast<float>(width), static_cast<float>(height), 0.1f, 200.f);
+
 	// Create depth stencil
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
 	depthStencilDesc.DepthEnable = true;

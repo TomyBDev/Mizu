@@ -10,6 +10,7 @@ public:
 
 	const DirectX::XMMATRIX GetWorldMatrix() { return worldMatrix; };
 	const DirectX::XMMATRIX GetProjectionMatrix() { return projectionMatrix; };
+	const DirectX::XMMATRIX GetOrthoMatrix() { return orthoMatrix; };
 
 	HWND GetHWND() { return hWnd; }
 
@@ -29,5 +30,5 @@ private:
 	D3D11_VIEWPORT viewport;
 	HWND hWnd;
 
-	DirectX::XMMATRIX worldMatrix, projectionMatrix;
+	DirectX::XMMATRIX worldMatrix, projectionMatrix, orthoMatrix;
 };

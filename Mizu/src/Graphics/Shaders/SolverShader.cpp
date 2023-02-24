@@ -54,7 +54,7 @@ SolverShader::~SolverShader()
 	}
 }
 
-void SolverShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* texture, int width, bool bFirstFrame)
+void SolverShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* texture, bool bFirstFrame)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* matPtr;
@@ -76,7 +76,6 @@ void SolverShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContex
 	DataBufferType* dataPtr;
 	deviceContext->Map(dataBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	dataPtr = (DataBufferType*)mappedResource.pData;
-	dataPtr->width = width;
 	dataPtr->bFirstFrame = bFirstFrame;
 	dataPtr->padding[0] = false;
 	dataPtr->padding[1] = false;

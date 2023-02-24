@@ -12,11 +12,12 @@ public:
 	void Update();
 
 	XMMATRIX GetViewMatrix();
+	const XMMATRIX GetOrthoViewMatrix() { return orthoMatrix; }
 
 	void SetSpeed(float newSpeed) { speed = newSpeed; }
 
-	const XMVECTOR GetPosition() { return position; };
-	const XMVECTOR GetRotation() { return rotation; };
+	const XMVECTOR GetPosition() { return position; }
+	const XMVECTOR GetRotation() { return rotation; }
 
 	//Movement
 	void MoveForward(float dt);
@@ -37,7 +38,7 @@ private:
 	XMVECTOR forward = { 0,0,0 };
 	XMVECTOR up = { 0,0,0 };
 	XMVECTOR right = { 0,0,0 };
-	XMMATRIX viewMatrix;
+	XMMATRIX viewMatrix, orthoMatrix;
 
 	POINT cursor;
 	HWND hWnd;

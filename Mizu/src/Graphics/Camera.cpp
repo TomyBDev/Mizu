@@ -12,6 +12,11 @@ Camera::Camera(HWND hwnd)
 	cursor.x = 1280 / 2;
 	cursor.y = 720 / 2;
 	ShowCursor(false);
+
+	XMVECTOR position = XMVectorSet(0.f, 0.f, -10.f, 1.f);
+	XMVECTOR lookAt = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+	XMVECTOR up = XMVectorSet(0.f, 1.f, 0.f, 1.f);
+	orthoMatrix = XMMatrixLookAtLH(position, lookAt, up);
 }
 
 void Camera::HandleInput(InputManager* input, float dt)

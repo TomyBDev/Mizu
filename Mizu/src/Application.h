@@ -21,8 +21,13 @@ private:
 	Graphics* graphics;
 	class Camera* camera;
 
+	// Mesh
 	class PlaneMesh* planeMesh;
+	class OrthoMesh* orthoMesh;
+
+	// Shaders
 	class NormalShader* normalShader;
+	class SolverShader* solverShader;
 
 	float frameRate = 0;
 	float cameraSpeed = 10.f;
