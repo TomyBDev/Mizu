@@ -26,7 +26,7 @@ Application::Application(InputManager* input, Graphics* gfx)
 	LOG_INFO("Camera initialised.");
 
 	// Create Mesh
-	planeMesh = new PlaneMesh(gfx->GetDevice(), 100, 100);
+	planeMesh = new PlaneMesh(gfx->GetDevice(), 1000, 1000);
 	orthoMesh = new OrthoMesh(gfx->GetDevice(), 100, 100, -(1280 / 2) + (100 / 2), (-720 / 2) - (100 / 2));
 
 	// Create Shaders
@@ -36,6 +36,11 @@ Application::Application(InputManager* input, Graphics* gfx)
 	// Create Textures
 	waterTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), L"../Content/WaterTexture.png");
 	//waterTexture = new Texture(gfx->GetDevice(), L"Content/WaterTexture.png");
+
+	waterScale.r[0] = { 0.1f,0,0,0 };
+	waterScale.r[1] = { 0,0.1f,0,0 };
+	waterScale.r[2] = { 0,0,0.1f,0 };
+	waterScale.r[3] = { -50.f,-5.f,-50.f,1.0f };
 }
 
 Application::~Application()
@@ -68,7 +73,7 @@ void Application::Render()
 	XMMATRIX projectionMatrix = graphics->GetProjectionMatrix();
 
 	planeMesh->SendData(graphics->GetDeviceContext());
-	normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, waterTexture->GetShaderResourceView(), timeElapsed);
+	normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale, viewMatrix, projectionMatrix, waterTexture->GetShaderResourceView(), timeElapsed);
 	normalShader->Render(planeMesh->GetIndexCount());
 
 	Imgui();

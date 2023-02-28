@@ -43,7 +43,7 @@ Texture::Texture(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::Co
 	textureDesc.MipLevels = 0; // All mip levels
 	textureDesc.ArraySize = 1;
 	textureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-	textureDesc.SampleDesc.Count = 1;
+	textureDesc.SampleDesc.Count = 1u;
 	textureDesc.SampleDesc.Quality = 0;
 	textureDesc.Usage = D3D11_USAGE_DEFAULT;
 	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;

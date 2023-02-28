@@ -32,6 +32,8 @@ private:
 	// Textures
 	class Texture* waterTexture;
 
+	DirectX::XMMATRIX waterScale;
+
 	float frameRate = 0;
 	float cameraSpeed = 10.f;
 	float timeElapsed = 0;
