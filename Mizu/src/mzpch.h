@@ -17,6 +17,7 @@
 #include <Tools/Log.h>
 #include <spdlog/spdlog.h>
 #include <DirectXMath.h>
+#include <gdiplus.h>
 
 // D3D11
 #include <d3d11.h>

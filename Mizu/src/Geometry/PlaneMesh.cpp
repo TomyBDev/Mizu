@@ -52,7 +52,11 @@ PlaneMesh::PlaneMesh(Microsoft::WRL::ComPtr<ID3D11Device> device, int width, int
 			data[index].normals = DirectX::XMFLOAT3(0.f, 1.f, 0.f);
 			indices[index] = index;
 			index++;
+
+			u += uInc;
 		}
+		u = 0;
+		v += vInc;
 	}
 
 	D3D11_BUFFER_DESC vertexBufferDesc = {};

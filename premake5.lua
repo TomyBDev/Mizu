@@ -38,7 +38,8 @@ project "Mizu"
     links
     {
         "d3d11",
-        "D3DCompiler"
+        "D3DCompiler",
+        "gdiplus"
     }
     
     filter "system:windows"

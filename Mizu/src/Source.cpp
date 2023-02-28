@@ -1,13 +1,18 @@
 #include "mzpch.h"
 
+#include "Graphics/GDIPlusManager.h"
 #include "System/RenderWindow.h"
 #include "Input/InputManager.h"
 #include "Application.h"
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	//Initialise Logger
+	// Initialise Logger
 	Log::Init();
+
+	LOG_INFO("Initalising GDIPlus...");
+	static GDIPlusManager gdiPlusManager;
+	LOG_INFO("GDIPlus initialised.");
 
 	// Create objects for window, input, and application.
 	RenderWindow renderWindow(hInstance);
@@ -38,7 +43,6 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		app.Update((float)cycles / (float)clock_frequency);
 		LOG_FLUSH();
 	}
-
 	return 0;
 }
 

@@ -29,6 +29,9 @@ private:
 	class NormalShader* normalShader;
 	class SolverShader* solverShader;
 
+	// Textures
+	class Texture* waterTexture;
+
 	float frameRate = 0;
 	float cameraSpeed = 10.f;
 	float timeElapsed = 0;

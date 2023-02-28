@@ -31,6 +31,18 @@ NormalShader::NormalShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::
 	timeBufferDesc.MiscFlags = 0;
 	timeBufferDesc.StructureByteStride = 0;
 	device->CreateBuffer(&timeBufferDesc, NULL, &timeBuffer);
+
+	D3D11_SAMPLER_DESC waterSamplerDesc;
+	waterSamplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	waterSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	waterSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	waterSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	waterSamplerDesc.MipLODBias = 0.0f;
+	waterSamplerDesc.MaxAnisotropy = 1;
+	waterSamplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	waterSamplerDesc.MinLOD = 0;
+	waterSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	device->CreateSamplerState(&waterSamplerDesc, &waterSampleState);
 }
 
 NormalShader::~NormalShader()
@@ -47,14 +59,14 @@ NormalShader::~NormalShader()
 		timeBuffer = NULL;
 	}
 
-	if (sampleState)
+	if (waterSampleState)
 	{
-		sampleState->Release();
-		sampleState = NULL;
+		waterSampleState->Release();
+		waterSampleState = NULL;
 	}
 }
 
-void NormalShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, float timeElapsed)
+void NormalShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* waterTexture, float timeElapsed)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
@@ -80,4 +92,7 @@ void NormalShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContex
 	timePtr->padding = { 0,0,0 };
 	deviceContext->Unmap(timeBuffer, 0);
 	deviceContext->VSSetConstantBuffers(1, 1, &timeBuffer);
+
+	deviceContext->PSSetShaderResources(0, 1, &waterTexture);
+	deviceContext->PSSetSamplers(0, 1, &waterSampleState);
 }

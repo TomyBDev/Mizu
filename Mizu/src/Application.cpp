@@ -14,6 +14,8 @@
 #include <Graphics/Shaders/NormalShader.h>
 #include <Graphics/Shaders/SolverShader.h>
 
+#include <Graphics/Texture.h>
+
 Application::Application(InputManager* input, Graphics* gfx)
 	: inputManager(input),
 	graphics(gfx)
@@ -23,11 +25,17 @@ Application::Application(InputManager* input, Graphics* gfx)
 	camera->SetSpeed(cameraSpeed);
 	LOG_INFO("Camera initialised.");
 
+	// Create Mesh
 	planeMesh = new PlaneMesh(gfx->GetDevice(), 100, 100);
 	orthoMesh = new OrthoMesh(gfx->GetDevice(), 100, 100, -(1280 / 2) + (100 / 2), (-720 / 2) - (100 / 2));
 
+	// Create Shaders
 	normalShader = new NormalShader(gfx->GetDevice(), gfx->GetDeviceContext());
 	solverShader = new SolverShader(gfx->GetDevice(), gfx->GetDeviceContext());
+
+	// Create Textures
+	waterTexture = new Texture(gfx->GetDevice(), L"../Content/WaterTexture.png");
+	//waterTexture = new Texture(gfx->GetDevice(), L"Content/WaterTexture.png");
 }
 
 Application::~Application()
@@ -60,7 +68,7 @@ void Application::Render()
 	XMMATRIX projectionMatrix = graphics->GetProjectionMatrix();
 
 	planeMesh->SendData(graphics->GetDeviceContext());
-	normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, timeElapsed);
+	normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, waterTexture->GetShaderResourceView(), timeElapsed);
 	normalShader->Render(planeMesh->GetIndexCount());
 
 	Imgui();
