@@ -10,7 +10,7 @@ struct PS_Input
 
 float4 main(PS_Input input) : SV_TARGET
 {
-    return waterTexture.Sample(waterSampler, input.tex);
+    return waterTexture.Sample(waterSampler, input.tex*5.f);
 
     return float4(0.3f,0.4f,1.f,1.f);
 }

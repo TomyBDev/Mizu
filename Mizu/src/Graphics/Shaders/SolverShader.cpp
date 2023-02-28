@@ -46,12 +46,6 @@ SolverShader::~SolverShader()
 		dataBuffer->Release();
 		dataBuffer = NULL;
 	}
-
-	if (sampleState)
-	{
-		sampleState->Release();
-		sampleState = NULL;
-	}
 }
 
 void SolverShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* texture, bool bFirstFrame)

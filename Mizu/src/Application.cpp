@@ -34,7 +34,7 @@ Application::Application(InputManager* input, Graphics* gfx)
 	solverShader = new SolverShader(gfx->GetDevice(), gfx->GetDeviceContext());
 
 	// Create Textures
-	waterTexture = new Texture(gfx->GetDevice(), L"../Content/WaterTexture.png");
+	waterTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), L"../Content/WaterTexture.png");
 	//waterTexture = new Texture(gfx->GetDevice(), L"Content/WaterTexture.png");
 }
 

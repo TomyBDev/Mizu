@@ -38,7 +38,7 @@ NormalShader::NormalShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::
 	waterSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	waterSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	waterSamplerDesc.MipLODBias = 0.0f;
-	waterSamplerDesc.MaxAnisotropy = 1;
+	waterSamplerDesc.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;
 	waterSamplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
 	waterSamplerDesc.MinLOD = 0;
 	waterSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;

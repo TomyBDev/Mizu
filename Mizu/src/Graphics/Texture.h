@@ -3,7 +3,7 @@
 class Texture
 {
 public:
-	Texture(Microsoft::WRL::ComPtr<ID3D11Device> device, std::wstring fileName);
+	Texture(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::wstring fileName);
 
 	ID3D11ShaderResourceView* GetShaderResourceView();
 
