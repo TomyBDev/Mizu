@@ -31,7 +31,7 @@ Graphics::Graphics(HWND hwnd)
 		nullptr, 
 		D3D_DRIVER_TYPE_HARDWARE, 
 		nullptr, 
-		0, 
+		0,
 		nullptr, 
 		0, 
 		D3D11_SDK_VERSION, 
@@ -72,7 +72,10 @@ Graphics::Graphics(HWND hwnd)
 	device->CreateDepthStencilState(&depthStencilDesc, &depthStencilState);
 
 	// Create no depth stencil
-	depthStencilDesc.DepthEnable = false;
+	D3D11_DEPTH_STENCIL_DESC noDepthStencilDesc;
+	noDepthStencilDesc.DepthEnable = false;
+	noDepthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	noDepthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
 	device->CreateDepthStencilState(&depthStencilDesc, &noDepthStencilState);
 
 	// Bind depth state

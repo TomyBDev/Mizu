@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Graphics/RenderTexture.h>
+
 class InputManager;
 
 class Application
@@ -28,9 +30,15 @@ private:
 	// Shaders
 	class NormalShader* normalShader;
 	class SolverShader* solverShader;
+	class WaterShader* waterShader;
 
 	// Textures
 	class Texture* waterTexture;
+	class Texture* startingConditionTexture;
+
+	// Render Textures
+	std::unique_ptr<RenderTexture> newRenderTexture;
+	std::unique_ptr<RenderTexture> oldRenderTexture;
 
 	DirectX::XMMATRIX waterScale;
 

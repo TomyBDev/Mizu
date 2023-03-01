@@ -68,3 +68,4 @@ project "Mizu"
 
    filter("files:**_vs.hlsl")
       shadertype("Vertex")
+      shadermodel("4.0")

@@ -4,8 +4,6 @@
 #include <Input/InputManager.h>
 
 #include <Graphics/Graphics.h>
-#include "Input/Keyboard.h"
-#include "Input/Mouse.h"
 #include <Graphics/Camera.h>
 
 #include <Geometry/PlaneMesh.h>
@@ -13,6 +11,7 @@
 
 #include <Graphics/Shaders/NormalShader.h>
 #include <Graphics/Shaders/SolverShader.h>
+#include <Graphics/Shaders/WaterShader.h>
 
 #include <Graphics/Texture.h>
 
@@ -27,15 +26,22 @@ Application::Application(InputManager* input, Graphics* gfx)
 
 	// Create Mesh
 	planeMesh = new PlaneMesh(gfx->GetDevice(), 1000, 1000);
-	orthoMesh = new OrthoMesh(gfx->GetDevice(), 100, 100, -(1280 / 2) + (100 / 2), (-720 / 2) - (100 / 2));
+	orthoMesh = new OrthoMesh(gfx->GetDevice(), 1000, 1000, -(1280 / 2) + (1000 / 2), (-720 / 2) - (1000 / 2));
 
 	// Create Shaders
 	normalShader = new NormalShader(gfx->GetDevice(), gfx->GetDeviceContext());
 	solverShader = new SolverShader(gfx->GetDevice(), gfx->GetDeviceContext());
+	waterShader = new WaterShader(gfx->GetDevice(), gfx->GetDeviceContext());
 
 	// Create Textures
 	waterTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), L"../Content/WaterTexture.png");
-	//waterTexture = new Texture(gfx->GetDevice(), L"Content/WaterTexture.png");
+	//waterTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), L"Content/WaterTexture.png");
+	startingConditionTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), L"../Content/StartingConditionTexture.png");
+	//startingConditionTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), L"Content/StartingConditionTexture.png");
+
+	// Render Textures
+	newRenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), 1280, 720, 0.1f, 200.f);
+	oldRenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), 1280, 720, 0.1f, 200.f);
 
 	waterScale.r[0] = { 0.1f,0,0,0 };
 	waterScale.r[1] = { 0,0.1f,0,0 };
@@ -56,9 +62,11 @@ void Application::Update(float dt)
 
 	camera->Update();
 
-	//SolverPass();
+	SolverPass();
 
 	Render();
+
+	newRenderTexture.swap(oldRenderTexture);
 }
 
 void Application::Render()
@@ -73,8 +81,8 @@ void Application::Render()
 	XMMATRIX projectionMatrix = graphics->GetProjectionMatrix();
 
 	planeMesh->SendData(graphics->GetDeviceContext());
-	normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale, viewMatrix, projectionMatrix, waterTexture->GetShaderResourceView(), timeElapsed);
-	normalShader->Render(planeMesh->GetIndexCount());
+	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale, viewMatrix, projectionMatrix, newRenderTexture->GetShaderResourceView(), waterTexture->GetShaderResourceView());
+	waterShader->Render(planeMesh->GetIndexCount());
 
 	Imgui();
 	graphics->EndFrame();
@@ -87,13 +95,13 @@ void Application::HandleInput(float dt)
 	camera->HandleInput(inputManager, dt);
 }
 
-void Application::SolverPass()
+/*void Application::SolverPass()
 {
-	/*if (!graphics)
+	if (!graphics)
 		return;
 
-	newRenderTexture->setRenderTarget(graphics->GetDeviceContext());
-	newRenderTexture->clearRenderTarget(graphics->GetDeviceContext(), 0.f, 0.f, 0.f, 1.0f);
+	newRenderTexture->SetRenderTarget(graphics->GetDeviceContext());
+	newRenderTexture->ClearRenderTarget(graphics->GetDeviceContext(), 0.f, 0.f, 0.f);
 
 	XMMATRIX worldMatrix = graphics->GetWorldMatrix();
 	XMMATRIX orthoMatrix = graphics->GetOrthoMatrix();
@@ -103,14 +111,42 @@ void Application::SolverPass()
 
 	orthoMesh->SendData(graphics->GetDeviceContext());
 	if (bFirstFrame)
-		solverShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, textureMgr->getTexture(L"StartingCondition"), bFirstFrame);
+	{
+		bFirstFrame = false;
+		solverShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, startingConditionTexture->GetShaderResourceView());
+	}
 	else
-		solverShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, oldRenderTexture->getShaderResourceView(), bFirstFrame);
+	{
+		solverShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, oldRenderTexture->GetShaderResourceView());
+	}
 	solverShader->Render(orthoMesh->GetIndexCount());
 
 
+	graphics->SetZBuffer(true);
+	graphics->SetBackBufferRenderTarget();
+}*/
+
+void Application::SolverPass()
+{
+	if (!graphics)
+		return;
+
+	newRenderTexture->SetRenderTarget(graphics->GetDeviceContext());
+	newRenderTexture->ClearRenderTarget(graphics->GetDeviceContext(), 0.f, 0.f, 0.f);
+
+	XMMATRIX worldMatrix = graphics->GetWorldMatrix();
+	XMMATRIX orthoMatrix = graphics->GetOrthoMatrix();
+	XMMATRIX orthoViewMatrix = camera->GetOrthoViewMatrix();
+
 	graphics->SetZBuffer(false);
-	graphics->SetBackBufferRenderTarget();*/
+
+	orthoMesh->SendData(graphics->GetDeviceContext());
+	normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, startingConditionTexture->GetShaderResourceView(), 0.f);
+	normalShader->Render(orthoMesh->GetIndexCount());
+
+
+	graphics->SetZBuffer(true);
+	graphics->SetBackBufferRenderTarget();
 }
 
 void Application::Imgui()

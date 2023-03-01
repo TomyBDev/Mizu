@@ -8,7 +8,7 @@ class SolverShader : public Shader
 public:
 	SolverShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
 	~SolverShader();
-	void SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* texture, bool bFirstFrame);
+	void SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* texture);
 private:
 	struct MatrixBufferType
 	{
@@ -17,13 +17,18 @@ private:
 		XMMATRIX projection;
 	};
 
-	struct DataBufferType
+	struct ScaleBufferType
 	{
-		int width;
-		bool bFirstFrame;
-		bool padding[3];
+		float scale;
+		float buffer[3];
 	};
 
+	//Vertex
 	ID3D11Buffer* matrixBuffer;
-	ID3D11Buffer* dataBuffer;
+
+	//Pixel
+	ID3D11Buffer* scaleBuffer;
+	ID3D11SamplerState* solverSampleState;
+
+	float scale = 1.f;
 };
