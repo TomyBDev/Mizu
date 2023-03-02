@@ -32,3 +32,10 @@
 #ifdef MZ_PLATFORM_WINDOWS
 #include <Windows.h>
 #endif
+
+#ifdef MZ_DEBUG
+#include <comdef.h>
+#define CHECK_ERROR(...) if (FAILED(__VA_ARGS__)) { _com_error err(__VA_ARGS__); LOG_ERROR(StringConverter::WcharToString(err.ErrorMessage()));}
+#else
+#define CHECK_ERROR()
+#endif

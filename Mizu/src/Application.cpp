@@ -132,7 +132,7 @@ void Application::SolverPass()
 		return;
 
 	newRenderTexture->SetRenderTarget(graphics->GetDeviceContext());
-	newRenderTexture->ClearRenderTarget(graphics->GetDeviceContext(), 0.f, 0.f, 0.f);
+	newRenderTexture->ClearRenderTarget(graphics->GetDeviceContext().Get(), 0.f, 0.f, 0.f);
 
 	XMMATRIX worldMatrix = graphics->GetWorldMatrix();
 	XMMATRIX orthoMatrix = graphics->GetOrthoMatrix();

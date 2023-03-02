@@ -7,6 +7,13 @@ std::wstring StringConverter::StringToWide(std::string str)
 	return wide_string;
 }
 
+std::string StringConverter::WcharToString(const wchar_t* wchar)
+{
+    std::wstring wString(wchar);
+    std::string string(wString.begin(), wString.end());
+    return string;
+}
+
 //Returns the last Win32 error, in string format. Returns an empty string if there is no error.
 std::string StringConverter::GetLastErrorAsString()
 {

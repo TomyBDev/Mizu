@@ -4,5 +4,6 @@ class StringConverter
 {
 public:
 	static std::wstring StringToWide(std::string str);
+	static std::string WcharToString(const wchar_t* wchar);
 	static std::string GetLastErrorAsString();
 };

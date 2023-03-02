@@ -5,6 +5,7 @@ using namespace Microsoft::WRL;
 
 Graphics::Graphics(HWND hwnd)
 {
+	HRESULT hr;
 	hWnd = hwnd;
 
 	const UINT width = 1280u;
@@ -27,7 +28,7 @@ Graphics::Graphics(HWND hwnd)
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	sd.Flags = 0;
 
-	D3D11CreateDeviceAndSwapChain(
+	hr = D3D11CreateDeviceAndSwapChain(
 		nullptr, 
 		D3D_DRIVER_TYPE_HARDWARE, 
 		nullptr, 
@@ -41,8 +42,19 @@ Graphics::Graphics(HWND hwnd)
 		nullptr, 
 		&deviceContext);
 
+	if (FAILED(hr))
+	{
+		LOG_ERROR(StringConverter::GetLastErrorAsString());
+	}
+
 	ComPtr<ID3D11Resource> backBuffer = nullptr;
-	swapChain->GetBuffer(0, __uuidof(ID3D11Resource), &backBuffer);
+	hr = swapChain->GetBuffer(0, __uuidof(ID3D11Resource), &backBuffer);
+
+	if (FAILED(hr))
+	{
+		LOG_ERROR(StringConverter::GetLastErrorAsString());
+	}
+
 	device->CreateRenderTargetView(backBuffer.Get(), nullptr, &renderTarget);
 	backBuffer->Release();
 
