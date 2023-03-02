@@ -20,15 +20,14 @@ RenderTexture::RenderTexture(Microsoft::WRL::ComPtr<ID3D11Device> device, int te
 	CHECK_ERROR(device->CreateTexture2D(&textureDesc, nullptr, &texture2D));
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
-	shaderResourceViewDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	shaderResourceViewDesc.Format = textureDesc.Format;
 	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
 	shaderResourceViewDesc.Texture2D.MipLevels = 1; // don't use all mip levels
 	CHECK_ERROR(device->CreateShaderResourceView(texture2D.Get(), &shaderResourceViewDesc, &textureView));
 
 	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = {};
-	//renderTargetViewDesc.Format = textureDesc.Format;
-	renderTargetViewDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	renderTargetViewDesc.Format = textureDesc.Format;
 	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 	renderTargetViewDesc.Texture2D.MipSlice = 0;
 	CHECK_ERROR(device->CreateRenderTargetView(texture2D.Get(), &renderTargetViewDesc, &renderTargetView));
@@ -74,7 +73,7 @@ RenderTexture::~RenderTexture()
 
 void RenderTexture::SetRenderTarget(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext)
 {
-	deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView.Get());
+	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 	deviceContext->RSSetViewports(1, &viewport);
 }
 
