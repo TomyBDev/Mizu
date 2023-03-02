@@ -14,8 +14,9 @@ void Log::Init()
 	// Format file name using time.
 	std::stringstream fileOutput;
 	fileOutput << "../logs/MizuLog-" << std::put_time(&tm, "%Y.%m.%d-%H.%M.%S") << ".txt";
-
 	// Setup the output log file.
 	logger = spdlog::basic_logger_mt("Mizu", fileOutput.str());
+	logger->set_pattern("[%H:%S][%l][%s line: %#]: %v");
 	logger->set_level(spdlog::level::trace);
+	set_default_logger(logger);
 }

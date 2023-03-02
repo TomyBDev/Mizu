@@ -39,7 +39,8 @@ project "Mizu"
     {
         "d3d11",
         "D3DCompiler",
-        "gdiplus"
+        "gdiplus",
+        "dxgidebug"
     }
     
     filter "system:windows"

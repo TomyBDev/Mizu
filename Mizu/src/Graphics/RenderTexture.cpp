@@ -20,10 +20,10 @@ RenderTexture::RenderTexture(Microsoft::WRL::ComPtr<ID3D11Device> device, int te
 	CHECK_ERROR(device->CreateTexture2D(&textureDesc, nullptr, &texture2D));
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
-	shaderResourceViewDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	shaderResourceViewDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
-	shaderResourceViewDesc.Texture2D.MipLevels = -1; // use all mip levels
+	shaderResourceViewDesc.Texture2D.MipLevels = 1; // don't use all mip levels
 	CHECK_ERROR(device->CreateShaderResourceView(texture2D.Get(), &shaderResourceViewDesc, &textureView));
 
 	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = {};
@@ -45,13 +45,6 @@ RenderTexture::RenderTexture(Microsoft::WRL::ComPtr<ID3D11Device> device, int te
 
 	// Create the ortho matrix for 2D Rendering.
 	orthoMatrix = DirectX::XMMatrixOrthographicLH(static_cast<float>(texWidth), static_cast<float>(texHeight), screenNear, screenFar);
-
-	// Create depth stencil
-	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-	depthStencilDesc.DepthEnable = true;
-	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
-	CHECK_ERROR(device->CreateDepthStencilState(&depthStencilDesc, &depthStencilState));
 
 	// Create depth Stencil texture
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> depthStencilTexture;
