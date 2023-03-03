@@ -4,7 +4,7 @@ SamplerState waterSampler : register(s0);
 struct PS_Input
 {
     float4 pos : SV_POSITION;
-    float2 tex : TEXCOORD0;
+    float2 tex : TEXTURE;
     float3 normals : NORMALS;
 };
 

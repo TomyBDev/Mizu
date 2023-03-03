@@ -26,7 +26,7 @@ Application::Application(InputManager* input, Graphics* gfx)
 
 	// Create Mesh
 	planeMesh = new PlaneMesh(gfx->GetDevice(), 1000, 1000);
-	orthoMesh = new OrthoMesh(gfx->GetDevice(), 1000, 1000, -(1280 / 2) + (1000 / 2), (-720 / 2) - (1000 / 2));
+	orthoMesh = new OrthoMesh(gfx->GetDevice(), 1000, 1000, 0, 0);
 
 	// Create Shaders
 	normalShader = new NormalShader(gfx->GetDevice(), gfx->GetDeviceContext());
@@ -40,8 +40,8 @@ Application::Application(InputManager* input, Graphics* gfx)
 	//startingConditionTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), L"Content/StartingConditionTexture.png");
 
 	// Render Textures
-	newRenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), 1280, 720, 0.1f, 200.f);
-	oldRenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), 1280, 720, 0.1f, 200.f);
+	newRenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), 1000, 1000, 0.1f, 200.f);
+	oldRenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), 1000, 1000, 0.1f, 200.f);
 
 	waterScale.r[0] = { 0.1f,0,0,0 };
 	waterScale.r[1] = { 0,0.1f,0,0 };

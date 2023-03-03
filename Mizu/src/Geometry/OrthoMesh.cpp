@@ -34,13 +34,13 @@ OrthoMesh::OrthoMesh(Microsoft::WRL::ComPtr<ID3D11Device> device, int width, int
 	};
 
 	// Load the index array with data.
-	indices[0] = 0;  // Bottom left.
+	indices[0] = 1;  // Top left.
 	indices[1] = 2;  // Top right.
-	indices[2] = 1;  // Top left.
+	indices[2] = 0;  // Bottom left.
 
-	indices[3] = 0;	// bottom left
+	indices[3] = 2;	// top right
 	indices[4] = 3;	// bottom right
-	indices[5] = 2;	// top right
+	indices[5] = 0;	// bottom left
 
 	// Set up the description of the vertex buffer.
 	D3D11_BUFFER_DESC vertexBufferDesc = {};

@@ -11,7 +11,6 @@ cbuffer TimeBuffer : register(b1)
     float3 padding;
 };
 
-
 struct VS_Input
 {
     float4 pos : POSITION;
@@ -29,8 +28,6 @@ struct VS_Output
 VS_Output main(VS_Input input)
 {
     VS_Output output;
-
-    //input.pos.y = input.pos.y + sin(0.1f * input.pos.x + time * 3.f) * sin(0.1f * input.pos.z + time * 3.f) * 5.f;
 
 	// Calculate the position of the vertex against the world, view, and projection matrices.
     output.pos = mul(input.pos, worldMatrix);

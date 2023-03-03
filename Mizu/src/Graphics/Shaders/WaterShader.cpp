@@ -25,11 +25,11 @@ WaterShader::WaterShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WR
 
 	D3D11_SAMPLER_DESC heightMapSamplerDesc;
 	heightMapSamplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-	heightMapSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	heightMapSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-	heightMapSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	heightMapSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	heightMapSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	heightMapSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	heightMapSamplerDesc.MipLODBias = 0.0f;
-	heightMapSamplerDesc.MaxAnisotropy = 1u;
+	heightMapSamplerDesc.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;
 	heightMapSamplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
 	heightMapSamplerDesc.MinLOD = 0;
 	heightMapSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
@@ -41,7 +41,7 @@ WaterShader::WaterShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WR
 	waterSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	waterSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	waterSamplerDesc.MipLODBias = 0.0f;
-	waterSamplerDesc.MaxAnisotropy = 0u;
+	waterSamplerDesc.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;
 	waterSamplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
 	waterSamplerDesc.MinLOD = 0;
 	waterSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
@@ -86,6 +86,7 @@ void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext
 	matPtr->view = tview;
 	matPtr->projection = tproj;
 	deviceContext->Unmap(matrixBuffer, 0);
+	deviceContext->VSSetConstantBuffers(0, 1, &matrixBuffer);
 
 	deviceContext->VSSetShaderResources(0, 1, &heightMapTexture);
 	deviceContext->VSSetSamplers(0, 1, &heightMapSampleState);
