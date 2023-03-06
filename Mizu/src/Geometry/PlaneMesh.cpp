@@ -55,10 +55,10 @@ PlaneMesh::PlaneMesh(Microsoft::WRL::ComPtr<ID3D11Device> device, int width, int
 			indices[index] = index;
 			index++;
 
-			u += uInc;
+			v += vInc;
 		}
-		u = 0;
-		v += vInc;
+		v = 0;
+		u += uInc;
 	}
 
 	D3D11_BUFFER_DESC vertexBufferDesc = {};
