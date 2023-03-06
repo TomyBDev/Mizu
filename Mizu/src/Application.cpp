@@ -106,7 +106,7 @@ void Application::SolverPass()
 	// No need to clear render target, all pixels will be overwritten
 
 	XMMATRIX worldMatrix = graphics->GetWorldMatrix();
-	XMMATRIX orthoMatrix = graphics->GetOrthoMatrix();
+	XMMATRIX orthoMatrix = newRenderTexture->GetOrthoMatrix();
 	XMMATRIX orthoViewMatrix = camera->GetOrthoViewMatrix();
 
 	graphics->SetZBuffer(false);
@@ -114,7 +114,6 @@ void Application::SolverPass()
 	orthoMesh->SendData(graphics->GetDeviceContext());
 	normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, startingConditionTexture->GetShaderResourceView(), 0.f);
 	normalShader->Render(orthoMesh->GetIndexCount());
-
 
 	graphics->SetZBuffer(true);
 	graphics->SetBackBufferRenderTarget();
