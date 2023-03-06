@@ -28,11 +28,6 @@ Application::Application(InputManager* input, Graphics* gfx)
 	planeMesh = new PlaneMesh(gfx->GetDevice(), 1000, 1000);
 	orthoMesh = new OrthoMesh(gfx->GetDevice(), 1000, 1000, 0, 0);
 
-	LOG_ERROR(StringConverter::WcharToString(contentPath L"Content/WaterTexture.png"));
-	LOG_FLUSH();
-
-	waterTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), contentPath L"Content/WaterTexture.png");
-
 	// Create Shaders
 	normalShader = new NormalShader(gfx->GetDevice(), gfx->GetDeviceContext());
 	solverShader = new SolverShader(gfx->GetDevice(), gfx->GetDeviceContext());
@@ -40,6 +35,7 @@ Application::Application(InputManager* input, Graphics* gfx)
 
 	// Create Textures
 	startingConditionTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), contentPath L"Content/StartingConditionTexture.png");
+	waterTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), contentPath L"Content/WaterTexture.png");
 
 	// Render Textures
 	newRenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), 1000, 1000, 0.1f, 200.f);
@@ -49,6 +45,9 @@ Application::Application(InputManager* input, Graphics* gfx)
 	waterScale.r[1] = { 0,0.1f,0,0 };
 	waterScale.r[2] = { 0,0,0.1f,0 };
 	waterScale.r[3] = { -50.f,-5.f,-50.f,1.0f };
+
+	// Store initial condition in the old render texture buffer.
+	oldRenderTexture->SetShaderResourceView(startingConditionTexture->GetShaderResourceView());
 }
 
 Application::~Application()
@@ -112,7 +111,7 @@ void Application::SolverPass()
 	graphics->SetZBuffer(false);
 
 	orthoMesh->SendData(graphics->GetDeviceContext());
-	normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, startingConditionTexture->GetShaderResourceView(), 0.f);
+	normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, oldRenderTexture->GetShaderResourceView(), 0.f);
 	normalShader->Render(orthoMesh->GetIndexCount());
 
 	graphics->SetZBuffer(true);

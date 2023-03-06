@@ -9,6 +9,7 @@ public:
 	void SetRenderTarget(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext);
 	void ClearRenderTarget(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, float r, float g, float b);
 
+	void SetShaderResourceView(ID3D11ShaderResourceView* SRV);
 	ID3D11ShaderResourceView* GetShaderResourceView();
 
 	const DirectX::XMMATRIX GetProjectionMatrix() { return projectionMatrix; };

@@ -16,5 +16,5 @@ struct PS_Input
 
 float4 main(PS_Input input) : SV_TARGET
 {
-    return texture0.Sample(sampler0, input.tex * scale);
+    return texture0.Sample(sampler0, input.tex);
 }

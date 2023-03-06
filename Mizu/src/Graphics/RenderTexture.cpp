@@ -84,6 +84,11 @@ void RenderTexture::ClearRenderTarget(Microsoft::WRL::ComPtr<ID3D11DeviceContext
 	deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0u);
 }
 
+void RenderTexture::SetShaderResourceView(ID3D11ShaderResourceView* SRV)
+{
+	textureView = SRV;
+}
+
 ID3D11ShaderResourceView* RenderTexture::GetShaderResourceView()
 {
 	return textureView.Get();
