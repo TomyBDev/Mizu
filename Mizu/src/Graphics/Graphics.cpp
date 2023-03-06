@@ -74,11 +74,11 @@ Graphics::Graphics(HWND hwnd)
 	CHECK_ERROR(device->CreateDepthStencilState(&depthStencilDesc, &depthStencilState));
 
 	// Create no depth stencil
-	D3D11_DEPTH_STENCIL_DESC noDepthStencilDesc;
+	D3D11_DEPTH_STENCIL_DESC noDepthStencilDesc = depthStencilDesc;
 	noDepthStencilDesc.DepthEnable = false;
-	noDepthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	noDepthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
-	CHECK_ERROR(device->CreateDepthStencilState(&depthStencilDesc, &noDepthStencilState));
+	CHECK_ERROR(device->CreateDepthStencilState(&noDepthStencilDesc, &noDepthStencilState));
+
+	LOG_FLUSH();
 
 	// Bind depth state
 	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 1u);
@@ -112,7 +112,7 @@ Graphics::Graphics(HWND hwnd)
 	D3D11_RASTERIZER_DESC rasterizerDesc = {};
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
 	rasterizerDesc.CullMode = D3D11_CULL_BACK;
-	rasterizerDesc.FrontCounterClockwise = FALSE;
+	rasterizerDesc.FrontCounterClockwise = TRUE;
 	rasterizerDesc.DepthBias = 0;
 	rasterizerDesc.DepthBiasClamp = 0.f;
 	rasterizerDesc.SlopeScaledDepthBias = 0.f;
@@ -153,4 +153,5 @@ void Graphics::SetZBuffer(bool b)
 void Graphics::SetBackBufferRenderTarget()
 {
 	deviceContext->OMSetRenderTargets(1u, renderTarget.GetAddressOf(), depthStencilView.Get());
+	deviceContext->RSSetViewports(1, &viewport);
 }

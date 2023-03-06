@@ -3,16 +3,8 @@
 
 WaterShader::WaterShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) : Shader(dev, context)
 {
-	if (true)
-	{
-		LoadVertexShader(L"../bin/Debug-windows-x86_64/Mizu/WaterShader_vs.cso");
-		LoadPixelShader(L"../bin/Debug-windows-x86_64/Mizu/WaterShader_ps.cso");
-	}
-	else
-	{
-		LoadVertexShader(L"WaterShader_vs.cso");
-		LoadPixelShader(L"WaterShader_ps.cso");
-	}
+	LoadVertexShader(shaderPath L"Shaders/WaterShader_vs.cso");
+	LoadPixelShader(shaderPath L"Shaders/WaterShader_ps.cso");
 
 	D3D11_BUFFER_DESC matrixBufferDesc;
 	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;

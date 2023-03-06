@@ -28,16 +28,18 @@ Application::Application(InputManager* input, Graphics* gfx)
 	planeMesh = new PlaneMesh(gfx->GetDevice(), 1000, 1000);
 	orthoMesh = new OrthoMesh(gfx->GetDevice(), 1000, 1000, 0, 0);
 
+	LOG_ERROR(StringConverter::WcharToString(contentPath L"Content/WaterTexture.png"));
+	LOG_FLUSH();
+
+	waterTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), contentPath L"Content/WaterTexture.png");
+
 	// Create Shaders
 	normalShader = new NormalShader(gfx->GetDevice(), gfx->GetDeviceContext());
 	solverShader = new SolverShader(gfx->GetDevice(), gfx->GetDeviceContext());
 	waterShader = new WaterShader(gfx->GetDevice(), gfx->GetDeviceContext());
 
 	// Create Textures
-	waterTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), L"../Content/WaterTexture.png");
-	//waterTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), L"Content/WaterTexture.png");
-	startingConditionTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), L"../Content/StartingConditionTexture.png");
-	//startingConditionTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), L"Content/StartingConditionTexture.png");
+	startingConditionTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), contentPath L"Content/StartingConditionTexture.png");
 
 	// Render Textures
 	newRenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), 1000, 1000, 0.1f, 200.f);
@@ -95,44 +97,13 @@ void Application::HandleInput(float dt)
 	camera->HandleInput(inputManager, dt);
 }
 
-/*void Application::SolverPass()
-{
-	if (!graphics)
-		return;
-
-	newRenderTexture->SetRenderTarget(graphics->GetDeviceContext());
-	newRenderTexture->ClearRenderTarget(graphics->GetDeviceContext(), 0.f, 0.f, 0.f);
-
-	XMMATRIX worldMatrix = graphics->GetWorldMatrix();
-	XMMATRIX orthoMatrix = graphics->GetOrthoMatrix();
-	XMMATRIX orthoViewMatrix = camera->GetOrthoViewMatrix();
-
-	graphics->SetZBuffer(false);
-
-	orthoMesh->SendData(graphics->GetDeviceContext());
-	if (bFirstFrame)
-	{
-		bFirstFrame = false;
-		solverShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, startingConditionTexture->GetShaderResourceView());
-	}
-	else
-	{
-		solverShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, oldRenderTexture->GetShaderResourceView());
-	}
-	solverShader->Render(orthoMesh->GetIndexCount());
-
-
-	graphics->SetZBuffer(true);
-	graphics->SetBackBufferRenderTarget();
-}*/
-
 void Application::SolverPass()
 {
 	if (!graphics)
 		return;
 
 	newRenderTexture->SetRenderTarget(graphics->GetDeviceContext());
-	newRenderTexture->ClearRenderTarget(graphics->GetDeviceContext().Get(), 0.f, 0.f, 0.f);
+	// No need to clear render target, all pixels will be overwritten
 
 	XMMATRIX worldMatrix = graphics->GetWorldMatrix();
 	XMMATRIX orthoMatrix = graphics->GetOrthoMatrix();

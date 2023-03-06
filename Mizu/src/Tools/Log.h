@@ -14,11 +14,6 @@ private:
 };
 
 #ifdef MZ_DEBUG
-/*#define LOG_TRACE(...) ::Log::GetLogger()->trace(__VA_ARGS__)
-#define LOG_INFO(...) ::Log::GetLogger()->info(__VA_ARGS__)
-#define LOG_WARN(...) ::Log::GetLogger()->warn(__VA_ARGS__)
-#define LOG_ERROR(...) ::Log::GetLogger()->error(__VA_ARGS__)
-#define LOG_CRITICAL(...) ::Log::GetLogger()->critical(__VA_ARGS__)*/
 #define LOG_TRACE(...) SPDLOG_TRACE(__VA_ARGS__)
 #define LOG_INFO(...) SPDLOG_INFO(__VA_ARGS__)
 #define LOG_WARN(...) SPDLOG_WARN(__VA_ARGS__)

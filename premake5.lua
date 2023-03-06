@@ -52,6 +52,11 @@ project "Mizu"
             "MZ_PLATFORM_WINDOWS"
         }
 
+        postbuildcommands
+        {
+            ("Xcopy " .. os.realpath("Content") .. " " .. os.realpath("bin/" .. outputdir .. "/%{prj.name}/Content") .. " /s /h /e /c /i /d")
+        }
+
     filter "configurations:Debug"
         defines "MZ_DEBUG"
         symbols "On"
@@ -65,7 +70,10 @@ project "Mizu"
 
    filter("files:**_ps.hlsl")
       shadertype("Pixel")
+      shaderobjectfileoutput("../bin/" .. outputdir .. "/%{prj.name}/Shaders/%{file.basename}.cso")
+
 
    filter("files:**_vs.hlsl")
       shadertype("Vertex")
       shadermodel("4.0")
+      shaderobjectfileoutput("../bin/" .. outputdir .. "/%{prj.name}/Shaders/%{file.basename}.cso")

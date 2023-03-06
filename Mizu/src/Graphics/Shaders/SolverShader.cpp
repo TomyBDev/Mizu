@@ -3,16 +3,8 @@
 
 SolverShader::SolverShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) : Shader(dev, context)
 {
-	if (true)
-	{
-		LoadVertexShader(L"../bin/Debug-windows-x86_64/Mizu/SolverShader_vs.cso");
-		LoadPixelShader(L"../bin/Debug-windows-x86_64/Mizu/SolverShader_ps.cso");
-	}
-	else
-	{
-		LoadVertexShader(L"SolverShader_vs.cso");
-		LoadPixelShader(L"SolverShader_ps.cso");
-	}
+	LoadVertexShader(shaderPath L"Shaders/SolverShader_vs.cso");
+	LoadPixelShader(shaderPath L"Shaders/SolverShader_ps.cso");
 
 	D3D11_BUFFER_DESC matrixBufferDesc;
 	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;

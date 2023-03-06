@@ -23,6 +23,7 @@
 #include <d3d11.h>
 #include <d3dcompiler.h>
 
+
 // ImGui
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
@@ -37,5 +38,13 @@
 #include <comdef.h>
 #define CHECK_ERROR(...) if (FAILED(__VA_ARGS__)) { _com_error err(__VA_ARGS__); LOG_ERROR(StringConverter::WcharToString(err.ErrorMessage()));}
 #else
-#define CHECK_ERROR()
+#define CHECK_ERROR(...) __VA_ARGS__
+#endif
+
+#if (TRUE)
+#define shaderPath L"../bin/Debug-windows-x86_64/Mizu/"
+#define contentPath L"../"
+#else
+#define shaderPath L""
+#define contentPath L""
 #endif
