@@ -40,6 +40,10 @@ private:
 	std::unique_ptr<RenderTexture> newRenderTexture;
 	std::unique_ptr<RenderTexture> oldRenderTexture;
 
+	// Lights
+	DirectionalLight light;
+
+	// Matrices
 	DirectX::XMMATRIX waterScale;
 
 	float frameRate = 0;

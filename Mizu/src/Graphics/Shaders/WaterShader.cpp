@@ -27,6 +27,15 @@ WaterShader::WaterShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WR
 	heightMapSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	device->CreateSamplerState(&heightMapSamplerDesc, &heightMapSampleState);
 
+	D3D11_BUFFER_DESC lightBufferDesc;
+	lightBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	lightBufferDesc.ByteWidth = sizeof(LightBufferType);
+	lightBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	lightBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	lightBufferDesc.MiscFlags = 0;
+	lightBufferDesc.StructureByteStride = 0;
+	device->CreateBuffer(&lightBufferDesc, NULL, &lightBuffer);
+
 	D3D11_SAMPLER_DESC waterSamplerDesc;
 	waterSamplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
 	waterSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -54,6 +63,12 @@ WaterShader::~WaterShader()
 		heightMapSampleState = NULL;
 	}
 
+	if (lightBuffer)
+	{
+		lightBuffer->Release();
+		lightBuffer = NULL;
+	}
+
 	if (waterSampleState)
 	{
 		waterSampleState->Release();
@@ -61,7 +76,7 @@ WaterShader::~WaterShader()
 	}
 }
 
-void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightMapTexture, ID3D11ShaderResourceView* waterTexture)
+void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightMapTexture, ID3D11ShaderResourceView* waterTexture, DirectionalLight dirLight)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 
@@ -84,6 +99,18 @@ void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext
 	deviceContext->VSSetSamplers(0, 1, &heightMapSampleState);
 
 	// Pixel
+
+	// Vertex
+	LightBufferType* lightPtr;
+	deviceContext->Map(lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	lightPtr = (LightBufferType*)mappedResource.pData;
+	lightPtr->ambient = dirLight.ambient;
+	lightPtr->diffuse = dirLight.diffuse;
+	lightPtr->direction = dirLight.direction;
+	lightPtr->padding = 0.f;
+	deviceContext->Unmap(lightBuffer, 0);
+	deviceContext->PSSetConstantBuffers(0, 1, &lightBuffer);
+
 	deviceContext->PSSetShaderResources(0, 1, &waterTexture);
 	deviceContext->PSSetSamplers(0, 1, &waterSampleState);
 }

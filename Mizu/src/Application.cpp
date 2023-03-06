@@ -41,6 +41,12 @@ Application::Application(InputManager* input, Graphics* gfx)
 	newRenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), 1000, 1000, 0.1f, 200.f);
 	oldRenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), 1000, 1000, 0.1f, 200.f);
 
+	// Lighting
+
+	light.direction = XMFLOAT3(0.5f, -0.5f, 0.f);
+	light.ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.f);
+	light.diffuse = XMFLOAT4(0.6f, 0.6f, 0.8f, 1.f);
+
 	waterScale.r[0] = { 0.1f,0,0,0 };
 	waterScale.r[1] = { 0,0.1f,0,0 };
 	waterScale.r[2] = { 0,0,0.1f,0 };
@@ -82,7 +88,7 @@ void Application::Render()
 	XMMATRIX projectionMatrix = graphics->GetProjectionMatrix();
 
 	planeMesh->SendData(graphics->GetDeviceContext());
-	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale, viewMatrix, projectionMatrix, newRenderTexture->GetShaderResourceView(), waterTexture->GetShaderResourceView());
+	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale, viewMatrix, projectionMatrix, newRenderTexture->GetShaderResourceView(), waterTexture->GetShaderResourceView(), light);
 	waterShader->Render(planeMesh->GetIndexCount());
 
 	Imgui();

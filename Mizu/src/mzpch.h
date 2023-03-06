@@ -23,7 +23,6 @@
 #include <d3d11.h>
 #include <d3dcompiler.h>
 
-
 // ImGui
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
@@ -48,3 +47,10 @@
 #define shaderPath L""
 #define contentPath L""
 #endif
+
+struct DirectionalLight
+{
+	DirectX::XMFLOAT3 direction;
+	DirectX::XMFLOAT4 ambient;
+	DirectX::XMFLOAT4 diffuse;
+};
