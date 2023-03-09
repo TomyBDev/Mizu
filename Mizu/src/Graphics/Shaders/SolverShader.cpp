@@ -15,22 +15,22 @@ SolverShader::SolverShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::
 	matrixBufferDesc.StructureByteStride = 0;
 	device->CreateBuffer(&matrixBufferDesc, NULL, &matrixBuffer);
 
-	D3D11_BUFFER_DESC scaleBufferDesc;
-	scaleBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	scaleBufferDesc.ByteWidth = sizeof(ScaleBufferType);
-	scaleBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	scaleBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	scaleBufferDesc.MiscFlags = 0;
-	scaleBufferDesc.StructureByteStride = 0;
-	device->CreateBuffer(&scaleBufferDesc, NULL, &scaleBuffer);
+	D3D11_BUFFER_DESC dataBufferDesc;
+	dataBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	dataBufferDesc.ByteWidth = sizeof(DataBufferType);
+	dataBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	dataBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	dataBufferDesc.MiscFlags = 0;
+	dataBufferDesc.StructureByteStride = 0;
+	device->CreateBuffer(&dataBufferDesc, NULL, &dataBuffer);
 
 	D3D11_SAMPLER_DESC solverSamplerDesc;
 	solverSamplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-	solverSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	solverSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-	solverSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	solverSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	solverSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	solverSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	solverSamplerDesc.MipLODBias = 0.0f;
-	solverSamplerDesc.MaxAnisotropy = 0u;
+	solverSamplerDesc.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;
 	solverSamplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
 	solverSamplerDesc.MinLOD = 0;
 	solverSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
@@ -45,10 +45,10 @@ SolverShader::~SolverShader()
 		matrixBuffer = NULL;
 	}
 
-	if (scaleBuffer)
+	if (dataBuffer)
 	{
-		scaleBuffer->Release();
-		scaleBuffer = NULL;
+		dataBuffer->Release();
+		dataBuffer = NULL;
 	}
 
 	if (solverSampleState)
@@ -58,7 +58,7 @@ SolverShader::~SolverShader()
 	}
 }
 
-void SolverShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* solverTexture)
+void SolverShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* solverTexture, float dt)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 
@@ -75,20 +75,17 @@ void SolverShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContex
 	matPtr->view = tview;
 	matPtr->projection = tproj;
 	deviceContext->Unmap(matrixBuffer, 0);
+	deviceContext->VSSetConstantBuffers(0, 1, &matrixBuffer);
 
 	// Pixel
-	ScaleBufferType* scalePtr;
-	deviceContext->Map(scaleBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	scalePtr = (ScaleBufferType*)mappedResource.pData;
-	scalePtr->scale = scale;
-	scalePtr->buffer[0] = 0.f;
-	scalePtr->buffer[1] = 0.f;
-	scalePtr->buffer[2] = 0.f;
-	deviceContext->Unmap(scaleBuffer, 0);
-	deviceContext->PSSetConstantBuffers(0, 1, &scaleBuffer);
+	DataBufferType* scalePtr;
+	deviceContext->Map(dataBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	scalePtr = (DataBufferType*)mappedResource.pData;
+	scalePtr->dt = dt;
+	scalePtr->buffer = { 0.f, 0.f, 0.f };
+	deviceContext->Unmap(dataBuffer, 0);
+	deviceContext->PSSetConstantBuffers(0, 1, &dataBuffer);
 
 	deviceContext->PSSetShaderResources(0, 1, &solverTexture);
 	deviceContext->PSSetSamplers(0, 1, &solverSampleState);
-
-	scale = 0.001f;
 }

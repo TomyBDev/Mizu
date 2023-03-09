@@ -15,7 +15,7 @@ public:
 private:
 	void HandleInput(float dt);
 
-	void SolverPass();
+	void SolverPass(float dt);
 
 	void Imgui();
 
