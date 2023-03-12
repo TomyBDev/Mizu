@@ -45,8 +45,7 @@ VS_Output main(VS_Input input)
     const float heightScale = 250.f;
 
     //offset the y position based on the height map information
-    input.pos.y = heightMapTexture.SampleLevel(heightMapSampler, input.tex, 0).x * heightScale;
-
+    input.pos.y = heightMapTexture.SampleLevel(heightMapSampler, input.tex, 0).x;
 	// Calculate the position of the vertex against the world, view, and projection matrices.
     output.pos = mul(input.pos, worldMatrix);
     output.pos = mul(output.pos, viewMatrix);

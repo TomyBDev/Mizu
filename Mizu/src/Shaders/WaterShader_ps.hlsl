@@ -34,13 +34,13 @@ float4 main(PS_Input input) : SV_TARGET
             color = waterTexture.Sample(waterSampler, input.tex * 5.f);
             break;
     	case 1:
-            color.x = abs(waterTexture.Sample(waterSampler, input.tex).x - 0.5f);
+            color.x = waterTexture.Sample(waterSampler, input.tex).x;
             break;
     	case 2:
-            color.y = abs(waterTexture.Sample(waterSampler, input.tex).y - 0.5f);
+            color.y = abs(waterTexture.Sample(waterSampler, input.tex).y - 0.5f) * 2.f;
             break;
     	case 3:
-            color.z = abs(waterTexture.Sample(waterSampler, input.tex).z - 0.5f);
+            color.z = abs(waterTexture.Sample(waterSampler, input.tex).z - 0.5f) * 2.f;
             break;
     	default:
             break;

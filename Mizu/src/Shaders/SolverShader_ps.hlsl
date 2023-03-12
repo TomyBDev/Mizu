@@ -16,12 +16,12 @@ struct PS_Input
 
 float3 ColorToSpeed(float3 c)
 {
-    return c - 0.5f;
+    return float3(c.x, c.yz - 0.5f);
 }
 
 float3 SpeedToColor(float3 s)
 {
-    return s + 0.5f;
+    return float3(s.x, s.yz + 0.5f);
 }
 
 float3 F(float3 u)
@@ -48,14 +48,21 @@ float4 main(PS_Input input) : SV_TARGET
     if (input.tex.x == 0.f || input.tex.x == 1.f || input.tex.y == 0.f || input.tex.y == 1.f)
         return solverTexture.Sample(solverSampler, input.tex);
 
+    const int iterations = 5;
     const float dx = 1.f / 1000.f;
 
-    const float3 un = ColorToSpeed(solverTexture.Sample(solverSampler, input.tex + float2(0, dx)).xyz);
+    /*const float3 un = ColorToSpeed(solverTexture.Sample(solverSampler, input.tex + float2(0, dx)).xyz);
     const float3 ue = ColorToSpeed(solverTexture.Sample(solverSampler, input.tex + float2(dx, 0)).xyz);
     const float3 us = ColorToSpeed(solverTexture.Sample(solverSampler, input.tex + float2(0, -dx)).xyz);
-    const float3 uw = ColorToSpeed(solverTexture.Sample(solverSampler, input.tex + float2(-dx, 0)).xyz);
+    const float3 uw = ColorToSpeed(solverTexture.Sample(solverSampler, input.tex + float2(-dx, 0)).xyz);*/
 
-    const float3 newU = 0.25f * (un + ue + us + uw) - (dt / 2 * dx) * (F(ue) - F(uw)) - (dt / 2 * dx) * (G(un) - G(us));
 
-    return float4(SpeedToColor(newU), 1.f);
+	const float3 un = solverTexture.Sample(solverSampler, input.tex + float2(0, dx)).xyz;
+    const float3 ue = solverTexture.Sample(solverSampler, input.tex + float2(dx, 0)).xyz;
+    const float3 us = solverTexture.Sample(solverSampler, input.tex + float2(0, -dx)).xyz;
+    const float3 uw = solverTexture.Sample(solverSampler, input.tex + float2(-dx, 0)).xyz;
+
+    const float3 newU = 0.25f * (un + ue + us + uw) - ((dt / (2 * dx)) * (F(ue) - F(uw))) - ((dt / (2 * dx)) * (G(un) - G(us)));
+
+    return float4(newU, 1.f);
 }
