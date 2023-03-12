@@ -76,7 +76,7 @@ WaterShader::~WaterShader()
 	}
 }
 
-void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightMapTexture, ID3D11ShaderResourceView* waterTexture, DirectionalLight dirLight)
+void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightMapTexture, ID3D11ShaderResourceView* waterTexture, DirectionalLight dirLight, int textureMode)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 
@@ -107,10 +107,13 @@ void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext
 	lightPtr->ambient = dirLight.ambient;
 	lightPtr->diffuse = dirLight.diffuse;
 	lightPtr->direction = dirLight.direction;
-	lightPtr->padding = 0.f;
+	lightPtr->textureMode = textureMode;
 	deviceContext->Unmap(lightBuffer, 0);
 	deviceContext->PSSetConstantBuffers(0, 1, &lightBuffer);
 
-	deviceContext->PSSetShaderResources(0, 1, &waterTexture);
+	if (textureMode)
+		deviceContext->PSSetShaderResources(0, 1, &heightMapTexture);
+	else
+		deviceContext->PSSetShaderResources(0, 1, &waterTexture);
 	deviceContext->PSSetSamplers(0, 1, &waterSampleState);
 }

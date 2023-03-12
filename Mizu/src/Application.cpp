@@ -88,8 +88,7 @@ void Application::Render()
 	XMMATRIX projectionMatrix = graphics->GetProjectionMatrix();
 
 	planeMesh->SendData(graphics->GetDeviceContext());
-	//waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale, viewMatrix, projectionMatrix, newRenderTexture->GetShaderResourceView(), waterTexture->GetShaderResourceView(), light);
-	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale, viewMatrix, projectionMatrix, newRenderTexture->GetShaderResourceView(), newRenderTexture->GetShaderResourceView(), light);
+	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale, viewMatrix, projectionMatrix, newRenderTexture->GetShaderResourceView(), waterTexture->GetShaderResourceView(), light, currentItem);
 	waterShader->Render(planeMesh->GetIndexCount());
 
 	Imgui();
@@ -147,6 +146,10 @@ void Application::Imgui()
 	{
 		camera->SetSpeed(cameraSpeed);
 	}
+
+	const char* labels[] = {"Texture", "Height", "uVel", "vVel"};
+
+	ImGui::Combo("Render Mode", &currentItem, labels, IM_ARRAYSIZE(labels));
 
 	/** End of ImGui Rendering. */
 	ImGui::End();

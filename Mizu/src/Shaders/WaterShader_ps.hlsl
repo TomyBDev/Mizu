@@ -6,7 +6,7 @@ cbuffer LightBuffer : register(b0)
     float4 ambient;
     float4 diffuse;
     float3 direction;
-    float padding;
+    int textureMode;
 };
 
 struct PS_Input
@@ -25,6 +25,26 @@ float4 CalculateLighting(float3 lightDirection, float3 normal, float4 diffuse)
 
 float4 main(PS_Input input) : SV_TARGET
 {
-    const float4 color = ambient + CalculateLighting(-direction, input.normals, diffuse);
-    return saturate(color) * waterTexture.Sample(waterSampler, input.tex);
+    const float4 lightColor = ambient + CalculateLighting(-direction, input.normals, diffuse);
+    float4 color = float4(0.f, 0.f, 0.f, 1.f);
+
+    switch (abs(textureMode))
+    {
+    	case 0:
+            color = waterTexture.Sample(waterSampler, input.tex * 5.f);
+            break;
+    	case 1:
+            color.x = abs(waterTexture.Sample(waterSampler, input.tex).x - 0.5f);
+            break;
+    	case 2:
+            color.y = abs(waterTexture.Sample(waterSampler, input.tex).y - 0.5f);
+            break;
+    	case 3:
+            color.z = abs(waterTexture.Sample(waterSampler, input.tex).z - 0.5f);
+            break;
+    	default:
+            break;
+    }
+
+    return saturate(lightColor) * color;
 }

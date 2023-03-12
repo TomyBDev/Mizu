@@ -49,6 +49,5 @@ private:
 	float frameRate = 0;
 	float cameraSpeed = 10.f;
 	float timeElapsed = 0;
-
-	bool bFirstFrame = true;
+	int currentItem = 0;
 };
