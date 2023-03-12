@@ -15,7 +15,7 @@ public:
 private:
 	void HandleInput(float dt);
 
-	void SolverPass(float dt);
+	void SolverPass(ID3D11ShaderResourceView* srv, float dt);
 
 	void Imgui();
 

@@ -44,8 +44,6 @@ float3 G(float3 u)
 
 float4 main(PS_Input input) : SV_TARGET
 {
-    //return solverTexture.Sample(solverSampler, input.tex);
-
     // If we are on boundary
     if (input.tex.x == 0.f || input.tex.x == 1.f || input.tex.y == 0.f || input.tex.y == 1.f)
         return solverTexture.Sample(solverSampler, input.tex);

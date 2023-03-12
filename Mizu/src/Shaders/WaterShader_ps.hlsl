@@ -26,5 +26,5 @@ float4 CalculateLighting(float3 lightDirection, float3 normal, float4 diffuse)
 float4 main(PS_Input input) : SV_TARGET
 {
     const float4 color = ambient + CalculateLighting(-direction, input.normals, diffuse);
-    return saturate(color) * waterTexture.Sample(waterSampler, input.tex * 5.f);
+    return saturate(color) * waterTexture.Sample(waterSampler, input.tex);
 }

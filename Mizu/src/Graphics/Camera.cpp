@@ -13,9 +13,9 @@ Camera::Camera(HWND hwnd)
 	cursor.y = 720 / 2;
 	ShowCursor(false);
 
-	XMVECTOR position = XMVectorSet(0.f, 0.f, -10.f, 1.f);
-	XMVECTOR lookAt = XMVectorSet(0.f, 0.f, 0.f, 1.f);
-	XMVECTOR up = XMVectorSet(0.f, 1.f, 0.f, 1.f);
+	const XMVECTOR position = XMVectorSet(0.f, 0.f, -10.f, 1.f);
+	const XMVECTOR lookAt = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+	const XMVECTOR up = XMVectorSet(0.f, 1.f, 0.f, 1.f);
 	orthoMatrix = XMMatrixLookAtLH(position, lookAt, up);
 }
 
@@ -112,20 +112,6 @@ void Camera::Update()
 	up = XMVector3TransformCoord(up, rotMat);
 
 	lookAtPos = position + forward;
-
-	//forward.m128_f32[0] = cosf(yaw);
-	//forward.m128_f32[1] = -sinf(pitch);
-	//forward.m128_f32[2] = cosf(pitch)*cosf(yaw);
-
-	//right.m128_f32[0] = cosf(yaw);
-	//right.m128_f32[1] = 0;
-	//right.m128_f32[2] = -sinf(yaw);
-
-	//up.m128_f32[0] = sinf(pitch) * sinf(yaw);
-	//up.m128_f32[1] = cosf(pitch);
-	//up.m128_f32[2] = sinf(pitch) * cosf(yaw);
-
-	//lookAtPos = position + forward;
 
 	viewMatrix = XMMatrixLookAtLH(position, lookAtPos, up);
 }
