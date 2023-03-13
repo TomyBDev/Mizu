@@ -25,10 +25,10 @@ struct VS_Output
 float3 CalcNormals(float2 uv, float yPos, float scale)
 {
 	//recalc normals
-    const float e = heightMapTexture.SampleLevel(heightMapSampler, float2(uv.x + (1.f /1000.f), uv.y), 0).x * scale;
-    const float w = heightMapTexture.SampleLevel(heightMapSampler, float2(uv.x - (1.f / 1000.f), uv.y), 0).x * scale;
-    const float n = heightMapTexture.SampleLevel(heightMapSampler, float2(uv.x, uv.y + (1.f / 1000.f)), 0).x * scale;
-    const float s = heightMapTexture.SampleLevel(heightMapSampler, float2(uv.x, uv.y - (1.f / 1000.f)), 0).x * scale;
+    const float e = heightMapTexture.SampleLevel(heightMapSampler, float2(uv.x + (1.f /100.f), uv.y), 0).x * scale;
+    const float w = heightMapTexture.SampleLevel(heightMapSampler, float2(uv.x - (1.f / 100.f), uv.y), 0).x * scale;
+    const float n = heightMapTexture.SampleLevel(heightMapSampler, float2(uv.x, uv.y + (1.f / 100.f)), 0).x * scale;
+    const float s = heightMapTexture.SampleLevel(heightMapSampler, float2(uv.x, uv.y - (1.f / 100.f)), 0).x * scale;
 
     const float3 vecn = float3(0, n - yPos, 1);
     const float3 vece = float3(1, e - yPos, 0);
@@ -45,7 +45,7 @@ VS_Output main(VS_Input input)
     const float heightScale = 250.f;
 
     //offset the y position based on the height map information
-    input.pos.y = heightMapTexture.SampleLevel(heightMapSampler, input.tex, 0).x;
+    input.pos.y = heightMapTexture.SampleLevel(heightMapSampler, input.tex, 0).x * heightScale;
 	// Calculate the position of the vertex against the world, view, and projection matrices.
     output.pos = mul(input.pos, worldMatrix);
     output.pos = mul(output.pos, viewMatrix);

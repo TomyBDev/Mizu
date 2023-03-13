@@ -25,8 +25,8 @@ Application::Application(InputManager* input, Graphics* gfx)
 	LOG_INFO("Camera initialised.");
 
 	// Create Mesh
-	planeMesh = new PlaneMesh(gfx->GetDevice(), 1000, 1000);
-	orthoMesh = new OrthoMesh(gfx->GetDevice(), 1000, 1000, 0, 0);
+	planeMesh = new PlaneMesh(gfx->GetDevice(), 100, 100);
+	orthoMesh = new OrthoMesh(gfx->GetDevice(), 100, 100, 0, 0);
 
 	// Create Shaders
 	//normalShader = new NormalShader(gfx->GetDevice(), gfx->GetDeviceContext());
@@ -34,22 +34,22 @@ Application::Application(InputManager* input, Graphics* gfx)
 	waterShader = new WaterShader(gfx->GetDevice(), gfx->GetDeviceContext());
 
 	// Create Textures
-	startingConditionTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), contentPath L"Content/StartingConditionTexture3.png");
+	startingConditionTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), contentPath L"Content/StartingConditionTexture.png");
 	waterTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), contentPath L"Content/WaterTexture.png");
 
 	// Render Textures
-	newRenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), 1000, 1000, 0.1f, 200.f);
-	oldRenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), 1000, 1000, 0.1f, 200.f);
+	newRenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), 100, 100, 0.1f, 200.f);
+	oldRenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), 100, 100, 0.1f, 200.f);
 
 	// Lighting
 	light.direction = XMFLOAT3(0.5f, -0.5f, 0.f);
 	light.ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.f);
 	light.diffuse = XMFLOAT4(0.6f, 0.6f, 0.8f, 1.f);
 
-	waterScale.r[0] = { 0.1f,0,0,0 };
-	waterScale.r[1] = { 0,0.1f,0,0 };
-	waterScale.r[2] = { 0,0,0.1f,0 };
-	waterScale.r[3] = { -50.f,-5.f,-50.f,1.0f };
+	waterScale.r[0] = { 1.f,0,0,0 };
+	waterScale.r[1] = { 0,1.f,0,0 };
+	waterScale.r[2] = { 0,0,1.f,0 };
+	waterScale.r[3] = { -5.f,-5.f,-5.f,1.0f };
 
 	// Store initial condition in the old render texture buffer.
 	SolverPass(startingConditionTexture->GetShaderResourceView(), 0.0166f);
@@ -150,6 +150,12 @@ void Application::Imgui()
 	const char* labels[] = {"Texture", "Height", "uVel", "vVel"};
 
 	ImGui::Combo("Render Mode", &currentItem, labels, IM_ARRAYSIZE(labels));
+
+	if (ImGui::Button("Reset"))
+	{
+		SolverPass(startingConditionTexture->GetShaderResourceView(), 0.00416666667f);
+		newRenderTexture.swap(oldRenderTexture);
+	}
 
 	/** End of ImGui Rendering. */
 	ImGui::End();
