@@ -34,24 +34,27 @@ float3 G(float3 u)
 
 float4 main(PS_Input input) : SV_TARGET
 {
-    // If we are on boundary
+    // If we are on boundary just keep what was there last pass.
     if (input.tex.x == 0.f || input.tex.x == 1.f || input.tex.y == 0.f || input.tex.y == 1.f)
         return solverTexture.Sample(solverSampler, input.tex);
 
+    // Determine time and displacement step.
     const float dx = 1.f;
     const float dt2 = 0.00416666667 * 5.f;
     const float du = 1.f / 100.f;
 
+    // Get neighbour values from previous pass.
     const float3 un = solverTexture.Sample(solverSampler, input.tex + float2(0, du)).xyz;
     const float3 ue = solverTexture.Sample(solverSampler, input.tex + float2(du, 0)).xyz;
     const float3 us = solverTexture.Sample(solverSampler, input.tex + float2(0, -du)).xyz;
     const float3 uw = solverTexture.Sample(solverSampler, input.tex + float2(-du, 0)).xyz;
 
+    //Calculate New values
     const float3 val1 = 0.25f * (un + ue + us + uw);
     const float3 val2 = (dt2 / (4 * dx)) * (F(ue) - F(uw));
     const float3 val3 = (dt2 / (4 * dx)) * (G(un) - G(us));
+    const float3 newU =  val1 - val2 - val3;
 
-    const float3 newU =  val1 - val2 - val3 ;
-
+    // Return new pixel color (storing the height and momentum in texture).
     return float4(newU, 1.f);
 }
