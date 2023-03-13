@@ -17,7 +17,7 @@ private:
 
 	void SolverPass(float dt);
 
-	void SetRenderTexturePass(ID3D11ShaderResourceView* srv);
+	void SetRenderTexturePass(std::unique_ptr<RenderTexture>& renderTexture, ID3D11ShaderResourceView* srv);
 
 	void Imgui();
 

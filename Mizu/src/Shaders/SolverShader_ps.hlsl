@@ -39,7 +39,7 @@ float4 main(PS_Input input) : SV_TARGET
         return solverTexture.Sample(solverSampler, input.tex);
 
     const float dx = 1.f;
-    const float dt2 = 0.00416666667;
+    const float dt2 = 0.00416666667 * 5.f;
     const float du = 1.f / 100.f;
 
     const float3 un = solverTexture.Sample(solverSampler, input.tex + float2(0, du)).xyz;

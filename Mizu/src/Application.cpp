@@ -55,7 +55,7 @@ Application::Application(InputManager* input, Graphics* gfx)
 	waterScale.r[3] = { -5.f,-5.f,-5.f,1.0f };
 
 	// Store initial condition in the old render texture buffer.
-	SetRenderTexturePass(startingConditionTexture->GetShaderResourceView());
+	SetRenderTexturePass(oldRenderTexture, startingConditionTexture->GetShaderResourceView());
 }
 
 Application::~Application()
@@ -133,16 +133,16 @@ void Application::SolverPass(float dt)
 	graphics->SetBackBufferRenderTarget();
 }
 
-void Application::SetRenderTexturePass(ID3D11ShaderResourceView* srv)
+void Application::SetRenderTexturePass(std::unique_ptr<RenderTexture>& renderTexture, ID3D11ShaderResourceView* srv)
 {
 	if (!graphics)
 		return;
 
-	oldRenderTexture->SetRenderTarget(graphics->GetDeviceContext());
+	renderTexture->SetRenderTarget(graphics->GetDeviceContext());
 	// No need to clear render target, all pixels will be overwritten
 
 	XMMATRIX worldMatrix = graphics->GetWorldMatrix();
-	XMMATRIX orthoMatrix = oldRenderTexture->GetOrthoMatrix();
+	XMMATRIX orthoMatrix = renderTexture->GetOrthoMatrix();
 	XMMATRIX orthoViewMatrix = camera->GetOrthoViewMatrix();
 
 	graphics->SetZBuffer(false);
@@ -184,7 +184,7 @@ void Application::Imgui()
 
 	if (ImGui::Button("Reset"))
 	{
-		SetRenderTexturePass(startingConditionTexture->GetShaderResourceView());
+		SetRenderTexturePass(pass2RenderTexture,startingConditionTexture->GetShaderResourceView());
 	}
 
 	/** End of ImGui Rendering. */
