@@ -5,12 +5,6 @@ cbuffer MatrixBuffer : register(b0)
     matrix projectionMatrix;
 };
 
-cbuffer TimeBuffer : register(b1)
-{
-    float time;
-    float3 padding;
-};
-
 struct VS_Input
 {
     float4 pos : POSITION;

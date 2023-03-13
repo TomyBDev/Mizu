@@ -15,7 +15,9 @@ public:
 private:
 	void HandleInput(float dt);
 
-	void SolverPass(ID3D11ShaderResourceView* srv, float dt);
+	void SolverPass(float dt);
+
+	void SetRenderTexturePass(ID3D11ShaderResourceView* srv);
 
 	void Imgui();
 
@@ -30,6 +32,7 @@ private:
 	// Shaders
 	class NormalShader* normalShader;
 	class SolverShader* solverShader;
+	class SolverShader2* solverShader2;
 	class WaterShader* waterShader;
 
 	// Textures
@@ -37,7 +40,8 @@ private:
 	class Texture* startingConditionTexture;
 
 	// Render Textures
-	std::unique_ptr<RenderTexture> newRenderTexture;
+	std::unique_ptr<RenderTexture> pass1RenderTexture;
+	std::unique_ptr<RenderTexture> pass2RenderTexture;
 	std::unique_ptr<RenderTexture> oldRenderTexture;
 
 	// Lights

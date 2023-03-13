@@ -1,5 +1,5 @@
-Texture2D waterTexture : register(t0);
-SamplerState waterSampler : register(s0);
+Texture2D theTexture : register(t0);
+SamplerState textureSampler : register(s0);
 
 struct PS_Input
 {
@@ -10,5 +10,5 @@ struct PS_Input
 
 float4 main(PS_Input input) : SV_TARGET
 {
-    return waterTexture.Sample(waterSampler, input.tex);
+    return theTexture.Sample(textureSampler, input.tex);
 }
