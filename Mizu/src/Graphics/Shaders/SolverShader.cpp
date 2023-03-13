@@ -25,12 +25,12 @@ SolverShader::SolverShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::
 	device->CreateBuffer(&dataBufferDesc, NULL, &dataBuffer);
 
 	D3D11_SAMPLER_DESC solverSamplerDesc;
-	solverSamplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-	solverSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	solverSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	solverSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	solverSamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	solverSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	solverSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	solverSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
 	solverSamplerDesc.MipLODBias = 0.0f;
-	solverSamplerDesc.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;
+	solverSamplerDesc.MaxAnisotropy = 1;
 	solverSamplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
 	solverSamplerDesc.MinLOD = 0;
 	solverSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
