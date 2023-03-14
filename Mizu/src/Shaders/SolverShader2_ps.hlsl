@@ -5,7 +5,8 @@ SamplerState solverSampler : register(s0);
 cbuffer DataBuffer : register(b0)
 {
     float dt;
-    float3 buffer;
+    int res;
+    float2 buffer;
 };
 
 struct PS_Input
@@ -40,7 +41,7 @@ float4 Reflect(float2 uv, float2 offset)
 
 float4 main(PS_Input input) : SV_TARGET
 {
-    const float du = 1.f / 100.f;
+    const float du = 1.f / res;
 
     // Left Boundary
     if (input.tex.x == 0.f)

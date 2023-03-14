@@ -58,7 +58,7 @@ SolverShader::~SolverShader()
 	}
 }
 
-void SolverShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* solverTexture, float dt)
+void SolverShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* solverTexture, float dt, int resolution)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 
@@ -78,11 +78,12 @@ void SolverShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContex
 	deviceContext->VSSetConstantBuffers(0, 1, &matrixBuffer);
 
 	// Pixel
-	DataBufferType* scalePtr;
+	DataBufferType* dataPtr;
 	deviceContext->Map(dataBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	scalePtr = (DataBufferType*)mappedResource.pData;
-	scalePtr->dt = dt;
-	scalePtr->buffer = { 0.f, 0.f, 0.f };
+	dataPtr = (DataBufferType*)mappedResource.pData;
+	dataPtr->dt = dt;
+	dataPtr->res = resolution;
+	dataPtr->buffer = { 0.f, 0.f };
 	deviceContext->Unmap(dataBuffer, 0);
 	deviceContext->PSSetConstantBuffers(0, 1, &dataBuffer);
 

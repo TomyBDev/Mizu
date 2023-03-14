@@ -1,12 +1,25 @@
-Texture2D waterTexture : register(t0);
-SamplerState waterSampler : register(s0);
+Texture2D depthTexture : register(t0);
+SamplerState depthSampler : register(s0);
 
 cbuffer LightBuffer : register(b0)
 {
-    float4 ambient;
-    float4 diffuse;
-    float3 direction;
-    int textureMode;
+    float4 lAmbient;
+    float4 lDiffuse;
+    float3 lDirection;
+    float lBuffer;
+};
+
+cbuffer CameraBuffer : register(b1)
+{
+    float3 camPosition;
+    float3 camDirection;
+    float2 camBuffer;
+};
+
+cbuffer CameraBuffer : register(b2)
+{
+    float cStrength;
+    float3 cBuffer;
 };
 
 struct PS_Input
@@ -25,26 +38,11 @@ float4 CalculateLighting(float3 lightDirection, float3 normal, float4 diffuse)
 
 float4 main(PS_Input input) : SV_TARGET
 {
-    const float4 lightColor = ambient + CalculateLighting(-direction, input.normals, diffuse);
-    float4 color = float4(0.f, 0.f, 0.f, 1.f);
+    const float4 lightColor = lAmbient + CalculateLighting(-lDirection, input.normals, lDiffuse);
+    //saturate(lightColor)
+    float4 deepColor = float4(0.2578125f, 0.421875f, 0.95703125f, 0.76f);
+    float4 shallowColor = float4(0.2578125f, 0.8046875f, 0.95703125f, 0.51f);
+    float depth = clamp(depthTexture.Sample(depthSampler, input.tex).x * cStrength, 0, 1);
 
-    switch (abs(textureMode))
-    {
-    	case 0:
-            color = waterTexture.Sample(waterSampler, input.tex * 5.f);
-            break;
-    	case 1:
-            color.x = waterTexture.Sample(waterSampler, input.tex).x;
-            break;
-    	case 2:
-            color.y = abs(waterTexture.Sample(waterSampler, input.tex).y - 0.5f) * 2.f;
-            break;
-    	case 3:
-            color.z = abs(waterTexture.Sample(waterSampler, input.tex).z - 0.5f) * 2.f;
-            break;
-    	default:
-            break;
-    }
-
-    return saturate(lightColor) * color;
+    return lerp(shallowColor, deepColor, depth);
 }

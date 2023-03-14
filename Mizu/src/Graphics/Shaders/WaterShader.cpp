@@ -1,5 +1,6 @@
 ﻿#include "mzpch.h"
 #include "Graphics/Shaders/WaterShader.h"
+#include <Graphics/Camera.h>
 
 WaterShader::WaterShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) : Shader(dev, context)
 {
@@ -16,12 +17,12 @@ WaterShader::WaterShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WR
 	device->CreateBuffer(&matrixBufferDesc, NULL, &matrixBuffer);
 
 	D3D11_SAMPLER_DESC heightMapSamplerDesc;
-	heightMapSamplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-	heightMapSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	heightMapSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	heightMapSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	heightMapSamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	heightMapSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	heightMapSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	heightMapSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
 	heightMapSamplerDesc.MipLODBias = 0.0f;
-	heightMapSamplerDesc.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;
+	heightMapSamplerDesc.MaxAnisotropy = 1;
 	heightMapSamplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
 	heightMapSamplerDesc.MinLOD = 0;
 	heightMapSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
@@ -35,6 +36,24 @@ WaterShader::WaterShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WR
 	lightBufferDesc.MiscFlags = 0;
 	lightBufferDesc.StructureByteStride = 0;
 	device->CreateBuffer(&lightBufferDesc, NULL, &lightBuffer);
+
+	D3D11_BUFFER_DESC cameraBufferDesc;
+	cameraBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	cameraBufferDesc.ByteWidth = sizeof(LightBufferType);
+	cameraBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cameraBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cameraBufferDesc.MiscFlags = 0;
+	cameraBufferDesc.StructureByteStride = 0;
+	device->CreateBuffer(&cameraBufferDesc, NULL, &cameraBuffer);
+
+	D3D11_BUFFER_DESC controlBufferDesc;
+	controlBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	controlBufferDesc.ByteWidth = sizeof(ControlBufferType);
+	controlBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	controlBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	controlBufferDesc.MiscFlags = 0;
+	controlBufferDesc.StructureByteStride = 0;
+	device->CreateBuffer(&controlBufferDesc, NULL, &controlBuffer);
 
 	D3D11_SAMPLER_DESC waterSamplerDesc;
 	waterSamplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
@@ -76,7 +95,7 @@ WaterShader::~WaterShader()
 	}
 }
 
-void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightMapTexture, ID3D11ShaderResourceView* waterTexture, DirectionalLight dirLight, int textureMode)
+void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightMapTexture, ID3D11ShaderResourceView* waterTexture, DirectionalLight dirLight, Camera* camera, float strength)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 
@@ -99,21 +118,33 @@ void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext
 	deviceContext->VSSetSamplers(0, 1, &heightMapSampleState);
 
 	// Pixel
-
-	// Vertex
 	LightBufferType* lightPtr;
 	deviceContext->Map(lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	lightPtr = (LightBufferType*)mappedResource.pData;
 	lightPtr->ambient = dirLight.ambient;
 	lightPtr->diffuse = dirLight.diffuse;
 	lightPtr->direction = dirLight.direction;
-	lightPtr->textureMode = textureMode;
+	lightPtr->buffer = 0.f;
 	deviceContext->Unmap(lightBuffer, 0);
 	deviceContext->PSSetConstantBuffers(0, 1, &lightBuffer);
 
-	if (textureMode)
-		deviceContext->PSSetShaderResources(0, 1, &heightMapTexture);
-	else
-		deviceContext->PSSetShaderResources(0, 1, &waterTexture);
-	deviceContext->PSSetSamplers(0, 1, &waterSampleState);
+	CameraBufferType* cameraPtr;
+	deviceContext->Map(cameraBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	cameraPtr = (CameraBufferType*)mappedResource.pData;
+	cameraPtr->position = { camera->GetPosition().m128_f32[0],camera->GetPosition().m128_f32[1],camera->GetPosition().m128_f32[2] };
+	cameraPtr->direction = { camera->GetRotation().m128_f32[0],camera->GetRotation().m128_f32[1],camera->GetRotation().m128_f32[2] };
+	cameraPtr->buffer = { 0.f, 0.f };
+	deviceContext->Unmap(cameraBuffer, 0);
+	deviceContext->PSSetConstantBuffers(1, 1, &cameraBuffer);
+
+	ControlBufferType* controlPtr;
+	deviceContext->Map(controlBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	controlPtr = (ControlBufferType*)mappedResource.pData;
+	controlPtr->strength = strength;
+	controlPtr->buffer = { 0.f, 0.f, 0.f };
+	deviceContext->Unmap(controlBuffer, 0);
+	deviceContext->PSSetConstantBuffers(2, 1, &controlBuffer);
+
+	deviceContext->PSSetShaderResources(0, 1, &heightMapTexture);
+	deviceContext->PSSetSamplers(0, 1, &heightMapSampleState);
 }

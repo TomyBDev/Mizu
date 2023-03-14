@@ -4,7 +4,8 @@ SamplerState solverSampler : register(s0);
 cbuffer DataBuffer : register(b0)
 {
     float dt;
-    float3 buffer;
+    int res;
+    float2 buffer;
 };
 
 struct PS_Input
@@ -41,7 +42,7 @@ float4 main(PS_Input input) : SV_TARGET
     // Determine time and displacement step.
     const float dx = 1.f;
     const float dt2 = 0.00416666667 * 5.f;
-    const float du = 1.f / 100.f;
+    const float du = 1.f / res;
 
     // Get neighbour values from previous pass.
     const float3 un = solverTexture.Sample(solverSampler, input.tex + float2(0, du)).xyz;

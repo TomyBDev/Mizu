@@ -43,6 +43,7 @@
 #if (TRUE)
 #define shaderPath L"../bin/Debug-windows-x86_64/Mizu/"
 #define contentPath L"../"
+#define contentPathS "../"
 #else
 #define shaderPath L""
 #define contentPath L""

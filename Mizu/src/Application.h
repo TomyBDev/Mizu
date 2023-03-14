@@ -13,6 +13,8 @@ public:
 	void Update(float dt);
 	void Render();
 private:
+	void Init();
+
 	void HandleInput(float dt);
 
 	void SolverPass(float dt);
@@ -20,6 +22,7 @@ private:
 	void SetRenderTexturePass(std::unique_ptr<RenderTexture>& renderTexture, ID3D11ShaderResourceView* srv);
 
 	void Imgui();
+	void Restart();
 
 	InputManager* inputManager;
 	Graphics* graphics;
@@ -54,4 +57,9 @@ private:
 	float cameraSpeed = 10.f;
 	float timeElapsed = 0;
 	int currentItem = 0;
+	int resolution;
+	int resolutionItem = 1;
+	float strength = 1.f;
+
+	const std::unordered_map<int, int> resolutions = {{0,128}, {1,256}, {2,512}, {3,1024}};
 };

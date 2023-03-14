@@ -25,10 +25,6 @@ Application::Application(InputManager* input, Graphics* gfx)
 	camera->SetSpeed(cameraSpeed);
 	LOG_INFO("Camera initialised.");
 
-	// Create Mesh
-	planeMesh = new PlaneMesh(gfx->GetDevice(), 100, 100);
-	orthoMesh = new OrthoMesh(gfx->GetDevice(), 100, 100, 0, 0);
-
 	// Create Shaders
 	normalShader = new NormalShader(gfx->GetDevice(), gfx->GetDeviceContext());
 	solverShader = new SolverShader(gfx->GetDevice(), gfx->GetDeviceContext());
@@ -36,23 +32,16 @@ Application::Application(InputManager* input, Graphics* gfx)
 	waterShader = new WaterShader(gfx->GetDevice(), gfx->GetDeviceContext());
 
 	// Create Textures
-	startingConditionTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), contentPath L"Content/StartingConditionTexture2.png");
 	waterTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), contentPath L"Content/WaterTexture.png");
-
-	// Render Textures
-	pass1RenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), 100, 100, 0.1f, 200.f);
-	pass2RenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), 100, 100, 0.1f, 200.f);
-	oldRenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), 100, 100, 0.1f, 200.f);
 
 	// Lighting
 	light.direction = XMFLOAT3(0.5f, -0.5f, 0.f);
 	light.ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.f);
 	light.diffuse = XMFLOAT4(0.6f, 0.6f, 0.8f, 1.f);
 
-	waterScale.r[0] = { 1.f,0,0,0 };
-	waterScale.r[1] = { 0,1.f,0,0 };
-	waterScale.r[2] = { 0,0,1.f,0 };
-	waterScale.r[3] = { -5.f,-5.f,-5.f,1.0f };
+	resolution = resolutions.at(resolutionItem);
+
+	Init();
 
 	// Store initial condition in the old render texture buffer.
 	SetRenderTexturePass(oldRenderTexture, startingConditionTexture->GetShaderResourceView());
@@ -90,12 +79,34 @@ void Application::Render()
 	XMMATRIX projectionMatrix = graphics->GetProjectionMatrix();
 
 	planeMesh->SendData(graphics->GetDeviceContext());
-	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale, viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), waterTexture->GetShaderResourceView(), light, currentItem);
+	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale, viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), waterTexture->GetShaderResourceView(), light, camera, strength);
 	waterShader->Render(planeMesh->GetIndexCount());
 
 	Imgui();
 	graphics->EndFrame();
 	
+}
+
+void Application::Init()
+{
+
+	// Create Mesh
+	planeMesh = new PlaneMesh(graphics->GetDevice(), resolution, resolution);
+	orthoMesh = new OrthoMesh(graphics->GetDevice(), resolution, resolution, 0, 0);
+
+	// Create Textures
+	std::string s = contentPathS;
+	s.append("/Content/StartingConditionTexture" + std::to_string(resolution) + ".png");
+	startingConditionTexture = new Texture(graphics->GetDevice(), graphics->GetDeviceContext(), StringConverter::StringToWide(s));
+
+	pass1RenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), resolution, resolution, 0.1f, 200.f);
+	pass2RenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), resolution, resolution, 0.1f, 200.f);
+	oldRenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), resolution, resolution, 0.1f, 200.f);
+
+	const float scale = 100.f / static_cast<float>(resolution);
+	XMMATRIX transMat = XMMatrixTranslation(-50.f, -5.f, -25.f);
+	XMMATRIX scaleMat = XMMatrixScaling(scale, 1.f, scale);
+	waterScale = scaleMat * transMat;
 }
 
 void Application::HandleInput(float dt)
@@ -119,14 +130,14 @@ void Application::SolverPass(float dt)
 	graphics->SetZBuffer(false);
 
 	orthoMesh->SendData(graphics->GetDeviceContext());
-	solverShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, oldRenderTexture->GetShaderResourceView(), dt);
+	solverShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, oldRenderTexture->GetShaderResourceView(), dt, resolution);
 	solverShader->Render(orthoMesh->GetIndexCount());
 
 	pass2RenderTexture->SetRenderTarget(graphics->GetDeviceContext());
 	// No need to clear render target, all pixels will be overwritten
 
 	orthoMesh->SendData(graphics->GetDeviceContext());
-	solverShader2->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, oldRenderTexture->GetShaderResourceView(), pass1RenderTexture->GetShaderResourceView(), dt);
+	solverShader2->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, oldRenderTexture->GetShaderResourceView(), pass1RenderTexture->GetShaderResourceView(), dt, resolution);
 	solverShader2->Render(orthoMesh->GetIndexCount());
 
 	graphics->SetZBuffer(true);
@@ -178,9 +189,19 @@ void Application::Imgui()
 		camera->SetSpeed(cameraSpeed);
 	}
 
+	ImGui::SliderFloat("Depth Strength", &strength, 0.1f, 100.f);
+
 	const char* labels[] = {"Texture", "Height", "uVel", "vVel"};
 
 	ImGui::Combo("Render Mode", &currentItem, labels, IM_ARRAYSIZE(labels));
+
+	const char* resolutionLabels[] = {"128x128", "256x256", "512x512", "1024x1024"};
+
+	if (ImGui::Combo("Resolution", &resolutionItem, resolutionLabels, IM_ARRAYSIZE(resolutionLabels)))
+	{
+		resolution = resolutions.at(resolutionItem);
+		Restart();
+	}
 
 	if (ImGui::Button("Reset"))
 	{
@@ -192,4 +213,42 @@ void Application::Imgui()
 
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+}
+
+void Application::Restart()
+{
+	// Clean up
+	if (planeMesh)
+	{
+		delete planeMesh;
+		planeMesh = nullptr;
+	}
+
+	if (orthoMesh)
+	{
+		delete orthoMesh;
+		orthoMesh = nullptr;
+	}
+
+	if (startingConditionTexture)
+	{
+		delete startingConditionTexture;
+		startingConditionTexture = nullptr;
+	}
+
+	if (pass1RenderTexture)
+		pass1RenderTexture.release();
+	
+
+	if (pass2RenderTexture)
+		pass2RenderTexture.release();
+
+	if (oldRenderTexture)
+		oldRenderTexture.release();
+
+	// Re-Initialise
+	Init();
+
+	// Store initial condition in the old render texture buffer.
+	SetRenderTexturePass(pass2RenderTexture, startingConditionTexture->GetShaderResourceView());
 }
