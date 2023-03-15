@@ -20,7 +20,7 @@ struct PS_Input
 float4 main(PS_Input input) : SV_TARGET
 {
     if (copyMode)
-        return theTexture.Sample(copyTextureSampler, input.tex);
+        return theTexture.Sample(copyTextureSampler, input.tex) * 0.0390625f;
 
     return theTexture.Sample(normalTextureSampler, input.tex * uvScale);
     	

@@ -42,7 +42,7 @@ float3 CalcNormals(float2 uv, float yPos, float scale)
 VS_Output main(VS_Input input)
 {
     VS_Output output;
-    const float heightScale = 250.f;
+    const float heightScale = 256.f;
 
     //offset the y position based on the height map information
     input.pos.y = heightMapTexture.SampleLevel(heightMapSampler, input.tex, 0).x * heightScale;

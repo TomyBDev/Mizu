@@ -88,12 +88,12 @@ void Application::Render()
 
 	// Render Floor
 	floorMesh->SendData(graphics->GetDeviceContext());
-	normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * floorScale, viewMatrix, projectionMatrix, floorTexture->GetShaderResourceView(), 5.f);
+	normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * floorScale, viewMatrix, projectionMatrix, floorTexture->GetShaderResourceView(), 25.f);
 	normalShader->Render(floorMesh->GetIndexCount());
 
 	// Render Water
 	planeMesh->SendData(graphics->GetDeviceContext());
-	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale, viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), waterTexture->GetShaderResourceView(), light, camera, strength);
+	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale, viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), waterTexture->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength);
 	waterShader->Render(planeMesh->GetIndexCount());
 
 	Imgui();
@@ -207,9 +207,8 @@ void Application::Imgui()
 
 	ImGui::SliderFloat("Depth Strength", &strength, 0.1f, 100.f);
 
-	const char* labels[] = {"Texture", "Height", "uVel", "vVel"};
-
-	ImGui::Combo("Render Mode", &currentItem, labels, IM_ARRAYSIZE(labels));
+	ImGui::ColorPicker4("Shallow Color", shallowColor);
+	ImGui::ColorPicker4("Deep Color", deepColor);
 
 	const char* resolutionLabels[] = {"128x128", "256x256", "512x512", "1024x1024"};
 
@@ -221,7 +220,7 @@ void Application::Imgui()
 
 	if (ImGui::Button("Reset"))
 	{
-		SetRenderTexturePass(pass2RenderTexture,startingConditionTexture->GetShaderResourceView());
+		Restart();
 	}
 
 	/** End of ImGui Rendering. */

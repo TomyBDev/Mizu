@@ -95,7 +95,7 @@ WaterShader::~WaterShader()
 	}
 }
 
-void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightMapTexture, ID3D11ShaderResourceView* waterTexture, DirectionalLight dirLight, Camera* camera, float strength)
+void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightMapTexture, ID3D11ShaderResourceView* waterTexture, DirectionalLight dirLight, Camera* camera, float* shallowColor, float* deepColor, float strength)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 
@@ -141,6 +141,8 @@ void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext
 	deviceContext->Map(controlBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	controlPtr = (ControlBufferType*)mappedResource.pData;
 	controlPtr->strength = strength;
+	controlPtr->shallowColor = { shallowColor[0],shallowColor[1],shallowColor[2],shallowColor[3] };
+	controlPtr->deepColor = { deepColor[0],deepColor[1],deepColor[2],deepColor[3] };
 	controlPtr->buffer = { 0.f, 0.f, 0.f };
 	deviceContext->Unmap(controlBuffer, 0);
 	deviceContext->PSSetConstantBuffers(2, 1, &controlBuffer);

@@ -16,10 +16,12 @@ cbuffer CameraBuffer : register(b1)
     float2 camBuffer;
 };
 
-cbuffer CameraBuffer : register(b2)
+cbuffer ControlBuffer : register(b2)
 {
     float cStrength;
     float3 cBuffer;
+    float4 shallowColor;
+    float4 deepColor;
 };
 
 struct PS_Input
@@ -41,8 +43,6 @@ float4 main(PS_Input input) : SV_TARGET
     //return float4(0.5f, 0.5f, 0.8f, 0.1f);
     //const float4 lightColor = lAmbient + CalculateLighting(-lDirection, input.normals, lDiffuse);
     //saturate(lightColor)
-    float4 deepColor = float4(0.2578125f, 0.421875f, 0.95703125f, 0.76f);
-    float4 shallowColor = float4(0.2578125f, 0.8046875f, 0.95703125f, 0.51f);
     float depth = clamp(depthTexture.Sample(depthSampler, input.tex).x * cStrength, 0, 1);
 
     //return lerp(float4(0.f, 0.f, 0.f, 1.f), float4(1.f, 1.f, 1.f, 1.f), depth); //Depth view
