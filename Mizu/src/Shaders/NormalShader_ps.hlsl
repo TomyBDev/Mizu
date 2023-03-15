@@ -1,5 +1,14 @@
 Texture2D theTexture : register(t0);
-SamplerState textureSampler : register(s0);
+SamplerState normalTextureSampler : register(s0);
+SamplerState copyTextureSampler : register(s1);
+
+cbuffer DataBuffer : register(b0)
+{
+    float uvScale;
+    bool copyMode;
+    bool buffer1[3];
+    float2 buffer2;
+};
 
 struct PS_Input
 {
@@ -10,5 +19,9 @@ struct PS_Input
 
 float4 main(PS_Input input) : SV_TARGET
 {
-    return theTexture.Sample(textureSampler, input.tex);
+    if (copyMode)
+        return theTexture.Sample(copyTextureSampler, input.tex);
+
+    return theTexture.Sample(normalTextureSampler, input.tex * uvScale);
+    	
 }

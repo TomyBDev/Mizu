@@ -47,6 +47,7 @@
 #else
 #define shaderPath L""
 #define contentPath L""
+#define contentPathS ""
 #endif
 
 struct DirectionalLight

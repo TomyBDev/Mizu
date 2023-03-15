@@ -17,6 +17,7 @@ public:
 	void EndFrame();
 	void ClearBuffer(float r, float g, float b) noexcept;
 	void SetZBuffer(bool b);
+	void SetAlpha(bool b);
 	void SetBackBufferRenderTarget();
 
 private:
@@ -27,6 +28,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView = nullptr;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState = nullptr;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> noDepthStencilState = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11BlendState> blendState = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11BlendState> noBlendState = nullptr;
 	D3D11_VIEWPORT viewport;
 	HWND hWnd;
 

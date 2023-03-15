@@ -124,6 +124,22 @@ Graphics::Graphics(HWND hwnd)
 	ComPtr<ID3D11RasterizerState> rasterizerState;
 	CHECK_ERROR(device->CreateRasterizerState(&rasterizerDesc, &rasterizerState));
 	deviceContext->RSSetState(rasterizerState.Get());
+
+
+	//// Blender
+
+	D3D11_BLEND_DESC blendDesc = {};
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0fu;
+	CHECK_ERROR(device->CreateBlendState(&blendDesc, &blendState));
+
+	deviceContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFFu);
 }
 
 void Graphics::EndFrame()
@@ -148,6 +164,17 @@ void Graphics::SetZBuffer(bool b)
 
 	deviceContext->OMSetDepthStencilState(noDepthStencilState.Get(), 1u);
 	
+}
+
+void Graphics::SetAlpha(bool b)
+{
+	if (b)
+	{
+		deviceContext->OMSetBlendState(blendState.Get(), nullptr, 0xFFFFFFFFu);
+		return;
+	}
+
+	deviceContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFFu);
 }
 
 void Graphics::SetBackBufferRenderTarget()

@@ -25,6 +25,9 @@ Application::Application(InputManager* input, Graphics* gfx)
 	camera->SetSpeed(cameraSpeed);
 	LOG_INFO("Camera initialised.");
 
+
+	floorMesh = new PlaneMesh(graphics->GetDevice(), 10.f, 10.f);
+
 	// Create Shaders
 	normalShader = new NormalShader(gfx->GetDevice(), gfx->GetDeviceContext());
 	solverShader = new SolverShader(gfx->GetDevice(), gfx->GetDeviceContext());
@@ -33,6 +36,7 @@ Application::Application(InputManager* input, Graphics* gfx)
 
 	// Create Textures
 	waterTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), contentPath L"Content/WaterTexture.png");
+	floorTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), contentPath L"Content/TileTexture.png");
 
 	// Lighting
 	light.direction = XMFLOAT3(0.5f, -0.5f, 0.f);
@@ -40,6 +44,10 @@ Application::Application(InputManager* input, Graphics* gfx)
 	light.diffuse = XMFLOAT4(0.6f, 0.6f, 0.8f, 1.f);
 
 	resolution = resolutions.at(resolutionItem);
+
+	XMMATRIX transMat = XMMatrixTranslation(-50.f, 0, -25.f);
+	XMMATRIX scaleMat = XMMatrixScaling(11.f, 1.f, 11.f);
+	floorScale = scaleMat * transMat;
 
 	Init();
 
@@ -72,12 +80,18 @@ void Application::Render()
 	if (!graphics)
 		return;
 
-	graphics->ClearBuffer(0.4f, 0.6f, 0.9f);
+	graphics->ClearBuffer(0.9f, 0.6f, 0.4f);
 
 	XMMATRIX worldMatrix = graphics->GetWorldMatrix();
 	XMMATRIX viewMatrix = camera->GetViewMatrix();
 	XMMATRIX projectionMatrix = graphics->GetProjectionMatrix();
 
+	// Render Floor
+	floorMesh->SendData(graphics->GetDeviceContext());
+	normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * floorScale, viewMatrix, projectionMatrix, floorTexture->GetShaderResourceView(), 5.f);
+	normalShader->Render(floorMesh->GetIndexCount());
+
+	// Render Water
 	planeMesh->SendData(graphics->GetDeviceContext());
 	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale, viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), waterTexture->GetShaderResourceView(), light, camera, strength);
 	waterShader->Render(planeMesh->GetIndexCount());
@@ -96,7 +110,7 @@ void Application::Init()
 
 	// Create Textures
 	std::string s = contentPathS;
-	s.append("/Content/StartingConditionTexture" + std::to_string(resolution) + ".png");
+	s.append("Content/StartingConditionTexture" + std::to_string(resolution) + ".png");
 	startingConditionTexture = new Texture(graphics->GetDevice(), graphics->GetDeviceContext(), StringConverter::StringToWide(s));
 
 	pass1RenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), resolution, resolution, 0.1f, 200.f);
@@ -104,7 +118,7 @@ void Application::Init()
 	oldRenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), resolution, resolution, 0.1f, 200.f);
 
 	const float scale = 100.f / static_cast<float>(resolution);
-	XMMATRIX transMat = XMMatrixTranslation(-50.f, -5.f, -25.f);
+	XMMATRIX transMat = XMMatrixTranslation(-50.f, 0, -25.f);
 	XMMATRIX scaleMat = XMMatrixScaling(scale, 1.f, scale);
 	waterScale = scaleMat * transMat;
 }
@@ -128,6 +142,7 @@ void Application::SolverPass(float dt)
 	XMMATRIX orthoViewMatrix = camera->GetOrthoViewMatrix();
 
 	graphics->SetZBuffer(false);
+	graphics->SetAlpha(false);
 
 	orthoMesh->SendData(graphics->GetDeviceContext());
 	solverShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, oldRenderTexture->GetShaderResourceView(), dt, resolution);
@@ -141,6 +156,7 @@ void Application::SolverPass(float dt)
 	solverShader2->Render(orthoMesh->GetIndexCount());
 
 	graphics->SetZBuffer(true);
+	graphics->SetAlpha(true);
 	graphics->SetBackBufferRenderTarget();
 }
 
@@ -159,7 +175,7 @@ void Application::SetRenderTexturePass(std::unique_ptr<RenderTexture>& renderTex
 	graphics->SetZBuffer(false);
 
 	orthoMesh->SendData(graphics->GetDeviceContext());
-	normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, srv);
+	normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, srv, 1.f, true);
 	normalShader->Render(orthoMesh->GetIndexCount());
 
 	graphics->SetZBuffer(true);

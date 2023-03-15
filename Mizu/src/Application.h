@@ -32,6 +32,8 @@ private:
 	class PlaneMesh* planeMesh;
 	class OrthoMesh* orthoMesh;
 
+	PlaneMesh* floorMesh;
+
 	// Shaders
 	class NormalShader* normalShader;
 	class SolverShader* solverShader;
@@ -40,7 +42,8 @@ private:
 
 	// Textures
 	class Texture* waterTexture;
-	class Texture* startingConditionTexture;
+	Texture* startingConditionTexture;
+	Texture* floorTexture;
 
 	// Render Textures
 	std::unique_ptr<RenderTexture> pass1RenderTexture;
@@ -52,6 +55,7 @@ private:
 
 	// Matrices
 	DirectX::XMMATRIX waterScale;
+	DirectX::XMMATRIX floorScale;
 
 	float frameRate = 0;
 	float cameraSpeed = 10.f;
@@ -59,7 +63,7 @@ private:
 	int currentItem = 0;
 	int resolution;
 	int resolutionItem = 1;
-	float strength = 1.f;
+	float strength = 60.f;
 
 	const std::unordered_map<int, int> resolutions = {{0,128}, {1,256}, {2,512}, {3,1024}};
 };
