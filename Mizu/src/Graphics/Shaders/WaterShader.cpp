@@ -115,7 +115,7 @@ void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext
 	deviceContext->VSSetConstantBuffers(0, 1, &matrixBuffer);
 
 	deviceContext->VSSetShaderResources(0, 1, &heightMapTexture);
-	deviceContext->VSSetSamplers(0, 1, &heightMapSampleState);
+	deviceContext->VSSetSamplers(0, 1, &waterSampleState);
 
 	// Pixel
 	LightBufferType* lightPtr;
@@ -148,5 +148,5 @@ void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext
 	deviceContext->PSSetConstantBuffers(2, 1, &controlBuffer);
 
 	deviceContext->PSSetShaderResources(0, 1, &heightMapTexture);
-	deviceContext->PSSetSamplers(0, 1, &heightMapSampleState);
+	deviceContext->PSSetSamplers(0, 1, &waterSampleState);
 }

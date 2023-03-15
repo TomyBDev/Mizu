@@ -5,6 +5,7 @@
 #include <sstream>
 #include <memory>
 #include <wrl.h>
+#include <fstream>
 
 // Resources
 #include <Resources/resource.h>

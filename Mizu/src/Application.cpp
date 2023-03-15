@@ -8,6 +8,7 @@
 
 #include <Geometry/PlaneMesh.h>
 #include <Geometry/OrthoMesh.h>
+#include <Geometry/Wavefront.h>
 
 #include <Graphics/Shaders/NormalShader.h>
 #include <Graphics/Shaders/SolverShader2.h>
@@ -27,6 +28,7 @@ Application::Application(InputManager* input, Graphics* gfx)
 
 
 	floorMesh = new PlaneMesh(graphics->GetDevice(), 10.f, 10.f);
+	model = new Wavefront(graphics->GetDevice(), "PoolTest.obj");
 
 	// Create Shaders
 	normalShader = new NormalShader(gfx->GetDevice(), gfx->GetDeviceContext());
@@ -62,7 +64,6 @@ Application::~Application()
 void Application::Update(float dt)
 {
 	frameRate = 1.f / dt;
-	timeElapsed += dt;
 
 	HandleInput(dt);
 
@@ -85,6 +86,11 @@ void Application::Render()
 	XMMATRIX worldMatrix = graphics->GetWorldMatrix();
 	XMMATRIX viewMatrix = camera->GetViewMatrix();
 	XMMATRIX projectionMatrix = graphics->GetProjectionMatrix();
+
+	// Model Floor
+	model->SendData(graphics->GetDeviceContext());
+	normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * XMMatrixScaling(10.f, 10.f, 10.f), viewMatrix, projectionMatrix, floorTexture->GetShaderResourceView(), 25.f);
+	normalShader->Render(model->GetIndexCount());
 
 	// Render Floor
 	floorMesh->SendData(graphics->GetDeviceContext());
