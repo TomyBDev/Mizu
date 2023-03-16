@@ -26,8 +26,6 @@ Application::Application(InputManager* input, Graphics* gfx)
 	camera->SetSpeed(cameraSpeed);
 	LOG_INFO("Camera initialised.");
 
-
-	floorMesh = new PlaneMesh(graphics->GetDevice(), 10.f, 10.f);
 	model = new Wavefront(graphics->GetDevice(), "PoolTest.obj");
 
 	// Create Shaders
@@ -46,10 +44,6 @@ Application::Application(InputManager* input, Graphics* gfx)
 	light.diffuse = XMFLOAT4(0.6f, 0.6f, 0.8f, 1.f);
 
 	resolution = resolutions.at(resolutionItem);
-
-	XMMATRIX transMat = XMMatrixTranslation(-50.f, 0, -25.f);
-	XMMATRIX scaleMat = XMMatrixScaling(11.f, 1.f, 11.f);
-	floorScale = scaleMat * transMat;
 
 	Init();
 
@@ -89,13 +83,8 @@ void Application::Render()
 
 	// Model Floor
 	model->SendData(graphics->GetDeviceContext());
-	normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * XMMatrixScaling(10.f, 10.f, 10.f), viewMatrix, projectionMatrix, floorTexture->GetShaderResourceView(), 25.f);
+	normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * XMMatrixScaling(3.15f, 3.15f, 3.15f) * XMMatrixTranslation(0.f,6.2f, 25.f), viewMatrix, projectionMatrix, floorTexture->GetShaderResourceView(), 25.f);
 	normalShader->Render(model->GetIndexCount());
-
-	// Render Floor
-	floorMesh->SendData(graphics->GetDeviceContext());
-	normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * floorScale, viewMatrix, projectionMatrix, floorTexture->GetShaderResourceView(), 25.f);
-	normalShader->Render(floorMesh->GetIndexCount());
 
 	// Render Water
 	planeMesh->SendData(graphics->GetDeviceContext());
@@ -200,35 +189,53 @@ void Application::Imgui()
 
 	/** Begin Menu */
 	ImGui::Begin("Settings:");
-
+	
 	ImGui::Text("Framerate: %.1f", frameRate);
 
-	ImGui::Text("Camera Pos: x: %.1f, y: %.1f, z: %.1f", camera->GetPosition().m128_f32[0], camera->GetPosition().m128_f32[1], camera->GetPosition().m128_f32[2]);
-	ImGui::Text("Camera Rot: x: %.1f, y: %.1f, z: %.1f", camera->GetRotation().m128_f32[0], camera->GetRotation().m128_f32[1], camera->GetRotation().m128_f32[2]);
-
-	if (ImGui::SliderFloat("Camera Speed", &cameraSpeed, 0.1f, 1000.f))
+	if (ImGui::CollapsingHeader("Camera Settings"))
 	{
-		camera->SetSpeed(cameraSpeed);
+
+		ImGui::Text("Camera Pos: x: %.1f, y: %.1f, z: %.1f", camera->GetPosition().m128_f32[0], camera->GetPosition().m128_f32[1], camera->GetPosition().m128_f32[2]);
+		ImGui::Text("Camera Rot: x: %.1f, y: %.1f, z: %.1f", camera->GetRotation().m128_f32[0], camera->GetRotation().m128_f32[1], camera->GetRotation().m128_f32[2]);
+
+		if (ImGui::SliderFloat("Camera Speed", &cameraSpeed, 0.1f, 1000.f))
+		{
+			camera->SetSpeed(cameraSpeed);
+		}
 	}
-
-	ImGui::SliderFloat("Depth Strength", &strength, 0.1f, 100.f);
-
-	ImGui::ColorPicker4("Shallow Color", shallowColor);
-	ImGui::ColorPicker4("Deep Color", deepColor);
-
-	const char* resolutionLabels[] = {"128x128", "256x256", "512x512", "1024x1024"};
-
-	if (ImGui::Combo("Resolution", &resolutionItem, resolutionLabels, IM_ARRAYSIZE(resolutionLabels)))
+	if (ImGui::CollapsingHeader("Water Shader Settings"))
 	{
-		resolution = resolutions.at(resolutionItem);
-		Restart();
+		ImGui::SliderFloat("Depth Strength", &strength, 0.1f, 100.f);
+		if (ImGui::TreeNode("Shallow Water Color"))
+		{
+			ImGui::ColorPicker4("Shallow Color", shallowColor);
+			ImGui::TreePop();
+			ImGui::Separator();
+		}
+		if (ImGui::TreeNode("Deep Water Color"))
+		{
+			ImGui::ColorPicker4("Deep Color", deepColor);
+			ImGui::TreePop();
+			ImGui::Separator();
+		}
 	}
-
-	if (ImGui::Button("Reset"))
+	
+	if (ImGui::CollapsingHeader("Simulation Control"))
 	{
-		Restart();
-	}
+		const char* resolutionLabels[] = { "128x128", "256x256", "512x512", "1024x1024" };
 
+		if (ImGui::Combo("Resolution", &resolutionItem, resolutionLabels, IM_ARRAYSIZE(resolutionLabels)))
+		{
+			resolution = resolutions.at(resolutionItem);
+			Restart();
+		}
+
+		if (ImGui::Button("Reset"))
+		{
+			Restart();
+		}
+
+	}
 	/** End of ImGui Rendering. */
 	ImGui::End();
 

@@ -32,7 +32,6 @@ private:
 	class PlaneMesh* planeMesh;
 	class OrthoMesh* orthoMesh;
 
-	PlaneMesh* floorMesh;
 	class Wavefront* model;
 
 	// Shaders
@@ -56,7 +55,6 @@ private:
 
 	// Matrices
 	DirectX::XMMATRIX waterScale;
-	DirectX::XMMATRIX floorScale;
 
 	// Frame rate to be displayed
 	float frameRate = 0;
