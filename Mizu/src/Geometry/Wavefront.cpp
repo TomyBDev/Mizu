@@ -57,6 +57,7 @@ Wavefront::Wavefront(Microsoft::WRL::ComPtr<ID3D11Device> device, const char* fi
 		{
 			DirectX::XMFLOAT2 tex;
 			sscanf_s(s.c_str(), "%*s %f %f\n", &tex.x, &tex.y);
+			tex.y = 1.f - tex.y;
 			vt.push_back(tex);
 			continue;
 		}
@@ -129,7 +130,7 @@ Wavefront::Wavefront(Microsoft::WRL::ComPtr<ID3D11Device> device, const char* fi
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufferDesc.CPUAccessFlags = 0u;
 	vertexBufferDesc.MiscFlags = 0u;
-	vertexBufferDesc.ByteWidth = sizeof(Data) * vertexCount;
+	vertexBufferDesc.ByteWidth = sizeof(MaterialData) * vertexCount;
 	vertexBufferDesc.StructureByteStride = 0;
 	D3D11_SUBRESOURCE_DATA vertexData = {};
 	vertexData.pSysMem = data;

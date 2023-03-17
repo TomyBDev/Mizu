@@ -28,7 +28,7 @@ Application::Application(InputManager* input, Graphics* gfx)
 	camera->SetSpeed(cameraSpeed);
 	LOG_INFO("Camera initialised.");
 
-	model = new Wavefront(graphics->GetDevice(), "bridge_pillar.obj");
+	model = new Wavefront(graphics->GetDevice(), "PoolTest.obj");
 
 	// Create Shaders
 	textureShader = new TextureShader(gfx->GetDevice(), gfx->GetDeviceContext());
