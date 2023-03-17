@@ -14,6 +14,8 @@ public:
 protected:
 
 	void LoadVertexShader(const wchar_t* fileName);
+	void LoadTextureVertexShader(const wchar_t* fileName);
+	void LoadMaterialVertexShader(const wchar_t* fileName);
 	void LoadPixelShader(const wchar_t* fileName);
 
 	Microsoft::WRL::ComPtr<ID3D11Device> device;

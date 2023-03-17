@@ -57,7 +57,7 @@ void Shader::LoadVertexShader(const wchar_t* fileName)
 {
 	ComPtr<ID3DBlob> blob;
 	D3DReadFileToBlob(fileName, &blob);
-	device->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &vertexShader);
+	CHECK_ERROR(device->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &vertexShader));
 
 	const D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
 	{
@@ -74,7 +74,7 @@ void Shader::LoadVertexShader(const wchar_t* fileName)
 			0,
 			D3D11_APPEND_ALIGNED_ELEMENT,
 			D3D11_INPUT_PER_VERTEX_DATA,
-			0},		
+			0},
 		{"NORMALS",
 			0,
 			DXGI_FORMAT_R32G32B32_FLOAT,
@@ -90,6 +90,84 @@ void Shader::LoadVertexShader(const wchar_t* fileName)
 		blob->GetBufferPointer(),
 		blob->GetBufferSize(),
 		&inputLayout);
+}
+
+void Shader::LoadTextureVertexShader(const wchar_t* fileName)
+{
+	ComPtr<ID3DBlob> blob;
+	D3DReadFileToBlob(fileName, &blob);
+	CHECK_ERROR(device->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &vertexShader));
+
+	const D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
+	{
+		{"POSITION",
+			0,
+			DXGI_FORMAT_R32G32B32_FLOAT,
+			0,
+			0,
+			D3D11_INPUT_PER_VERTEX_DATA,
+			0},
+		{"TEXTURE",
+			0,
+			DXGI_FORMAT_R32G32_FLOAT,
+			0,
+			D3D11_APPEND_ALIGNED_ELEMENT,
+			D3D11_INPUT_PER_VERTEX_DATA,
+			0}
+	};
+
+	device->CreateInputLayout(
+		inputElementDesc,
+		(UINT)std::size(inputElementDesc),
+		blob->GetBufferPointer(),
+		blob->GetBufferSize(),
+		&inputLayout);
+}
+
+void Shader::LoadMaterialVertexShader(const wchar_t* fileName)
+{
+	ComPtr<ID3DBlob> blob;
+	D3DReadFileToBlob(fileName, &blob);
+	CHECK_ERROR(device->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &vertexShader));
+
+	const D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
+	{
+		{"POSITION",
+			0,
+			DXGI_FORMAT_R32G32B32_FLOAT,
+			0,
+			0,
+			D3D11_INPUT_PER_VERTEX_DATA,
+			0},
+		{"TEXTURE",
+			0,
+			DXGI_FORMAT_R32G32_FLOAT,
+			0,
+			D3D11_APPEND_ALIGNED_ELEMENT,
+			D3D11_INPUT_PER_VERTEX_DATA,
+			0},
+		{"NORMALS",
+			0,
+			DXGI_FORMAT_R32G32B32_FLOAT,
+			0,
+			D3D11_APPEND_ALIGNED_ELEMENT,
+			D3D11_INPUT_PER_VERTEX_DATA,
+			0},
+		{"MATERIALS",
+			0,
+			DXGI_FORMAT_R32G32B32_FLOAT,
+			0,
+			D3D11_APPEND_ALIGNED_ELEMENT,
+			D3D11_INPUT_PER_VERTEX_DATA,
+			0}
+	};
+
+	CHECK_ERROR(device->CreateInputLayout(
+		inputElementDesc,
+		(UINT)std::size(inputElementDesc),
+		blob->GetBufferPointer(),
+		blob->GetBufferSize(),
+		&inputLayout));
 }
 
 void Shader::LoadPixelShader(const wchar_t* fileName)

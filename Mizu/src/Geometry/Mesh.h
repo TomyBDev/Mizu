@@ -11,7 +11,22 @@ public:
 		DirectX::XMFLOAT3 normals;
 	};
 
-	void SendData(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext);
+	struct TextureData
+	{
+		DirectX::XMFLOAT3 position;
+		DirectX::XMFLOAT2 texture;
+		DirectX::XMFLOAT3 normals;
+	};
+
+	struct MaterialData
+	{
+		DirectX::XMFLOAT3 position;
+		DirectX::XMFLOAT2 texture;
+		DirectX::XMFLOAT3 normals;
+		DirectX::XMFLOAT3 materials;
+	};
+
+	virtual void SendData(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext);
 	int GetIndexCount();
 protected:
 

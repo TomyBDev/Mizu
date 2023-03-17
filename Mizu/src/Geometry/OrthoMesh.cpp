@@ -25,12 +25,12 @@ OrthoMesh::OrthoMesh(Microsoft::WRL::ComPtr<ID3D11Device> device, int width, int
 
 	using namespace DirectX;
 
-	const Data data[] =
+	const TextureData data[] =
 	{
-		{XMFLOAT3(left, bottom, 0.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f)},
-		{XMFLOAT3(left, top, 0.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f)},
-		{XMFLOAT3(right, top, 0.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f)},
-		{XMFLOAT3(right, bottom, 0.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f)}
+		{XMFLOAT3(left, bottom, 0.0f), XMFLOAT2(0.0f, 1.0f)},
+		{XMFLOAT3(left, top, 0.0f), XMFLOAT2(0.0f, 0.0f)},
+		{XMFLOAT3(right, top, 0.0f), XMFLOAT2(1.0f, 0.0f)},
+		{XMFLOAT3(right, bottom, 0.0f), XMFLOAT2(1.0f, 1.0f)}
 	};
 
 	// Load the index array with data.
@@ -45,7 +45,7 @@ OrthoMesh::OrthoMesh(Microsoft::WRL::ComPtr<ID3D11Device> device, int width, int
 	// Set up the description of the vertex buffer.
 	D3D11_BUFFER_DESC vertexBufferDesc = {};
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.ByteWidth = sizeof(Data) * vertexCount;
+	vertexBufferDesc.ByteWidth = sizeof(TextureData) * vertexCount;
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufferDesc.CPUAccessFlags = 0;
 	vertexBufferDesc.MiscFlags = 0;
@@ -76,4 +76,13 @@ OrthoMesh::OrthoMesh(Microsoft::WRL::ComPtr<ID3D11Device> device, int width, int
 
 	delete[] indices;
 	indices = 0;
+}
+
+void OrthoMesh::SendData(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext)
+{
+	const UINT stride = sizeof(TextureData);
+	const UINT offset = 0u;
+	deviceContext->IASetVertexBuffers(0u, 1u, vertexBuffer.GetAddressOf(), &stride, &offset);
+	deviceContext->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }

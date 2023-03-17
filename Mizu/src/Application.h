@@ -35,10 +35,12 @@ private:
 	class Wavefront* model;
 
 	// Shaders
+	class TextureShader* textureShader;
 	class NormalShader* normalShader;
 	class SolverShader* solverShader;
 	class SolverShader2* solverShader2;
 	class WaterShader* waterShader;
+	class WavefrontShader* wavefrontShader;
 
 	// Textures
 	class Texture* waterTexture;

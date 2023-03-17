@@ -10,10 +10,12 @@
 #include <Geometry/OrthoMesh.h>
 #include <Geometry/Wavefront.h>
 
+#include <Graphics/Shaders/TextureShader.h>
 #include <Graphics/Shaders/NormalShader.h>
 #include <Graphics/Shaders/SolverShader2.h>
 #include <Graphics/Shaders/SolverShader.h>
 #include <Graphics/Shaders/WaterShader.h>
+#include <Graphics/Shaders/WavefrontShader.h>
 
 #include <Graphics/Texture.h>
 
@@ -26,13 +28,15 @@ Application::Application(InputManager* input, Graphics* gfx)
 	camera->SetSpeed(cameraSpeed);
 	LOG_INFO("Camera initialised.");
 
-	model = new Wavefront(graphics->GetDevice(), "PoolTest.obj");
+	model = new Wavefront(graphics->GetDevice(), "bridge_pillar.obj");
 
 	// Create Shaders
-	normalShader = new NormalShader(gfx->GetDevice(), gfx->GetDeviceContext());
+	textureShader = new TextureShader(gfx->GetDevice(), gfx->GetDeviceContext());
+	//normalShader = new NormalShader(gfx->GetDevice(), gfx->GetDeviceContext());
 	solverShader = new SolverShader(gfx->GetDevice(), gfx->GetDeviceContext());
 	solverShader2 = new SolverShader2(gfx->GetDevice(), gfx->GetDeviceContext());
 	waterShader = new WaterShader(gfx->GetDevice(), gfx->GetDeviceContext());
+	wavefrontShader = new WavefrontShader(gfx->GetDevice(), gfx->GetDeviceContext());
 
 	// Create Textures
 	waterTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), contentPath L"Content/WaterTexture.png");
@@ -83,8 +87,8 @@ void Application::Render()
 
 	// Model Floor
 	model->SendData(graphics->GetDeviceContext());
-	normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * XMMatrixScaling(3.15f, 3.15f, 3.15f) * XMMatrixTranslation(0.f,6.2f, 25.f), viewMatrix, projectionMatrix, floorTexture->GetShaderResourceView(), 25.f);
-	normalShader->Render(model->GetIndexCount());
+	wavefrontShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * XMMatrixScaling(3.15f, 3.15f, 3.15f) * XMMatrixTranslation(0.f,6.2f, 25.f), viewMatrix, projectionMatrix, light);
+	wavefrontShader->Render(model->GetIndexCount());
 
 	// Render Water
 	planeMesh->SendData(graphics->GetDeviceContext());
@@ -170,8 +174,8 @@ void Application::SetRenderTexturePass(std::unique_ptr<RenderTexture>& renderTex
 	graphics->SetZBuffer(false);
 
 	orthoMesh->SendData(graphics->GetDeviceContext());
-	normalShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, srv, 1.f, true);
-	normalShader->Render(orthoMesh->GetIndexCount());
+	textureShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, srv);
+	textureShader->Render(orthoMesh->GetIndexCount());
 
 	graphics->SetZBuffer(true);
 	graphics->SetBackBufferRenderTarget();
