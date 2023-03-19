@@ -70,6 +70,7 @@ project "Mizu"
 
    filter("files:**_ps.hlsl")
       shadertype("Pixel")
+      shadermodel("4.0")
       shaderobjectfileoutput("../bin/" .. outputdir .. "/%{prj.name}/Shaders/%{file.basename}.cso")
 
 

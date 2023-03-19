@@ -1,4 +1,5 @@
 Texture2D depthTexture : register(t0);
+TextureCube skyTextureCube : register(t1);
 SamplerState depthSampler : register(s0);
 
 cbuffer LightBuffer : register(b0)
@@ -31,20 +32,12 @@ struct PS_Input
     float3 normals : NORMALS;
 };
 
-// Calculate lighting intensity based on direction and normal. Combine with light colour.
-float4 CalculateLighting(float3 lightDirection, float3 normal, float4 diffuse)
-{
-    const float intensity = saturate(dot(normal, lightDirection));
-    return saturate(diffuse * intensity);
-}
-
 float4 main(PS_Input input) : SV_TARGET
 {
-    //return float4(0.5f, 0.5f, 0.8f, 0.1f);
-    //const float4 lightColor = lAmbient + CalculateLighting(-lDirection, input.normals, lDiffuse);
-    //saturate(lightColor)
-    float depth = clamp(depthTexture.Sample(depthSampler, input.tex).x * cStrength, 0, 1);
+    const float depth = clamp(depthTexture.Sample(depthSampler, input.tex).x * cStrength, 0, 1);
 
-    //return lerp(float4(0.f, 0.f, 0.f, 1.f), float4(1.f, 1.f, 1.f, 1.f), depth); //Depth view
-    return lerp(shallowColor, deepColor, depth); //Color view
+
+	return lerp(shallowColor, deepColor, depth);
+
+    //return skyTextureCube.Sample(depthSampler, -lDirection);
 }

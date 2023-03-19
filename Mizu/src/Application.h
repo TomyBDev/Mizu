@@ -36,16 +36,14 @@ private:
 
 	// Shaders
 	class TextureShader* textureShader;
-	class NormalShader* normalShader;
 	class SolverShader* solverShader;
 	class SolverShader2* solverShader2;
 	class WaterShader* waterShader;
 	class WavefrontShader* wavefrontShader;
 
 	// Textures
-	class Texture* waterTexture;
-	Texture* startingConditionTexture;
-	Texture* floorTexture;
+	class Texture* startingConditionTexture;
+	class TextureCube* skyTextureCube;
 
 	// Render Textures
 	std::unique_ptr<RenderTexture> pass1RenderTexture;

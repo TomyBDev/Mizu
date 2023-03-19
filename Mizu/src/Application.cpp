@@ -11,13 +11,13 @@
 #include <Geometry/Wavefront.h>
 
 #include <Graphics/Shaders/TextureShader.h>
-#include <Graphics/Shaders/NormalShader.h>
 #include <Graphics/Shaders/SolverShader2.h>
 #include <Graphics/Shaders/SolverShader.h>
 #include <Graphics/Shaders/WaterShader.h>
 #include <Graphics/Shaders/WavefrontShader.h>
 
 #include <Graphics/Texture.h>
+#include <Graphics/TextureCube.h>
 
 Application::Application(InputManager* input, Graphics* gfx)
 	: inputManager(input),
@@ -32,18 +32,15 @@ Application::Application(InputManager* input, Graphics* gfx)
 
 	// Create Shaders
 	textureShader = new TextureShader(gfx->GetDevice(), gfx->GetDeviceContext());
-	//normalShader = new NormalShader(gfx->GetDevice(), gfx->GetDeviceContext());
 	solverShader = new SolverShader(gfx->GetDevice(), gfx->GetDeviceContext());
 	solverShader2 = new SolverShader2(gfx->GetDevice(), gfx->GetDeviceContext());
 	waterShader = new WaterShader(gfx->GetDevice(), gfx->GetDeviceContext());
 	wavefrontShader = new WavefrontShader(gfx->GetDevice(), gfx->GetDeviceContext());
 
-	// Create Textures
-	waterTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), contentPath L"Content/WaterTexture.png");
-	floorTexture = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), contentPath L"Content/TileTexture.png");
+	skyTextureCube = new TextureCube(gfx->GetDevice(), gfx->GetDeviceContext(), contentPath L"Content/SkyCubeMap.png");
 
 	// Lighting
-	light.direction = XMFLOAT3(0.5f, -0.5f, 0.f);
+	light.direction = XMFLOAT3(1.f, -0.5f, 1.f);
 	light.ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.f);
 	light.diffuse = XMFLOAT4(0.6f, 0.6f, 0.8f, 1.f);
 
@@ -92,7 +89,7 @@ void Application::Render()
 
 	// Render Water
 	planeMesh->SendData(graphics->GetDeviceContext());
-	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale, viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), waterTexture->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength);
+	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale, viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength);
 	waterShader->Render(planeMesh->GetIndexCount());
 
 	Imgui();

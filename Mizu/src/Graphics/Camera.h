@@ -18,6 +18,7 @@ public:
 
 	const XMVECTOR GetPosition() { return position; }
 	const XMVECTOR GetRotation() { return rotation; }
+	const XMVECTOR GetForward() { return forward; }
 
 	//Movement
 	void MoveForward(float dt);
