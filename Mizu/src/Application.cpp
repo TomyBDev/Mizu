@@ -44,7 +44,7 @@ Application::Application(InputManager* input, Graphics* gfx)
 	skyTextureCube = new TextureCube(gfx->GetDevice(), gfx->GetDeviceContext(), contentPath L"Content/SkyCubeMap.png");
 
 	// Lighting
-	light.direction = XMFLOAT3(1.f, -0.5f, 1.f);
+	light.direction = XMFLOAT3(-1.f, -0.5f, 1.f);
 	light.ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.f);
 	light.diffuse = XMFLOAT4(0.6f, 0.6f, 0.8f, 1.f);
 
@@ -85,6 +85,8 @@ void Application::Render()
 	XMMATRIX worldMatrix = graphics->GetWorldMatrix();
 	XMMATRIX viewMatrix = camera->GetViewMatrix();
 	XMMATRIX projectionMatrix = graphics->GetProjectionMatrix();
+
+	// Sky Box
 	graphics->SetZBuffer(false);
 	cubeMesh->SendData(graphics->GetDeviceContext());
 	skyShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * XMMatrixScaling(10.f, 10.f, 10.f) * XMMatrixRotationX(-1.570795f) * XMMatrixTranslation(camera->GetPosition().m128_f32[0], camera->GetPosition().m128_f32[1], camera->GetPosition().m128_f32[2]), viewMatrix, projectionMatrix, skyTextureCube->GetShaderResourceView());
