@@ -11,6 +11,13 @@ public:
 		DirectX::XMFLOAT3 normals;
 	};
 
+	struct Data3D
+	{
+		DirectX::XMFLOAT3 position;
+		DirectX::XMFLOAT3 texture;
+		DirectX::XMFLOAT3 normals;
+	};
+
 	struct TextureData
 	{
 		DirectX::XMFLOAT3 position;

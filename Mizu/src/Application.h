@@ -31,7 +31,7 @@ private:
 	// Mesh
 	class PlaneMesh* planeMesh;
 	class OrthoMesh* orthoMesh;
-
+	class CubeMesh* cubeMesh;
 	class Wavefront* model;
 
 	// Shaders
@@ -40,6 +40,7 @@ private:
 	class SolverShader2* solverShader2;
 	class WaterShader* waterShader;
 	class WavefrontShader* wavefrontShader;
+	class SkyShader* skyShader;
 
 	// Textures
 	class Texture* startingConditionTexture;

@@ -36,7 +36,6 @@ float4 main(PS_Input input) : SV_TARGET
 {
     const float depth = clamp(depthTexture.Sample(depthSampler, input.tex).x * cStrength, 0, 1);
 
-
 	return lerp(shallowColor, deepColor, depth);
 
     //return skyTextureCube.Sample(depthSampler, -lDirection);

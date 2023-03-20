@@ -9,12 +9,14 @@
 #include <Geometry/PlaneMesh.h>
 #include <Geometry/OrthoMesh.h>
 #include <Geometry/Wavefront.h>
+#include <Geometry/CubeMesh.h>
 
 #include <Graphics/Shaders/TextureShader.h>
 #include <Graphics/Shaders/SolverShader2.h>
 #include <Graphics/Shaders/SolverShader.h>
 #include <Graphics/Shaders/WaterShader.h>
 #include <Graphics/Shaders/WavefrontShader.h>
+#include <Graphics/Shaders/SkyShader.h>
 
 #include <Graphics/Texture.h>
 #include <Graphics/TextureCube.h>
@@ -29,6 +31,7 @@ Application::Application(InputManager* input, Graphics* gfx)
 	LOG_INFO("Camera initialised.");
 
 	model = new Wavefront(graphics->GetDevice(), "PoolTest.obj");
+	cubeMesh = new CubeMesh(graphics->GetDevice());
 
 	// Create Shaders
 	textureShader = new TextureShader(gfx->GetDevice(), gfx->GetDeviceContext());
@@ -36,6 +39,7 @@ Application::Application(InputManager* input, Graphics* gfx)
 	solverShader2 = new SolverShader2(gfx->GetDevice(), gfx->GetDeviceContext());
 	waterShader = new WaterShader(gfx->GetDevice(), gfx->GetDeviceContext());
 	wavefrontShader = new WavefrontShader(gfx->GetDevice(), gfx->GetDeviceContext());
+	skyShader = new SkyShader(gfx->GetDevice(), gfx->GetDeviceContext());
 
 	skyTextureCube = new TextureCube(gfx->GetDevice(), gfx->GetDeviceContext(), contentPath L"Content/SkyCubeMap.png");
 
@@ -81,6 +85,11 @@ void Application::Render()
 	XMMATRIX worldMatrix = graphics->GetWorldMatrix();
 	XMMATRIX viewMatrix = camera->GetViewMatrix();
 	XMMATRIX projectionMatrix = graphics->GetProjectionMatrix();
+	graphics->SetZBuffer(false);
+	cubeMesh->SendData(graphics->GetDeviceContext());
+	skyShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * XMMatrixScaling(10.f, 10.f, 10.f) * XMMatrixRotationX(-1.570795f) * XMMatrixTranslation(camera->GetPosition().m128_f32[0], camera->GetPosition().m128_f32[1], camera->GetPosition().m128_f32[2]), viewMatrix, projectionMatrix, skyTextureCube->GetShaderResourceView());
+	skyShader->Render(cubeMesh->GetIndexCount());
+	graphics->SetZBuffer(true);
 
 	// Model Floor
 	model->SendData(graphics->GetDeviceContext());
