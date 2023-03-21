@@ -1,0 +1,281 @@
+#include <mzpch.h>
+#include <Audio/SoundSystem.h>
+
+SoundSystem::SoundSystem()
+{
+	// Ensure COM is initialized.
+	CHECK_ERROR(CoInitializeEx(NULL, COINIT_MULTITHREADED));
+
+	// Create instance of XAudio2 Engine.
+	CHECK_ERROR(XAudio2Create(&engine, 0, XAUDIO2_DEFAULT_PROCESSOR));
+
+	// Create Mastering Voice
+	CHECK_ERROR(engine->CreateMasteringVoice(&masterVoice));
+
+	// Initialise Format Data.
+	format.cbSize = 24932;
+	format.wFormatTag = 1;
+	format.nChannels = 2;
+	format.nSamplesPerSec = 44100;
+	format.nAvgBytesPerSec = 176400;
+	format.nBlockAlign = 4;
+	format.wBitsPerSample = 16;
+
+	// Create the number of channels specified and add them to inactive list.
+	for (int i = 0; i < nChannel; i++)
+		idleChannels.push_back(std::make_unique<Channel>(*this));
+}
+
+SoundSystem::~SoundSystem()
+{
+	for (auto& a : activeChannels)
+	{
+		a.reset();
+	}
+
+	for (auto& a : idleChannels)
+	{
+		a.reset();
+	}
+
+	masterVoice = nullptr;
+
+	// Uninitialize COM
+	CoUninitialize();
+}
+
+SoundSystem& SoundSystem::Get()
+{
+	static SoundSystem instance;
+	return instance;
+}
+
+void SoundSystem::PlaySound(Sound& s)
+{
+	if (!idleChannels.empty())
+	{
+		activeChannels.push_back(std::move(idleChannels.back()));
+		activeChannels.back()->Play(s);
+	}
+}
+
+void SoundSystem::DeactivateChannel(Channel& channel)
+{
+	auto i = std::find_if(activeChannels.begin(), activeChannels.end(), [&channel](const std::unique_ptr<Channel>& chan) -> bool
+		{
+			return &channel == chan.get();
+		});
+
+	idleChannels.push_back(std::move(*i));
+	activeChannels.erase(i);
+}
+
+// Channel
+
+SoundSystem::Channel::Channel(SoundSystem& ss)
+{
+	static VoiceCallback voiceCallback;
+	ZeroMemory(&xaBuffer, sizeof(xaBuffer));
+	xaBuffer.pContext = this;
+	ss.engine->CreateSourceVoice(&source, &ss.format, 0u, 2.f, &voiceCallback);
+}
+
+SoundSystem::Channel::~Channel()
+{
+	if (source != nullptr)
+	{
+		source->DestroyVoice();
+		source = nullptr;
+	}
+
+	if (sound != nullptr)
+		sound == nullptr;
+}
+
+void SoundSystem::Channel::Play(Sound& s)
+{
+	s.AddChannel(*this);
+	sound = &s;
+	xaBuffer.pAudioData = s.data.get();
+	xaBuffer.AudioBytes = s.nBytes;
+	source->SubmitSourceBuffer(&xaBuffer, nullptr);
+	source->Start();
+}
+
+void SoundSystem::Channel::Stop()
+{
+	if (!source)
+	{
+		LOG_ERROR("Failed to stop sound due to null source");
+		return;
+	}
+
+	if (!sound)
+	{
+		LOG_ERROR("Failed to stop sound due to null sound");
+		return;
+	}
+
+	source->Stop();
+	source->FlushSourceBuffers();
+}
+
+void SoundSystem::Channel::VoiceCallback::OnBufferEnd(void* bufferContext)
+{
+	Channel& chan = *(Channel*)bufferContext;
+	chan.sound->RemoveChannel(chan);
+	chan.sound = nullptr;
+	Get().DeactivateChannel(chan);
+}
+
+// Sound
+
+Sound::Sound(const std::wstring& filename)
+{
+	unsigned int fileSize = 0;
+	std::unique_ptr<BYTE[]> pFileIn;
+	try
+	{
+		{
+			std::ifstream file;
+			file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+			try
+			{
+				file.open(filename, std::ios::binary);
+			}
+			catch (std::exception e)
+			{
+				throw SoundSystem::FileError(
+					std::string("error opening file: ") + e.what());
+			}
+
+			{
+				int fourcc;
+				file.read(reinterpret_cast<char*>(&fourcc), 4);
+				if (fourcc != 'FFIR')
+				{
+					throw SoundSystem::FileError("bad fourCC");
+				}
+			}
+
+			file.read(reinterpret_cast<char*>(&fileSize), 4);
+			fileSize += 8; // entry doesn't include the fourcc or itself
+			if (fileSize <= 44)
+			{
+				throw SoundSystem::FileError("file too small");
+			}
+
+			file.seekg(0, std::ios::beg);
+			pFileIn = std::make_unique<BYTE[]>(fileSize);
+			file.read(reinterpret_cast<char*>(pFileIn.get()), fileSize);
+		}
+
+		if (*reinterpret_cast<const int*>(&pFileIn[8]) != 'EVAW')
+		{
+			throw SoundSystem::FileError("format not WAVE");
+		}
+
+		//look for 'fmt ' chunk id
+		WAVEFORMATEX format;
+		bool bFilledFormat = false;
+		for (unsigned int i = 12; i < fileSize; )
+		{
+			if (*reinterpret_cast<const int*>(&pFileIn[i]) == ' tmf')
+			{
+				memcpy(&format, &pFileIn[i + 8], sizeof(format));
+				bFilledFormat = true;
+				break;
+			}
+			// chunk size + size entry size + chunk id entry size + word padding
+			i += (*reinterpret_cast<const int*>(&pFileIn[i + 4]) + 9) & 0xFFFFFFFE;
+		}
+		if (!bFilledFormat)
+		{
+			throw SoundSystem::FileError("fmt chunk not found");
+		}
+
+		// compare format with sound system format
+		{
+			const WAVEFORMATEX sysFormat = SoundSystem::GetFormat();
+
+			if (format.nChannels != sysFormat.nChannels)
+			{
+				throw SoundSystem::FileError("bad wave format (nChannels)");
+			}
+			else if (format.wBitsPerSample != sysFormat.wBitsPerSample)
+			{
+				throw SoundSystem::FileError("bad wave format (wBitsPerSample)");
+			}
+			else if (format.nSamplesPerSec != sysFormat.nSamplesPerSec)
+			{
+				throw SoundSystem::FileError("bad wave format (nSamplesPerSec)");
+			}
+			else if (format.wFormatTag != sysFormat.wFormatTag)
+			{
+				throw SoundSystem::FileError("bad wave format (wFormatTag)");
+			}
+			else if (format.nBlockAlign != sysFormat.nBlockAlign)
+			{
+				throw SoundSystem::FileError("bad wave format (nBlockAlign)");
+			}
+			else if (format.nAvgBytesPerSec != sysFormat.nAvgBytesPerSec)
+			{
+				throw SoundSystem::FileError("bad wave format (nAvgBytesPerSec)");
+			}
+		}
+
+		//look for 'data' chunk id
+		bool bFilledData = false;
+		for (unsigned int i = 12; i < fileSize; )
+		{
+			const int chunkSize = *reinterpret_cast<const int*>(&pFileIn[i + 4]);
+			if (*reinterpret_cast<const int*>(&pFileIn[i]) == 'atad')
+			{
+				data = std::make_unique<BYTE[]>(chunkSize);
+				nBytes = chunkSize;
+				memcpy(data.get(), &pFileIn[i + 8], nBytes);
+
+				bFilledData = true;
+				break;
+			}
+			// chunk size + size entry size + chunk id entry size + word padding
+			i += (chunkSize + 9) & 0xFFFFFFFE;
+		}
+		if (!bFilledData)
+		{
+			throw SoundSystem::FileError("data chunk not found");
+		}
+	}
+	catch (SoundSystem::Error e)
+	{
+		throw e;
+	}
+	catch (std::exception e)
+	{
+		throw SoundSystem::FileError(e.what());
+	}
+}
+
+Sound::~Sound()
+{
+	for (auto channel : activeChannels)
+	{
+		channel->Stop();
+	}
+	while (!activeChannels.empty());
+}
+
+void Sound::Play()
+{
+	SoundSystem::Get().PlaySound(*this);
+}
+
+void Sound::AddChannel(SoundSystem::Channel& c)
+{
+	activeChannels.push_back(&c);
+}
+
+void Sound::RemoveChannel(SoundSystem::Channel& c)
+{
+	activeChannels.erase(std::find(activeChannels.begin(), activeChannels.end(), &c));
+}

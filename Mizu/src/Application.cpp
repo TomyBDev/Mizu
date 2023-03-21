@@ -2,6 +2,7 @@
 #include <Application.h>
 
 #include <Input/InputManager.h>
+#include <Audio/SoundSystem.h>
 
 #include <Graphics/Graphics.h>
 #include <Graphics/Camera.h>
@@ -29,6 +30,9 @@ Application::Application(InputManager* input, Graphics* gfx)
 	camera = new Camera(gfx->GetHWND());
 	camera->SetSpeed(cameraSpeed);
 	LOG_INFO("Camera initialised.");
+
+	ambient = new Sound(contentPath L"Content/Ambient.wav");
+	ambient->Play();
 
 	model = new Wavefront(graphics->GetDevice(), "PoolTest.obj");
 	cubeMesh = new CubeMesh(graphics->GetDevice());
@@ -110,7 +114,6 @@ void Application::Render()
 
 void Application::Init()
 {
-
 	// Create Mesh
 	planeMesh = new PlaneMesh(graphics->GetDevice(), resolution, resolution);
 	orthoMesh = new OrthoMesh(graphics->GetDevice(), resolution, resolution, 0, 0);

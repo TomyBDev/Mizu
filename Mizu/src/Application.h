@@ -51,6 +51,9 @@ private:
 	std::unique_ptr<RenderTexture> pass2RenderTexture;
 	std::unique_ptr<RenderTexture> oldRenderTexture;
 
+	// Sound
+	class Sound* ambient;
+
 	// Lights
 	DirectionalLight light;
 

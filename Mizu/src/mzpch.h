@@ -24,6 +24,9 @@
 #include <d3d11.h>
 #include <d3dcompiler.h>
 
+//xAudio2
+#include <xaudio2.h>
+
 // ImGui
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
