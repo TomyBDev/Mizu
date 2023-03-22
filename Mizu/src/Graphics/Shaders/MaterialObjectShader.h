@@ -3,11 +3,11 @@
 
 using namespace DirectX;
 
-class WavefrontShader : public Shader
+class MaterialObjectShader : public Shader
 {
 public:
-	WavefrontShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
-	~WavefrontShader();
+	MaterialObjectShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
+	~MaterialObjectShader();
 	void SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, DirectionalLight dirLight);
 private:
 	struct MatrixBufferType

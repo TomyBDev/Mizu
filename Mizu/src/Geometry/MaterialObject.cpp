@@ -1,10 +1,10 @@
 #include <mzpch.h>
-#include <Geometry/Wavefront.h>
+#include <Geometry/MaterialObject.h>
 
-Wavefront::Wavefront(Microsoft::WRL::ComPtr<ID3D11Device> device, const char* filename)
+MaterialObject::MaterialObject(Microsoft::WRL::ComPtr<ID3D11Device> device, const char* filename)
 {
 	// Format filename
-	std::string s = contentPathS "Content/";
+	std::string s = contentPathS "Content/Models/";
 	s.append(filename);
 
 	// Input file.
@@ -18,7 +18,7 @@ Wavefront::Wavefront(Microsoft::WRL::ComPtr<ID3D11Device> device, const char* fi
 	}
 	vertexCount = indexCount;
 
-	// Vectors to store the wavefront data.
+	// Vectors to store the MaterialObject data.
 	std::vector<DirectX::XMFLOAT3> v;
 	std::vector<DirectX::XMFLOAT2> vt;
 	std::vector<DirectX::XMFLOAT3> vn;
@@ -121,7 +121,7 @@ Wavefront::Wavefront(Microsoft::WRL::ComPtr<ID3D11Device> device, const char* fi
 		if (s.substr(0, 6) == "mtllib") // MTL filename
 		{
 			std::string mtlFilename = s.substr(7, s.size() - 7);
-			ReadMaterials(materialDict,mtlFilename.c_str());
+			ReadMaterials(materialDict,mtlFilename.c_str(), filename);
 		}
 	}
 
@@ -156,7 +156,7 @@ Wavefront::Wavefront(Microsoft::WRL::ComPtr<ID3D11Device> device, const char* fi
 	device->CreateBuffer(&indexBufferDesc, &indexData, &indexBuffer);
 }
 
-void Wavefront::SendData(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext)
+void MaterialObject::SendData(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext)
 {
 	const UINT stride = sizeof(MaterialData);
 	const UINT offset = 0u;
@@ -165,9 +165,12 @@ void Wavefront::SendData(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceConte
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
-void Wavefront::ReadMaterials(std::unordered_map<std::string, DirectX::XMFLOAT3>& dict, const char* filename)
+void MaterialObject::ReadMaterials(std::unordered_map<std::string, DirectX::XMFLOAT3>& dict, const char* filename, std::string originalFilename)
 {
-	std::string s = contentPathS "Content/";
+	auto it = originalFilename.find('/');
+
+	std::string s = contentPathS "Content/Models/";
+	s.append(originalFilename.substr(0, it+1));
 	s.append(filename);
 
 	// Input file.

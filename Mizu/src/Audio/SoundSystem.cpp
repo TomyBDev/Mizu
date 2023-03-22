@@ -117,7 +117,7 @@ void SoundSystem::Channel::VoiceCallback::OnBufferEnd(void* bufferContext)
 
 // Sound
 
-Sound::Sound(const std::wstring& filename)
+Sound::Sound(const std::string filename)
 {
 	unsigned int fileSize = 0;
 	std::unique_ptr<BYTE[]> pFileIn;
@@ -128,7 +128,10 @@ Sound::Sound(const std::wstring& filename)
 			file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 			try
 			{
-				file.open(filename, std::ios::binary);
+				std::string s = contentPathS "Content/Audio/";
+				s.append(filename);
+
+				file.open(s, std::ios::binary);
 			}
 			catch (std::exception e)
 			{

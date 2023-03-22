@@ -1,10 +1,10 @@
 ﻿#include "mzpch.h"
-#include "Graphics/Shaders/WavefrontShader.h"
+#include "Graphics/Shaders/MaterialObjectShader.h"
 
-WavefrontShader::WavefrontShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) : Shader(dev, context)
+MaterialObjectShader::MaterialObjectShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) : Shader(dev, context)
 {
-	LoadMaterialVertexShader(shaderPath L"Shaders/WavefrontShader_vs.cso");
-	LoadPixelShader(shaderPath L"Shaders/WavefrontShader_ps.cso");
+	LoadMaterialVertexShader(shaderPath L"Shaders/MaterialObjectShader_vs.cso");
+	LoadPixelShader(shaderPath L"Shaders/MaterialObjectShader_ps.cso");
 
 	D3D11_BUFFER_DESC matrixBufferDesc;
 	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -25,7 +25,7 @@ WavefrontShader::WavefrontShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Micro
 	device->CreateBuffer(&lightBufferDesc, NULL, &lightBuffer);
 }
 
-WavefrontShader::~WavefrontShader()
+MaterialObjectShader::~MaterialObjectShader()
 {
 	if (matrixBuffer)
 	{
@@ -40,7 +40,7 @@ WavefrontShader::~WavefrontShader()
 	}
 }
 
-void WavefrontShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, DirectionalLight dirLight)
+void MaterialObjectShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, DirectionalLight dirLight)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 

@@ -18,6 +18,7 @@ public:
 	void ClearBuffer(float r, float g, float b) noexcept;
 	void SetZBuffer(bool b);
 	void SetAlpha(bool b);
+	void SetBothSides(bool b);
 	void SetBackBufferRenderTarget();
 
 private:
@@ -30,6 +31,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> noDepthStencilState = nullptr;
 	Microsoft::WRL::ComPtr<ID3D11BlendState> blendState = nullptr;
 	Microsoft::WRL::ComPtr<ID3D11BlendState> noBlendState = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerState;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> noBackCullRasterizerState;
 	D3D11_VIEWPORT viewport;
 	HWND hWnd;
 

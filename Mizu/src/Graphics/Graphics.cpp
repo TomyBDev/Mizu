@@ -121,22 +121,23 @@ Graphics::Graphics(HWND hwnd)
 	rasterizerDesc.MultisampleEnable = TRUE;
 	rasterizerDesc.AntialiasedLineEnable = FALSE;
 
-	ComPtr<ID3D11RasterizerState> rasterizerState;
 	CHECK_ERROR(device->CreateRasterizerState(&rasterizerDesc, &rasterizerState));
 	deviceContext->RSSetState(rasterizerState.Get());
 
+	rasterizerDesc.CullMode = D3D11_CULL_NONE;
+	CHECK_ERROR(device->CreateRasterizerState(&rasterizerDesc, &noBackCullRasterizerState));
 
 	//// Blender
 
 	D3D11_BLEND_DESC blendDesc = {};
 	blendDesc.RenderTarget[0].BlendEnable = TRUE;
-	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ZERO;
 	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-	blendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0fu;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	CHECK_ERROR(device->CreateBlendState(&blendDesc, &blendState));
 
 	deviceContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFFu);
@@ -175,6 +176,17 @@ void Graphics::SetAlpha(bool b)
 	}
 
 	deviceContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFFu);
+}
+
+void Graphics::SetBothSides(bool b)
+{
+	if (b)
+	{
+		deviceContext->RSSetState(noBackCullRasterizerState.Get());
+		return;
+	}
+
+	deviceContext->RSSetState(rasterizerState.Get());
 }
 
 void Graphics::SetBackBufferRenderTarget()

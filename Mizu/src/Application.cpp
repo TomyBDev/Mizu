@@ -9,14 +9,16 @@
 
 #include <Geometry/PlaneMesh.h>
 #include <Geometry/OrthoMesh.h>
-#include <Geometry/Wavefront.h>
+#include <Geometry/MaterialObject.h>
+#include <Geometry/TextureObject.h>
 #include <Geometry/CubeMesh.h>
 
 #include <Graphics/Shaders/TextureShader.h>
 #include <Graphics/Shaders/SolverShader2.h>
 #include <Graphics/Shaders/SolverShader.h>
 #include <Graphics/Shaders/WaterShader.h>
-#include <Graphics/Shaders/WavefrontShader.h>
+#include <Graphics/Shaders/MaterialObjectShader.h>
+#include <Graphics/Shaders/TextureObjectShader.h>
 #include <Graphics/Shaders/SkyShader.h>
 
 #include <Graphics/Texture.h>
@@ -31,10 +33,11 @@ Application::Application(InputManager* input, Graphics* gfx)
 	camera->SetSpeed(cameraSpeed);
 	LOG_INFO("Camera initialised.");
 
-	ambient = new Sound(contentPath L"Content/Ambient.wav");
-	ambient->Play();
+	ambient = new Sound("Ambient.wav");
+	ambient->Play(true);
 
-	model = new Wavefront(graphics->GetDevice(), "PoolTest.obj");
+	model = new MaterialObject(graphics->GetDevice(), "Pool/Pool.obj");
+	palmTree = new TextureObject(graphics->GetDevice(), "PalmTree/palm_tree.obj");
 	cubeMesh = new CubeMesh(graphics->GetDevice());
 
 	// Create Shaders
@@ -42,10 +45,14 @@ Application::Application(InputManager* input, Graphics* gfx)
 	solverShader = new SolverShader(gfx->GetDevice(), gfx->GetDeviceContext());
 	solverShader2 = new SolverShader2(gfx->GetDevice(), gfx->GetDeviceContext());
 	waterShader = new WaterShader(gfx->GetDevice(), gfx->GetDeviceContext());
-	wavefrontShader = new WavefrontShader(gfx->GetDevice(), gfx->GetDeviceContext());
+	materialObjectShader = new MaterialObjectShader(gfx->GetDevice(), gfx->GetDeviceContext());
+	textureObjectShader = new TextureObjectShader(gfx->GetDevice(), gfx->GetDeviceContext());
 	skyShader = new SkyShader(gfx->GetDevice(), gfx->GetDeviceContext());
 
-	skyTextureCube = new TextureCube(gfx->GetDevice(), gfx->GetDeviceContext(), contentPath L"Content/SkyCubeMap.png");
+	skyTextureCube = new TextureCube(gfx->GetDevice(), gfx->GetDeviceContext(), L"Sky/SkyCubeMap.png");
+	palmTreeDiffuse = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), L"PalmTree/diffuse.png");
+	palmTreeNormal = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), L"PalmTree/normal.png");
+	palmTreeSpecular = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), L"PalmTree/specular.png");
 
 	// Lighting
 	light.direction = XMFLOAT3(-1.f, -0.5f, 1.f);
@@ -99,13 +106,20 @@ void Application::Render()
 
 	// Model Floor
 	model->SendData(graphics->GetDeviceContext());
-	wavefrontShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * XMMatrixScaling(3.15f, 3.15f, 3.15f) * XMMatrixTranslation(0.f,6.2f, 25.f), viewMatrix, projectionMatrix, light);
-	wavefrontShader->Render(model->GetIndexCount());
+	materialObjectShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * XMMatrixScaling(3.15f, 3.15f, 3.15f) * XMMatrixTranslation(0.f,6.2f, 25.f), viewMatrix, projectionMatrix, light);
+	materialObjectShader->Render(model->GetIndexCount());
 
 	// Render Water
 	planeMesh->SendData(graphics->GetDeviceContext());
 	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale, viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength);
 	waterShader->Render(planeMesh->GetIndexCount());
+
+	// Palm Tree
+	graphics->SetBothSides(true);
+	palmTree->SendData(graphics->GetDeviceContext());
+	textureObjectShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * XMMatrixScaling(0.05f, 0.05f, 0.05f), viewMatrix, projectionMatrix, light, palmTreeDiffuse->GetShaderResourceView(), palmTreeNormal->GetShaderResourceView(), palmTreeSpecular->GetShaderResourceView());
+	textureObjectShader->Render(palmTree->GetIndexCount());
+	graphics->SetBothSides(false);
 
 	Imgui();
 	graphics->EndFrame();
@@ -119,8 +133,8 @@ void Application::Init()
 	orthoMesh = new OrthoMesh(graphics->GetDevice(), resolution, resolution, 0, 0);
 
 	// Create Textures
-	std::string s = contentPathS;
-	s.append("Content/StartingConditionTexture" + std::to_string(resolution) + ".png");
+	std::string s = "StartingCondition/SC";
+	s.append(std::to_string(resolution) + ".png");
 	startingConditionTexture = new Texture(graphics->GetDevice(), graphics->GetDeviceContext(), StringConverter::StringToWide(s));
 
 	pass1RenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), resolution, resolution, 0.1f, 200.f);

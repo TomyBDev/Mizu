@@ -44,12 +44,12 @@ WaterShader::WaterShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WR
 	device->CreateBuffer(&controlBufferDesc, NULL, &controlBuffer);
 
 	D3D11_SAMPLER_DESC skySamplerDesc;
-	skySamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	skySamplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
 	skySamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	skySamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	skySamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	skySamplerDesc.MipLODBias = 0.0f;
-	skySamplerDesc.MaxAnisotropy = 1;
+	skySamplerDesc.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;
 	skySamplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
 	skySamplerDesc.MinLOD = 0;
 	skySamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;

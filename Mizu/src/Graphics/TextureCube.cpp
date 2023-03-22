@@ -1,9 +1,12 @@
 ﻿#include "mzpch.h"
 #include "Graphics/TextureCube.h"
 
-TextureCube::TextureCube(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::wstring fileName)
+TextureCube::TextureCube(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const std::wstring fileName)
 {
-	Gdiplus::Bitmap bitmap(fileName.c_str());
+	std::wstring s = contentPath L"Content/Textures/";
+	s.append(fileName);
+
+	Gdiplus::Bitmap bitmap(s.c_str());
 
 	if (bitmap.GetLastStatus() != Gdiplus::Ok)
 	{

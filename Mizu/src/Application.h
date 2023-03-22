@@ -32,19 +32,24 @@ private:
 	class PlaneMesh* planeMesh;
 	class OrthoMesh* orthoMesh;
 	class CubeMesh* cubeMesh;
-	class Wavefront* model;
+	class MaterialObject* model;
+	class TextureObject* palmTree;
 
 	// Shaders
 	class TextureShader* textureShader;
 	class SolverShader* solverShader;
 	class SolverShader2* solverShader2;
 	class WaterShader* waterShader;
-	class WavefrontShader* wavefrontShader;
+	class MaterialObjectShader* materialObjectShader;
+	class TextureObjectShader* textureObjectShader;
 	class SkyShader* skyShader;
 
 	// Textures
 	class Texture* startingConditionTexture;
 	class TextureCube* skyTextureCube;
+	Texture* palmTreeDiffuse;
+	Texture* palmTreeNormal;
+	Texture* palmTreeSpecular;
 
 	// Render Textures
 	std::unique_ptr<RenderTexture> pass1RenderTexture;

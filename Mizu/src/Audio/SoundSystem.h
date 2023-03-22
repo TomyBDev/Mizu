@@ -74,7 +74,7 @@ class Sound
 {
 	friend SoundSystem::Channel;
 public:
-	Sound(const std::wstring& filename);
+	Sound(const std::string filename);
 	~Sound();
 
 	void Play(bool bLoop = false, float vol = 1.f, float freqMod = 1.0f);
