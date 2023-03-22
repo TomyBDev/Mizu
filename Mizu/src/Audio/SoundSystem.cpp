@@ -3,15 +3,6 @@
 
 SoundSystem::SoundSystem()
 {
-	// Ensure COM is initialized.
-	CHECK_ERROR(CoInitializeEx(NULL, COINIT_MULTITHREADED));
-
-	// Create instance of XAudio2 Engine.
-	CHECK_ERROR(XAudio2Create(&engine, 0, XAUDIO2_DEFAULT_PROCESSOR));
-
-	// Create Mastering Voice
-	CHECK_ERROR(engine->CreateMasteringVoice(&masterVoice));
-
 	// Initialise Format Data.
 	format.cbSize = 24932;
 	format.wFormatTag = 1;
@@ -21,27 +12,15 @@ SoundSystem::SoundSystem()
 	format.nBlockAlign = 4;
 	format.wBitsPerSample = 16;
 
+	// Create instance of XAudio2 Engine.
+	CHECK_ERROR(XAudio2Create(&engine, 0, XAUDIO2_DEFAULT_PROCESSOR));
+
+	// Create Mastering Voice
+	CHECK_ERROR(engine->CreateMasteringVoice(&masterVoice));
+
 	// Create the number of channels specified and add them to inactive list.
 	for (int i = 0; i < nChannel; i++)
 		idleChannels.push_back(std::make_unique<Channel>(*this));
-}
-
-SoundSystem::~SoundSystem()
-{
-	for (auto& a : activeChannels)
-	{
-		a.reset();
-	}
-
-	for (auto& a : idleChannels)
-	{
-		a.reset();
-	}
-
-	masterVoice = nullptr;
-
-	// Uninitialize COM
-	CoUninitialize();
 }
 
 SoundSystem& SoundSystem::Get()
@@ -50,17 +29,20 @@ SoundSystem& SoundSystem::Get()
 	return instance;
 }
 
-void SoundSystem::PlaySound(Sound& s)
+void SoundSystem::PlaySoundBuffer(Sound& s, bool bLoop, float vol, float freqMod)
 {
+	std::lock_guard<std::mutex> lock(mutex);
 	if (!idleChannels.empty())
 	{
 		activeChannels.push_back(std::move(idleChannels.back()));
-		activeChannels.back()->Play(s);
+		idleChannels.pop_back();
+		activeChannels.back()->PlaySoundBuffer(s, bLoop, vol, freqMod);
 	}
 }
 
 void SoundSystem::DeactivateChannel(Channel& channel)
 {
+	std::lock_guard<std::mutex> lock(mutex);
 	auto i = std::find_if(activeChannels.begin(), activeChannels.end(), [&channel](const std::unique_ptr<Channel>& chan) -> bool
 		{
 			return &channel == chan.get();
@@ -92,13 +74,17 @@ SoundSystem::Channel::~Channel()
 		sound == nullptr;
 }
 
-void SoundSystem::Channel::Play(Sound& s)
+void SoundSystem::Channel::PlaySoundBuffer(Sound& s, bool bLoop, float vol, float freqMod)
 {
 	s.AddChannel(*this);
 	sound = &s;
 	xaBuffer.pAudioData = s.data.get();
 	xaBuffer.AudioBytes = s.nBytes;
+	if (bLoop)
+		xaBuffer.LoopCount = XAUDIO2_LOOP_INFINITE;
 	source->SubmitSourceBuffer(&xaBuffer, nullptr);
+	source->SetFrequencyRatio(freqMod);
+	source->SetVolume(vol);
 	source->Start();
 }
 
@@ -123,6 +109,7 @@ void SoundSystem::Channel::Stop()
 void SoundSystem::Channel::VoiceCallback::OnBufferEnd(void* bufferContext)
 {
 	Channel& chan = *(Channel*)bufferContext;
+	chan.Stop();
 	chan.sound->RemoveChannel(chan);
 	chan.sound = nullptr;
 	Get().DeactivateChannel(chan);
@@ -258,24 +245,35 @@ Sound::Sound(const std::wstring& filename)
 
 Sound::~Sound()
 {
-	for (auto channel : activeChannels)
 	{
-		channel->Stop();
+		std::lock_guard<std::mutex> lock(mutex);
+		for (auto channel : activeChannels)
+		{
+			channel->Stop();
+		}
 	}
-	while (!activeChannels.empty());
+
+	bool allChannelsDeactivated = false;
+	do
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		allChannelsDeactivated = activeChannels.empty();
+	} while (!allChannelsDeactivated);
 }
 
-void Sound::Play()
+void Sound::Play(bool bLoop, float vol, float freqMod)
 {
-	SoundSystem::Get().PlaySound(*this);
+	SoundSystem::Get().PlaySoundBuffer(*this, bLoop, vol, freqMod);
 }
 
 void Sound::AddChannel(SoundSystem::Channel& c)
 {
+	std::lock_guard<std::mutex> lock(mutex);
 	activeChannels.push_back(&c);
 }
 
 void Sound::RemoveChannel(SoundSystem::Channel& c)
 {
+	std::lock_guard<std::mutex> lock(mutex);
 	activeChannels.erase(std::find(activeChannels.begin(), activeChannels.end(), &c));
 }

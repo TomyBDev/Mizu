@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Tools/ComManager.h>
+
 class SoundSystem
 {
 public:
@@ -38,7 +40,7 @@ public:
 		Channel(SoundSystem& soundSystem);
 		~Channel();
 
-		void Play(class Sound& s);
+		void PlaySoundBuffer(class Sound& s, bool bLoop, float vol, float freqMod);
 
 		void Stop();
 
@@ -51,20 +53,20 @@ public:
 	static SoundSystem& Get();
 	static WAVEFORMATEX& GetFormat() { return Get().format; }
 
-	void PlaySound(class Sound& s);
-
-	~SoundSystem();
+	void PlaySoundBuffer(class Sound& s, bool bLoop, float vol, float freqMod);
 
 private:
 	SoundSystem();
 
 	void DeactivateChannel(Channel& channel);
 
+	ComManager comManager;
 	Microsoft::WRL::ComPtr<IXAudio2> engine;
 	IXAudio2MasteringVoice* masterVoice;
 	WAVEFORMATEX format;
 	std::vector<std::unique_ptr<Channel>> idleChannels;
 	std::vector<std::unique_ptr<Channel>> activeChannels;
+	std::mutex mutex;
 	const int nChannel = 64;
 };
 
@@ -75,7 +77,7 @@ public:
 	Sound(const std::wstring& filename);
 	~Sound();
 
-	void Play();
+	void Play(bool bLoop = false, float vol = 1.f, float freqMod = 1.0f);
 
 private:
 	void AddChannel(SoundSystem::Channel& c);
@@ -84,4 +86,5 @@ private:
 	UINT32 nBytes = 0;
 	std::unique_ptr<BYTE[]> data;
 	std::vector<SoundSystem::Channel*> activeChannels;
+	std::mutex mutex;
 };
