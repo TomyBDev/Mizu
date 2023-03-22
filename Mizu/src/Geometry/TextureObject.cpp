@@ -14,7 +14,7 @@ TextureObject::TextureObject(Microsoft::WRL::ComPtr<ID3D11Device> device, const 
 	while (std::getline(obj, s))
 	{
 		if (s[0] == 'f')
-			indexCount += 3;
+			indexCount += 6;
 	}
 	vertexCount = indexCount;
 
@@ -88,26 +88,75 @@ TextureObject::TextureObject(Microsoft::WRL::ComPtr<ID3D11Device> device, const 
 
 		if (s.substr(0, 2) == "f ") // Faces
 		{
-			DirectX::XMINT3 vIndex, vtIndex, vnIndex;
-			sscanf_s(s.c_str(), "%*s %i %*c %i %*c %i %i %*c %i %*c %i %i %*c %i %*c %i\n", &vIndex.x, &vtIndex.x, &vnIndex.x, &vIndex.y, &vtIndex.y, &vnIndex.y, &vIndex.z, &vtIndex.z, &vnIndex.z);
+			int count = std::count(s.begin(), s.end(), '/');
+			if (count == 6)
+			{
+				DirectX::XMINT3 vIndex, vtIndex, vnIndex;
+				sscanf_s(s.c_str(), "%*s %i %*c %i %*c %i %i %*c %i %*c %i %i %*c %i %*c %i\n", &vIndex.x, &vtIndex.x, &vnIndex.x, &vIndex.y, &vtIndex.y, &vnIndex.y, &vIndex.z, &vtIndex.z, &vnIndex.z);
 
-			data[i].position = v[vIndex.z - 1];
-			data[i].texture = vt[vtIndex.z - 1];
-			data[i].normals = vn[vnIndex.z - 1];
-			indices[i] = i;
-			i++;
+				data[i].position = v[vIndex.z - 1];
+				data[i].texture = vt[vtIndex.z - 1];
+				data[i].normals = vn[vnIndex.z - 1];
+				indices[i] = i;
+				i++;
 
-			data[i].position = v[vIndex.y - 1];
-			data[i].texture = vt[vtIndex.y - 1];
-			data[i].normals = vn[vnIndex.y - 1];
-			indices[i] = i;
-			i++;
+				data[i].position = v[vIndex.y - 1];
+				data[i].texture = vt[vtIndex.y - 1];
+				data[i].normals = vn[vnIndex.y - 1];
+				indices[i] = i;
+				i++;
 
-			data[i].position = v[vIndex.x - 1];
-			data[i].texture = vt[vtIndex.x - 1];
-			data[i].normals = vn[vnIndex.x - 1];
-			indices[i] = i;
-			i++;
+				data[i].position = v[vIndex.x - 1];
+				data[i].texture = vt[vtIndex.x - 1];
+				data[i].normals = vn[vnIndex.x - 1];
+				indices[i] = i;
+				i++;
+			}
+			else if (count == 8)
+			{
+				DirectX::XMINT4 vIndex, vtIndex, vnIndex;
+				sscanf_s(s.c_str(), "%*s %i %*c %i %*c %i %i %*c %i %*c %i %i %*c %i %*c %i %i %*c %i %*c %i\n", &vIndex.x, &vtIndex.x, &vnIndex.x, &vIndex.y, &vtIndex.y, &vnIndex.y, &vIndex.z, &vtIndex.z, &vnIndex.z, &vIndex.w, &vtIndex.w, &vnIndex.w);
+
+				// Triangle 1
+
+				data[i].position = v[vIndex.z - 1];
+				data[i].texture = vt[vtIndex.z - 1];
+				data[i].normals = vn[vnIndex.z - 1];
+				indices[i] = i;
+				i++;
+
+				data[i].position = v[vIndex.y - 1];
+				data[i].texture = vt[vtIndex.y - 1];
+				data[i].normals = vn[vnIndex.y - 1];
+				indices[i] = i;
+				i++;
+
+				data[i].position = v[vIndex.x - 1];
+				data[i].texture = vt[vtIndex.x - 1];
+				data[i].normals = vn[vnIndex.x - 1];
+				indices[i] = i;
+				i++;
+
+				//Triangle 2
+
+				data[i].position = v[vIndex.z - 1];
+				data[i].texture = vt[vtIndex.z - 1];
+				data[i].normals = vn[vnIndex.z - 1];
+				indices[i] = i;
+				i++;
+
+				data[i].position = v[vIndex.x - 1];
+				data[i].texture = vt[vtIndex.x - 1];
+				data[i].normals = vn[vnIndex.x - 1];
+				indices[i] = i;
+				i++;
+
+				data[i].position = v[vIndex.w - 1];
+				data[i].texture = vt[vtIndex.w - 1];
+				data[i].normals = vn[vnIndex.w - 1];
+				indices[i] = i;
+				i++;
+			}
 		}
 	}
 
