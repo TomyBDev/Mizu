@@ -197,12 +197,14 @@ void Application::SetRenderTexturePass(std::unique_ptr<RenderTexture>& renderTex
 	XMMATRIX orthoViewMatrix = camera->GetOrthoViewMatrix();
 
 	graphics->SetZBuffer(false);
+	graphics->SetAlpha(false);
 
 	orthoMesh->SendData(graphics->GetDeviceContext());
 	textureShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, srv);
 	textureShader->Render(orthoMesh->GetIndexCount());
 
 	graphics->SetZBuffer(true);
+	graphics->SetAlpha(true);
 	graphics->SetBackBufferRenderTarget();
 }
 
