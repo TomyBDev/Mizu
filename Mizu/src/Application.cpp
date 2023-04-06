@@ -100,7 +100,7 @@ void Application::Render()
 	// Sky Box
 	graphics->SetZBuffer(false);
 	cubeMesh->SendData(graphics->GetDeviceContext());
-	skyShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * XMMatrixScaling(10.f, 10.f, 10.f) * XMMatrixRotationX(-1.570795f) * XMMatrixTranslation(camera->GetPosition().m128_f32[0], camera->GetPosition().m128_f32[1], camera->GetPosition().m128_f32[2]), viewMatrix, projectionMatrix, skyTextureCube->GetShaderResourceView());
+	skyShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * XMMatrixScaling(10.f, 10.f, 10.f) * XMMatrixTranslation(camera->GetPosition().m128_f32[0], camera->GetPosition().m128_f32[1], camera->GetPosition().m128_f32[2]), viewMatrix, projectionMatrix, skyTextureCube->GetShaderResourceView());
 	skyShader->Render(cubeMesh->GetIndexCount());
 	graphics->SetZBuffer(true);
 
@@ -110,16 +110,18 @@ void Application::Render()
 	materialObjectShader->Render(model->GetIndexCount());
 
 	// Render Water
+	graphics->SetBothSides(true);
 	planeMesh->SendData(graphics->GetDeviceContext());
 	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale, viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength);
 	waterShader->Render(planeMesh->GetIndexCount());
+	graphics->SetBothSides(false);
 
 	// Palm Tree
-	graphics->SetBothSides(true);
+	/*graphics->SetBothSides(true);
 	palmTree->SendData(graphics->GetDeviceContext());
 	textureObjectShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * XMMatrixScaling(0.05f, 0.05f, 0.05f), viewMatrix, projectionMatrix, light, palmTreeDiffuse->GetShaderResourceView(), palmTreeNormal->GetShaderResourceView(), palmTreeSpecular->GetShaderResourceView());
 	textureObjectShader->Render(palmTree->GetIndexCount());
-	graphics->SetBothSides(false);
+	graphics->SetBothSides(false);*/
 
 	Imgui();
 	graphics->EndFrame();

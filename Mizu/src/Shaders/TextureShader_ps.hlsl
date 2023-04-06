@@ -9,5 +9,6 @@ struct PS_Input
 
 float4 main(PS_Input input) : SV_TARGET
 {
+    return theTexture.Sample(textureSampler, input.tex) * 0.01f; // Number here is to scale down the image file values to something smaller.
     return theTexture.Sample(textureSampler, input.tex) * 0.0390625f; // Number here is to scale down the image file values to something smaller.
 }

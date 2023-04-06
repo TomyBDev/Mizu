@@ -3,6 +3,7 @@
 bin/
 bin-int/
 logs/
+OtherTextures/
 
 # Files
 *.user

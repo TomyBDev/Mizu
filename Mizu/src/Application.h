@@ -77,7 +77,7 @@ private:
 	const std::unordered_map<int, int> resolutions = { {0,128}, {1,256}, {2,512}, {3,1024} };
 
 	// Water Shader Control
-	float strength = 55.f;
-	float shallowColor[4] = { 0.046875f, 0.7734375f, 0.66015625f, 0.35546875f };
+	float strength = 100.f;
+	float shallowColor[4] = { 0.01960784f, 0.28627451, 0.243137255, 0.35546875f };
 	float deepColor[4] = { 0.0390625f, 0.35546875f, 0.6796875f, 0.7578125f };
 };
