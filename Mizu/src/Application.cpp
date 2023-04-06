@@ -236,7 +236,7 @@ void Application::Imgui()
 	}
 	if (ImGui::CollapsingHeader("Water Shader Settings"))
 	{
-		ImGui::SliderFloat("Depth Strength", &strength, 0.1f, 100.f);
+		ImGui::SliderFloat("Depth Strength", &strength, 0.1f, 200.f);
 		if (ImGui::TreeNode("Shallow Water Color"))
 		{
 			ImGui::ColorPicker4("Shallow Color", shallowColor);

@@ -73,11 +73,11 @@ private:
 
 	// Water Resolution Control
 	int resolution;
-	int resolutionItem = 3;
+	int resolutionItem = 2;
 	const std::unordered_map<int, int> resolutions = { {0,128}, {1,256}, {2,512}, {3,1024} };
 
 	// Water Shader Control
-	float strength = 100.f;
-	float shallowColor[4] = { 0.01960784f, 0.28627451, 0.243137255, 0.35546875f };
-	float deepColor[4] = { 0.0390625f, 0.35546875f, 0.6796875f, 0.7578125f };
+	float strength = 145.f;
+	float shallowColor[4] = { 0.1f, 0.37f, 0.55f, 0.85f };
+	float deepColor[4] = { 0.004f, 0.15f, 0.3f, 1.f };
 };
