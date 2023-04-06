@@ -4,7 +4,7 @@
 TextureObject::TextureObject(Microsoft::WRL::ComPtr<ID3D11Device> device, const char* filename)
 {
 	// Format filename
-	std::string s = contentPathS "Content/Models/";
+	std::string s =  "Content/Models/";
 	s.append(filename);
 
 	// Input file.
@@ -191,11 +191,11 @@ TextureObject::TextureObject(Microsoft::WRL::ComPtr<ID3D11Device> device, const 
 	device->CreateBuffer(&indexBufferDesc, &indexData, &indexBuffer);
 }
 
-void TextureObject::SendData(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext)
+void TextureObject::SendData(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, D3D_PRIMITIVE_TOPOLOGY topology)
 {
 	const UINT stride = sizeof(Data);
 	const UINT offset = 0u;
 	deviceContext->IASetVertexBuffers(0u, 1u, vertexBuffer.GetAddressOf(), &stride, &offset);
 	deviceContext->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	deviceContext->IASetPrimitiveTopology(topology);
 }

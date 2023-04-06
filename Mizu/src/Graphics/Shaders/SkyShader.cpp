@@ -3,8 +3,8 @@
 
 SkyShader::SkyShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) : Shader(dev, context)
 {
-	Load3DVertexShader(shaderPath L"Shaders/SkyShader_vs.cso");
-	LoadPixelShader(shaderPath L"Shaders/SkyShader_ps.cso");
+	Load3DVertexShader( L"Shaders/SkyShader_vs.cso");
+	LoadPixelShader( L"Shaders/SkyShader_ps.cso");
 
 	D3D11_BUFFER_DESC matrixBufferDesc;
 	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;

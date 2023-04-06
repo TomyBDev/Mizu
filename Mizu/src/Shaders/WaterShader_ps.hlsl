@@ -37,7 +37,7 @@ struct PS_Input
     float4 pos : SV_POSITION;
     float2 tex : TEXTURE;
     float3 normals : NORMALS;
-    float4 worldPos : MEOW;
+    float4 worldPos : WORLDPOS;
 };
 
 float4 main(PS_Input input) : SV_TARGET

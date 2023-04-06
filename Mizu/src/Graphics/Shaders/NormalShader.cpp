@@ -3,8 +3,8 @@
 
 NormalShader::NormalShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) : Shader(dev, context)
 {
-	LoadVertexShader(shaderPath L"Shaders/NormalShader_vs.cso");
-	LoadPixelShader(shaderPath L"Shaders/NormalShader_ps.cso");
+	LoadVertexShader( L"Shaders/NormalShader_vs.cso");
+	LoadPixelShader( L"Shaders/NormalShader_ps.cso");
 
 	D3D11_BUFFER_DESC matrixBufferDesc;
 	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;

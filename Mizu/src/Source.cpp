@@ -22,9 +22,13 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	renderWindow.Initialize(&inputManager);
 	LOG_INFO("Render window initialised.");
 
+	LOG_FLUSH();
+
 	LOG_INFO("Initilaising Application...");
 	Application app(&inputManager, renderWindow.GetGraphics());
 	LOG_INFO("Application initialised.");
+
+	LOG_FLUSH();
 
 	// calculate the time between updates
 	UINT64 clock, clock_frequency, clock_last_frame_;

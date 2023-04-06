@@ -17,6 +17,7 @@ project "Mizu"
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
+
     pchheader "mzpch.h"
     pchsource "Mizu/src/mzpch.cpp"
 
@@ -52,29 +53,38 @@ project "Mizu"
             "MZ_PLATFORM_WINDOWS"
         }
 
-        postbuildcommands
-        {
-            ("Xcopy " .. os.realpath("Content") .. " " .. os.realpath("bin/" .. outputdir .. "/%{prj.name}/Content") .. " /s /h /e /c /i /d")
-        }
-
     filter "configurations:Debug"
+        debugdir ("bin/" .. outputdir .. "/%{prj.name}")
         defines "MZ_DEBUG"
         symbols "On"
 
     filter "configurations:Release"
+        debugdir ("bin/" .. outputdir .. "/%{prj.name}")
         defines "MZ_RELEASE"
         optimize "On"
 
     filter "files:vendor/ImGui/**.cpp"
         flags {"NoPCH"}
 
+    filter("files:**.hlsl")
+        shaderobjectfileoutput("../bin/" .. outputdir .. "/%{prj.name}/Shaders/%{file.basename}.cso")
+
    filter("files:**_ps.hlsl")
+      shadermodel("4.0")
       shadertype("Pixel")
-      shadermodel("4.0")
-      shaderobjectfileoutput("../bin/" .. outputdir .. "/%{prj.name}/Shaders/%{file.basename}.cso")
 
-
+      
    filter("files:**_vs.hlsl")
-      shadertype("Vertex")
       shadermodel("4.0")
-      shaderobjectfileoutput("../bin/" .. outputdir .. "/%{prj.name}/Shaders/%{file.basename}.cso")
+      shadertype("Vertex")
+
+      
+   filter("files:**_hs.hlsl")
+      shadermodel("5.0")
+      shadertype("Hull")
+
+      
+    filter("files:**_ds.hlsl")
+      shadermodel("5.0")
+      shadertype("Domain")
+        

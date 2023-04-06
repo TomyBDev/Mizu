@@ -120,11 +120,11 @@ CubeMesh::CubeMesh(Microsoft::WRL::ComPtr<ID3D11Device> device)
 	indices = 0;
 }
 
-void CubeMesh::SendData(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext)
+void CubeMesh::SendData(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, D3D_PRIMITIVE_TOPOLOGY topology)
 {
 	const UINT stride = sizeof(Data3D);
 	const UINT offset = 0u;
 	deviceContext->IASetVertexBuffers(0u, 1u, vertexBuffer.GetAddressOf(), &stride, &offset);
 	deviceContext->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	deviceContext->IASetPrimitiveTopology(topology);
 }

@@ -3,8 +3,8 @@
 
 MaterialObjectShader::MaterialObjectShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) : Shader(dev, context)
 {
-	LoadMaterialVertexShader(shaderPath L"Shaders/MaterialObjectShader_vs.cso");
-	LoadPixelShader(shaderPath L"Shaders/MaterialObjectShader_ps.cso");
+	LoadMaterialVertexShader( L"Shaders/MaterialObjectShader_vs.cso");
+	LoadPixelShader( L"Shaders/MaterialObjectShader_ps.cso");
 
 	D3D11_BUFFER_DESC matrixBufferDesc;
 	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;

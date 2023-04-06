@@ -78,8 +78,6 @@ Graphics::Graphics(HWND hwnd)
 	noDepthStencilDesc.DepthEnable = false;
 	CHECK_ERROR(device->CreateDepthStencilState(&noDepthStencilDesc, &noDepthStencilState));
 
-	LOG_FLUSH();
-
 	// Bind depth state
 	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 1u);
 

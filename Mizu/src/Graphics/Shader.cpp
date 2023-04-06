@@ -18,7 +18,18 @@ Shader::~Shader()
 		delete pixelShader;
 		pixelShader = nullptr;
 	}
+	
+	if (hullShader)
+	{
+		delete hullShader;
+		hullShader = nullptr;
+	}
 
+	if (domainShader)
+	{
+		delete domainShader;
+		domainShader = nullptr;
+	}
 
 	if (inputLayout)
 	{
@@ -49,6 +60,17 @@ void Shader::Render(int indexCount)
 
 	deviceContext->VSSetShader(vertexShader, NULL, 0);
 	deviceContext->PSSetShader(pixelShader, NULL, 0);
+
+	if (bUseTessellation)
+	{
+		deviceContext->HSSetShader(hullShader, NULL, 0);
+		deviceContext->DSSetShader(domainShader, NULL, 0);
+	}
+	else
+	{
+		deviceContext->HSSetShader(NULL, NULL, 0);
+		deviceContext->DSSetShader(NULL, NULL, 0);
+	}
 
 	deviceContext->DrawIndexed(indexCount, 0, 0);
 }
@@ -214,4 +236,19 @@ void Shader::LoadPixelShader(const wchar_t* fileName)
 	ComPtr<ID3DBlob> blob;
 	D3DReadFileToBlob(fileName, &blob);
 	device->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &pixelShader);
+}
+
+void Shader::LoadHullShader(const wchar_t* fileName)
+{
+	bUseTessellation = true;
+	ComPtr<ID3DBlob> blob;
+	CHECK_ERROR(D3DReadFileToBlob(fileName, &blob));
+	CHECK_ERROR(device->CreateHullShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &hullShader));
+}
+
+void Shader::LoadDomainShader(const wchar_t* fileName)
+{
+	ComPtr<ID3DBlob> blob;
+	CHECK_ERROR(D3DReadFileToBlob(fileName, &blob));
+	CHECK_ERROR(device->CreateDomainShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &domainShader));
 }

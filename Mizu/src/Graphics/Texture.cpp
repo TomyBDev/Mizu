@@ -3,7 +3,7 @@
 
 Texture::Texture(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::wstring fileName)
 {
-	std::wstring s = contentPath L"Content/Textures/";
+	std::wstring s = L"Content/Textures/";
 	s.append(fileName);
 
 	Gdiplus::Bitmap bitmap(s.c_str());

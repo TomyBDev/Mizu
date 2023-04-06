@@ -3,8 +3,8 @@
 
 TextureObjectShader::TextureObjectShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) : Shader(dev, context)
 {
-	LoadVertexShader(shaderPath L"Shaders/TextureObjectShader_vs.cso");
-	LoadPixelShader(shaderPath L"Shaders/TextureObjectShader_ps.cso");
+	LoadVertexShader( L"Shaders/TextureObjectShader_vs.cso");
+	LoadPixelShader( L"Shaders/TextureObjectShader_ps.cso");
 
 	D3D11_BUFFER_DESC matrixBufferDesc;
 	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;

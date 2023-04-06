@@ -128,13 +128,14 @@ Sound::Sound(const std::string filename)
 			file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 			try
 			{
-				std::string s = contentPathS "Content/Audio/";
+				std::string s = "Content/Audio/";
 				s.append(filename);
 
 				file.open(s, std::ios::binary);
 			}
 			catch (std::exception e)
 			{
+				LOG_ERROR("Error opening file!"); LOG_FLUSH();
 				throw SoundSystem::FileError(
 					std::string("error opening file: ") + e.what());
 			}

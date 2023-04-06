@@ -110,11 +110,9 @@ void Application::Render()
 	materialObjectShader->Render(model->GetIndexCount());
 
 	// Render Water
-	graphics->SetBothSides(true);
-	planeMesh->SendData(graphics->GetDeviceContext());
+	planeMesh->SendData(graphics->GetDeviceContext(), D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale, viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength);
 	waterShader->Render(planeMesh->GetIndexCount());
-	graphics->SetBothSides(false);
 
 	// Palm Tree
 	/*graphics->SetBothSides(true);

@@ -4,8 +4,10 @@
 
 WaterShader::WaterShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) : Shader(dev, context)
 {
-	LoadVertexShader(shaderPath L"Shaders/WaterShader_vs.cso");
-	LoadPixelShader(shaderPath L"Shaders/WaterShader_ps.cso");
+	LoadVertexShader( L"Shaders/WaterShader_vs.cso");
+	LoadPixelShader( L"Shaders/WaterShader_ps.cso");
+	LoadHullShader( L"Shaders/WaterShader_hs.cso");
+	LoadDomainShader( L"Shaders/WaterShader_ds.cso");
 
 	D3D11_BUFFER_DESC matrixBufferDesc;
 	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -123,15 +125,6 @@ void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext
 	XMMATRIX tproj = XMMatrixTranspose(projection);
 
 	// Vertex
-	MatrixBufferType* matPtr;
-	deviceContext->Map(matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	matPtr = (MatrixBufferType*)mappedResource.pData;
-	matPtr->world = tworld;
-	matPtr->view = tview;
-	matPtr->projection = tproj;
-	deviceContext->Unmap(matrixBuffer, 0);
-	deviceContext->VSSetConstantBuffers(0, 1, &matrixBuffer);
-
 	deviceContext->VSSetShaderResources(0, 1, &heightMapTexture);
 	deviceContext->VSSetSamplers(0, 1, &heightMapSampleState);
 
@@ -170,4 +163,19 @@ void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext
 	deviceContext->PSSetShaderResources(0, 1, &heightMapTexture);
 	deviceContext->PSSetShaderResources(1, 1, &skyTextureCube);
 	deviceContext->PSSetSamplers(0, 1, &skySampleState);
+
+	// Hull
+
+	// Domain
+	MatrixBufferType* matPtr;
+	deviceContext->Map(matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	matPtr = (MatrixBufferType*)mappedResource.pData;
+	matPtr->world = tworld;
+	matPtr->view = tview;
+	matPtr->projection = tproj;
+	deviceContext->Unmap(matrixBuffer, 0);
+	deviceContext->DSSetConstantBuffers(0, 1, &matrixBuffer);
+
+	deviceContext->DSSetShaderResources(0, 1, &heightMapTexture);
+	deviceContext->DSSetSamplers(0, 1, &heightMapSampleState);
 }
