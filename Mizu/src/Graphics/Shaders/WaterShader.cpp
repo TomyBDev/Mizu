@@ -45,6 +45,24 @@ WaterShader::WaterShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WR
 	controlBufferDesc.StructureByteStride = 0;
 	device->CreateBuffer(&controlBufferDesc, NULL, &controlBuffer);
 
+	D3D11_BUFFER_DESC tessellationBufferDesc;
+	tessellationBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	tessellationBufferDesc.ByteWidth = sizeof(TessellationBufferType);
+	tessellationBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	tessellationBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	tessellationBufferDesc.MiscFlags = 0;
+	tessellationBufferDesc.StructureByteStride = 0;
+	device->CreateBuffer(&tessellationBufferDesc, NULL, &tessellationBuffer);
+
+	D3D11_BUFFER_DESC resolutionBufferDesc;
+	resolutionBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	resolutionBufferDesc.ByteWidth = sizeof(ResolutionBufferType);
+	resolutionBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	resolutionBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	resolutionBufferDesc.MiscFlags = 0;
+	resolutionBufferDesc.StructureByteStride = 0;
+	device->CreateBuffer(&resolutionBufferDesc, NULL, &resolutionBuffer);
+
 	D3D11_SAMPLER_DESC skySamplerDesc;
 	skySamplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
 	skySamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -115,7 +133,7 @@ WaterShader::~WaterShader()
 	}
 }
 
-void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightMapTexture, ID3D11ShaderResourceView* skyTextureCube, DirectionalLight dirLight, Camera* camera, float* shallowColor, float* deepColor, float strength)
+void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightMapTexture, ID3D11ShaderResourceView* skyTextureCube, DirectionalLight dirLight, Camera* camera, float* shallowColor, float* deepColor, float strength, int res)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 
@@ -125,6 +143,23 @@ void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext
 	XMMATRIX tproj = XMMatrixTranspose(projection);
 
 	// Vertex
+	MatrixBufferType* matPtr;
+	deviceContext->Map(matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	matPtr = (MatrixBufferType*)mappedResource.pData;
+	matPtr->world = tworld;
+	matPtr->view = tview;
+	matPtr->projection = tproj;
+	deviceContext->Unmap(matrixBuffer, 0);
+	deviceContext->VSSetConstantBuffers(0, 1, &matrixBuffer);
+
+	ResolutionBufferType* resPtr;
+	deviceContext->Map(resolutionBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	resPtr = (ResolutionBufferType*)mappedResource.pData;
+	resPtr->res = res;
+	resPtr->buffer = {0.f, 0.f ,0.f};
+	deviceContext->Unmap(resolutionBuffer, 0);
+	deviceContext->VSSetConstantBuffers(1, 1, &resolutionBuffer);
+
 	deviceContext->VSSetShaderResources(0, 1, &heightMapTexture);
 	deviceContext->VSSetSamplers(0, 1, &heightMapSampleState);
 
@@ -165,15 +200,16 @@ void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext
 	deviceContext->PSSetSamplers(0, 1, &skySampleState);
 
 	// Hull
+	TessellationBufferType* tessPtr;
+	deviceContext->Map(tessellationBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	tessPtr = (TessellationBufferType*)mappedResource.pData;
+	tessPtr->first = tessellationTable[res];
+	tessPtr->second = tessellationTable[res];
+	tessPtr->buffer = {0.f, 0.f};
+	deviceContext->Unmap(tessellationBuffer, 0);
+	deviceContext->HSSetConstantBuffers(0, 1, &tessellationBuffer);
 
 	// Domain
-	MatrixBufferType* matPtr;
-	deviceContext->Map(matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	matPtr = (MatrixBufferType*)mappedResource.pData;
-	matPtr->world = tworld;
-	matPtr->view = tview;
-	matPtr->projection = tproj;
-	deviceContext->Unmap(matrixBuffer, 0);
 	deviceContext->DSSetConstantBuffers(0, 1, &matrixBuffer);
 
 	deviceContext->DSSetShaderResources(0, 1, &heightMapTexture);

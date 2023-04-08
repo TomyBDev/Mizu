@@ -109,6 +109,7 @@ Graphics::Graphics(HWND hwnd)
 
 	D3D11_RASTERIZER_DESC rasterizerDesc = {};
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+	//rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
 	rasterizerDesc.CullMode = D3D11_CULL_BACK;
 	rasterizerDesc.FrontCounterClockwise = TRUE;
 	rasterizerDesc.DepthBias = 0;

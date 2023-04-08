@@ -40,8 +40,8 @@ float4 main(PS_Input input) : SV_TARGET
         return solverTexture.Sample(solverSampler, input.tex);
 
     // Determine time and displacement step.
-    const float dx = 2.f;
-    const float dt2 = 0.00416666667 * 100.f;
+    const float dx = res * 0.004f;
+    const float dt2 = 0.000813802084 * res;
     const float du = 1.f / res;
 
     // Get neighbour values from previous pass.

@@ -1,3 +1,10 @@
+cbuffer DataBuffer : register(b0)
+{
+    int first;
+    int second;
+    float2 buffer;
+};
+
 struct InputType
 {
     float4 pos : POSITION;
@@ -22,10 +29,10 @@ ConstantOutputType PatchConstantFunction(InputPatch<InputType, 3> inputPatch, ui
 {
     ConstantOutputType output;
 
-    output.edges[0] = 3.0f;
-    output.edges[1] = 3.0f;
-    output.edges[2] = 3.0f;
-    output.inside = 3.0f;
+    output.edges[0] = first;
+    output.edges[1] = first;
+    output.edges[2] = first;
+    output.inside = second;
 
     return output;
 }

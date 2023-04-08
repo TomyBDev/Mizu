@@ -57,8 +57,8 @@ float4 main(PS_Input input) : SV_TARGET
 		return Reflect(input.tex, float2(0.f, -du));
     
     // Time and Displacement Step
-    const float dx = 2.f;
-    const float dt2 = 0.00416666667 * 100.f;
+    const float dx = res * 0.004f;
+    const float dt2 = 0.000813802084*res;
 
     // Get neighbour values from previous pass.
     const float3 uOld = oldTexture.Sample(solverSampler, input.tex).xyz;
