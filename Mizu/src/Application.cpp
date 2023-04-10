@@ -256,7 +256,7 @@ void Application::Imgui()
 	{
 		ImGui::SliderFloat3("Pos", waterPosition, -50, 50);
 
-		const char* resolutionLabels[] = { "128x128", "160x108", "256x256", "512x512", "1024x1024" };
+		const char* resolutionLabels[] = { "128x128", "160x108", "256x256", "320x216", "512x512", "1024x1024" };
 
 		if (ImGui::Combo("Resolution", &resolutionItem, resolutionLabels, IM_ARRAYSIZE(resolutionLabels)))
 		{

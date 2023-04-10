@@ -70,8 +70,8 @@ private:
 
 	// Water Resolution Control
 	std::pair<int,int> resolution;
-	int resolutionItem = 1;
-	const std::unordered_map<int, std::pair<int, int>> resolutions = { {0,{128, 128}}, {1,{160, 108}}, {2,{256, 256}}, {3,{512, 512}}, {4,{1024, 1024}} };
+	int resolutionItem = 3;
+	const std::unordered_map<int, std::pair<int, int>> resolutions = { {0,{128, 128}}, {1,{160, 108}}, {2,{256, 256}}, {3,{320, 216}}, {4,{512, 512}}, {5,{1024, 1024}} };
 
 	// Water Shader Control
 	float strength = 145.f;
