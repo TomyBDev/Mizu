@@ -32,9 +32,7 @@ private:
 	class PlaneMesh* planeMesh;
 	class OrthoMesh* orthoMesh;
 	class CubeMesh* cubeMesh;
-	class MaterialObject* model;
-	class TextureObject* palmTree;
-	MaterialObject* onsen;
+	class MaterialObject* onsen;
 
 	// Shaders
 	class TextureShader* textureShader;
@@ -42,15 +40,11 @@ private:
 	class SolverShader2* solverShader2;
 	class WaterShader* waterShader;
 	class MaterialObjectShader* materialObjectShader;
-	class TextureObjectShader* textureObjectShader;
 	class SkyShader* skyShader;
 
 	// Textures
 	class Texture* startingConditionTexture;
 	class TextureCube* skyTextureCube;
-	Texture* palmTreeDiffuse;
-	Texture* palmTreeNormal;
-	Texture* palmTreeSpecular;
 	class TextureArray* onsenDiff;
 	class TextureArray* onsenBump;
 
@@ -75,12 +69,13 @@ private:
 	float cameraSpeed = 10.f;
 
 	// Water Resolution Control
-	int resolution;
+	std::tuple<int,int> resolution;
 	int resolutionItem = 0;
-	const std::unordered_map<int, int> resolutions = { {0,128}, {1,256}, {2,512}, {3,1024} };
+	const std::unordered_map<int, std::tuple<int, int>> resolutions = { {0,{128, 128}}, {1,{256, 256}}, {2,{512, 512}}, {3,{1024, 1024}} };
 
 	// Water Shader Control
 	float strength = 145.f;
 	float shallowColor[4] = { 0.1f, 0.37f, 0.55f, 0.85f };
 	float deepColor[4] = { 0.004f, 0.15f, 0.3f, 1.f };
+	float waterPosition[3] = { -5.f, -15.f, 30.f };
 };

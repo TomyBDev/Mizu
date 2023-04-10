@@ -30,17 +30,20 @@ Application::Application(InputManager* input, Graphics* gfx)
 	: inputManager(input),
 	graphics(gfx)
 {
-	LOG_INFO("Initilaising camera...");
+	LOG_INFO("Initilaising camera..."); LOG_FLUSH();
 	camera = new Camera(gfx->GetHWND());
 	camera->SetSpeed(cameraSpeed);
-	LOG_INFO("Camera initialised.");
+	LOG_INFO("Camera initialised."); LOG_FLUSH();
 
+	LOG_INFO("Initilaising sound..."); LOG_FLUSH();
 	ambient = new Sound("Ambient.wav");
 	ambient->Play(true);
+	LOG_INFO("Initilaising sound..."); LOG_FLUSH();
 
-	//model = new MaterialObject(graphics, "Pool/Pool.obj");
-	palmTree = new TextureObject(graphics->GetDevice(), "PalmTree/palm_tree.obj");
+	// Skybox mesh
 	cubeMesh = new CubeMesh(graphics->GetDevice());
+
+	// Onsen Mesh
 	onsen = new MaterialObject(graphics, "Onsen/onsen.obj", &onsenDiff, &onsenBump);
 
 	// Create Shaders
@@ -49,21 +52,20 @@ Application::Application(InputManager* input, Graphics* gfx)
 	solverShader2 = new SolverShader2(gfx->GetDevice(), gfx->GetDeviceContext());
 	waterShader = new WaterShader(gfx->GetDevice(), gfx->GetDeviceContext());
 	materialObjectShader = new MaterialObjectShader(gfx->GetDevice(), gfx->GetDeviceContext());
-	textureObjectShader = new TextureObjectShader(gfx->GetDevice(), gfx->GetDeviceContext());
 	skyShader = new SkyShader(gfx->GetDevice(), gfx->GetDeviceContext());
 
+	// Create texture cube mesh
 	skyTextureCube = new TextureCube(gfx->GetDevice(), gfx->GetDeviceContext(), L"Sky/SkyCubeMap.png");
-	palmTreeDiffuse = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), L"PalmTree/diffuse.png");
-	palmTreeNormal = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), L"PalmTree/normal.png");
-	palmTreeSpecular = new Texture(gfx->GetDevice(), gfx->GetDeviceContext(), L"PalmTree/specular.png");
 
 	// Lighting
 	light.direction = XMFLOAT3(-1.f, -0.5f, 1.f);
 	light.ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.f);
 	light.diffuse = XMFLOAT4(0.375f, 0.375f, 0.5f, 1.f);
 
+	// Resolution of water mesh to be made.
 	resolution = resolutions.at(resolutionItem);
 
+	// Resolution specific initialisation.
 	Init();
 
 	// Store initial condition in the old render texture buffer.
@@ -107,11 +109,6 @@ void Application::Render()
 	skyShader->Render(cubeMesh->GetIndexCount());
 	graphics->SetZBuffer(true);
 
-	// Model Floor
-	/*model->SendData(graphics->GetDeviceContext());
-	materialObjectShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * XMMatrixScaling(3.15f, 3.15f, 3.15f) * XMMatrixTranslation(0.f,6.2f, 25.f), viewMatrix, projectionMatrix, light);
-	materialObjectShader->Render(model->GetIndexCount());*/
-
 	// Model Onsen
 	graphics->SetBothSides(true);
 	onsen->SendData(graphics->GetDeviceContext());
@@ -121,15 +118,8 @@ void Application::Render()
 
 	// Render Water
 	planeMesh->SendData(graphics->GetDeviceContext(), D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
-	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale, viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength, resolution);
+	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale * XMMatrixTranslation(waterPosition[0], waterPosition[1], waterPosition[2]), viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength, resolution);
 	waterShader->Render(planeMesh->GetIndexCount());
-
-	// Palm Tree
-	/*graphics->SetBothSides(true);
-	palmTree->SendData(graphics->GetDeviceContext());
-	textureObjectShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * XMMatrixScaling(0.05f, 0.05f, 0.05f), viewMatrix, projectionMatrix, light, palmTreeDiffuse->GetShaderResourceView(), palmTreeNormal->GetShaderResourceView(), palmTreeSpecular->GetShaderResourceView());
-	textureObjectShader->Render(palmTree->GetIndexCount());
-	graphics->SetBothSides(false);*/
 
 	Imgui();
 	graphics->EndFrame();
@@ -263,6 +253,8 @@ void Application::Imgui()
 	
 	if (ImGui::CollapsingHeader("Simulation Control"))
 	{
+		ImGui::SliderFloat3("Pos", waterPosition, -50, 50);
+
 		const char* resolutionLabels[] = { "128x128", "256x256", "512x512", "1024x1024" };
 
 		if (ImGui::Combo("Resolution", &resolutionItem, resolutionLabels, IM_ARRAYSIZE(resolutionLabels)))
