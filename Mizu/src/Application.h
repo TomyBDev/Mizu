@@ -34,6 +34,7 @@ private:
 	class CubeMesh* cubeMesh;
 	class MaterialObject* model;
 	class TextureObject* palmTree;
+	MaterialObject* onsen;
 
 	// Shaders
 	class TextureShader* textureShader;
@@ -50,6 +51,8 @@ private:
 	Texture* palmTreeDiffuse;
 	Texture* palmTreeNormal;
 	Texture* palmTreeSpecular;
+	class TextureArray* onsenDiff;
+	class TextureArray* onsenBump;
 
 	// Render Textures
 	std::unique_ptr<RenderTexture> pass1RenderTexture;
@@ -73,7 +76,7 @@ private:
 
 	// Water Resolution Control
 	int resolution;
-	int resolutionItem = 2;
+	int resolutionItem = 0;
 	const std::unordered_map<int, int> resolutions = { {0,128}, {1,256}, {2,512}, {3,1024} };
 
 	// Water Shader Control

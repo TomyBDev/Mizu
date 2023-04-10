@@ -24,6 +24,8 @@
 #include <Graphics/Texture.h>
 #include <Graphics/TextureCube.h>
 
+#include "Graphics/TextureArray.h"
+
 Application::Application(InputManager* input, Graphics* gfx)
 	: inputManager(input),
 	graphics(gfx)
@@ -36,9 +38,10 @@ Application::Application(InputManager* input, Graphics* gfx)
 	ambient = new Sound("Ambient.wav");
 	ambient->Play(true);
 
-	model = new MaterialObject(graphics->GetDevice(), "Pool/Pool.obj");
+	//model = new MaterialObject(graphics, "Pool/Pool.obj");
 	palmTree = new TextureObject(graphics->GetDevice(), "PalmTree/palm_tree.obj");
 	cubeMesh = new CubeMesh(graphics->GetDevice());
+	onsen = new MaterialObject(graphics, "Onsen/onsen.obj", &onsenDiff, &onsenBump);
 
 	// Create Shaders
 	textureShader = new TextureShader(gfx->GetDevice(), gfx->GetDeviceContext());
@@ -57,7 +60,7 @@ Application::Application(InputManager* input, Graphics* gfx)
 	// Lighting
 	light.direction = XMFLOAT3(-1.f, -0.5f, 1.f);
 	light.ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.f);
-	light.diffuse = XMFLOAT4(0.6f, 0.6f, 0.8f, 1.f);
+	light.diffuse = XMFLOAT4(0.375f, 0.375f, 0.5f, 1.f);
 
 	resolution = resolutions.at(resolutionItem);
 
@@ -105,9 +108,16 @@ void Application::Render()
 	graphics->SetZBuffer(true);
 
 	// Model Floor
-	model->SendData(graphics->GetDeviceContext());
+	/*model->SendData(graphics->GetDeviceContext());
 	materialObjectShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * XMMatrixScaling(3.15f, 3.15f, 3.15f) * XMMatrixTranslation(0.f,6.2f, 25.f), viewMatrix, projectionMatrix, light);
-	materialObjectShader->Render(model->GetIndexCount());
+	materialObjectShader->Render(model->GetIndexCount());*/
+
+	// Model Onsen
+	graphics->SetBothSides(true);
+	onsen->SendData(graphics->GetDeviceContext());
+	materialObjectShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * XMMatrixScaling(2.f, 2.f, 2.f) * XMMatrixTranslation(0.f, 0.f, 0.f), viewMatrix, projectionMatrix, light, onsenDiff->GetShaderResourceView(), onsenBump->GetShaderResourceView(), camera->GetPosition());
+	materialObjectShader->Render(onsen->GetIndexCount());
+	graphics->SetBothSides(false);
 
 	// Render Water
 	planeMesh->SendData(graphics->GetDeviceContext(), D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
@@ -141,7 +151,7 @@ void Application::Init()
 	pass2RenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), resolution, resolution, 0.1f, 200.f);
 	oldRenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), resolution, resolution, 0.1f, 200.f);
 
-	const float scale = 100.f / static_cast<float>(resolution);
+	const float scale = 50.f / static_cast<float>(resolution);
 	XMMATRIX transMat = XMMatrixTranslation(-50.f, 0, -25.f);
 	XMMATRIX scaleMat = XMMatrixScaling(scale, 1.f, scale);
 	waterScale = scaleMat * transMat;
