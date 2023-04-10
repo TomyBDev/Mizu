@@ -133,7 +133,7 @@ WaterShader::~WaterShader()
 	}
 }
 
-void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightMapTexture, ID3D11ShaderResourceView* skyTextureCube, DirectionalLight dirLight, Camera* camera, float* shallowColor, float* deepColor, float strength, int res)
+void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightMapTexture, ID3D11ShaderResourceView* skyTextureCube, DirectionalLight dirLight, Camera* camera, float* shallowColor, float* deepColor, float strength, std::pair<int, int> res)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 
@@ -155,8 +155,9 @@ void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext
 	ResolutionBufferType* resPtr;
 	deviceContext->Map(resolutionBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	resPtr = (ResolutionBufferType*)mappedResource.pData;
-	resPtr->res = res;
-	resPtr->buffer = {0.f, 0.f ,0.f};
+	resPtr->resX = res.first;
+	resPtr->resY = res.second;
+	resPtr->buffer = {0.f, 0.f};
 	deviceContext->Unmap(resolutionBuffer, 0);
 	deviceContext->VSSetConstantBuffers(1, 1, &resolutionBuffer);
 
@@ -203,8 +204,23 @@ void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext
 	TessellationBufferType* tessPtr;
 	deviceContext->Map(tessellationBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	tessPtr = (TessellationBufferType*)mappedResource.pData;
-	tessPtr->first = tessellationTable[res];
-	tessPtr->second = tessellationTable[res];
+
+	int temp = res.first * res.second;
+	if (temp < 65536)
+	{
+		tessPtr->first = 5;
+		tessPtr->second = 5;
+	}
+	else if (temp < 262144)
+	{
+		tessPtr->first = 3;
+		tessPtr->second = 3;
+	}
+	else
+	{
+		tessPtr->first = 1;
+		tessPtr->second = 1;
+	}
 	tessPtr->buffer = {0.f, 0.f};
 	deviceContext->Unmap(tessellationBuffer, 0);
 	deviceContext->HSSetConstantBuffers(0, 1, &tessellationBuffer);

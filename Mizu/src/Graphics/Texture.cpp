@@ -38,8 +38,6 @@ Texture::Texture(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::Co
 		}
 	}
 
-
-
 	D3D11_TEXTURE2D_DESC textureDesc = {};
 	textureDesc.Width = width;
 	textureDesc.Height = height;

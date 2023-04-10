@@ -8,7 +8,7 @@ class WaterShader : public Shader
 public:
 	WaterShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
 	~WaterShader();
-	void SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightMapTexture, ID3D11ShaderResourceView* skyTextureCube, DirectionalLight dirLight, class Camera* camera, float* shallowColor, float* deepColor, float strength = 1.f, int res = 512);
+	void SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightMapTexture, ID3D11ShaderResourceView* skyTextureCube, DirectionalLight dirLight, class Camera* camera, float* shallowColor, float* deepColor, float strength = 1.f, std::pair<int, int> res = { 128,128 });
 private:
 	struct MatrixBufferType
 	{
@@ -49,11 +49,10 @@ private:
 
 	struct ResolutionBufferType
 	{
-		int res;
-		XMFLOAT3 buffer;
+		int resX;
+		int resY;
+		XMFLOAT2 buffer;
 	};
-
-	std::unordered_map<int, int> tessellationTable = { {128, 5}, {256,4},{512,3},{1028,1}};
 
 	//Vertex
 	ID3D11Buffer* resolutionBuffer;

@@ -129,21 +129,22 @@ void Application::Render()
 void Application::Init()
 {
 	// Create Mesh
-	planeMesh = new PlaneMesh(graphics->GetDevice(), resolution, resolution);
-	orthoMesh = new OrthoMesh(graphics->GetDevice(), resolution, resolution, 0, 0);
+	planeMesh = new PlaneMesh(graphics->GetDevice(), resolution.first, resolution.second);
+	orthoMesh = new OrthoMesh(graphics->GetDevice(), resolution.first, resolution.second, 0, 0);
 
 	// Create Textures
 	std::string s = "StartingCondition/SC";
-	s.append(std::to_string(resolution) + ".png");
+	s.append(std::to_string(resolution.first) + "x" + std::to_string(resolution.second) + ".png");
 	startingConditionTexture = new Texture(graphics->GetDevice(), graphics->GetDeviceContext(), StringConverter::StringToWide(s));
 
-	pass1RenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), resolution, resolution, 0.1f, 200.f);
-	pass2RenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), resolution, resolution, 0.1f, 200.f);
-	oldRenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), resolution, resolution, 0.1f, 200.f);
+	pass1RenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), resolution.first, resolution.second, 0.1f, 200.f);
+	pass2RenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), resolution.first, resolution.second, 0.1f, 200.f);
+	oldRenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), resolution.first, resolution.second, 0.1f, 200.f);
 
-	const float scale = 50.f / static_cast<float>(resolution);
+	const float scaleX = 60.f / static_cast<float>(resolution.first);
+	const float scaleZ = 60.f / static_cast<float>(resolution.second);
 	XMMATRIX transMat = XMMatrixTranslation(-50.f, 0, -25.f);
-	XMMATRIX scaleMat = XMMatrixScaling(scale, 1.f, scale);
+	XMMATRIX scaleMat = XMMatrixScaling(scaleX, 1.f, scaleX);
 	waterScale = scaleMat * transMat;
 }
 
@@ -255,7 +256,7 @@ void Application::Imgui()
 	{
 		ImGui::SliderFloat3("Pos", waterPosition, -50, 50);
 
-		const char* resolutionLabels[] = { "128x128", "256x256", "512x512", "1024x1024" };
+		const char* resolutionLabels[] = { "128x128", "160x108", "256x256", "512x512", "1024x1024" };
 
 		if (ImGui::Combo("Resolution", &resolutionItem, resolutionLabels, IM_ARRAYSIZE(resolutionLabels)))
 		{

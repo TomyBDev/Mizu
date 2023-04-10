@@ -58,7 +58,7 @@ SolverShader2::~SolverShader2()
 	}
 }
 
-void SolverShader2::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* oldTexture, ID3D11ShaderResourceView* pass1Texture, float dt, int resolution)
+void SolverShader2::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* oldTexture, ID3D11ShaderResourceView* pass1Texture, float dt, std::pair<int, int> resolution)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 
@@ -82,8 +82,9 @@ void SolverShader2::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceConte
 	deviceContext->Map(dataBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	dataPtr = (DataBufferType*)mappedResource.pData;
 	dataPtr->dt = dt;
-	dataPtr->res = resolution;
-	dataPtr->buffer = { 0.f, 0.f };
+	dataPtr->resX = resolution.first;
+	dataPtr->resZ = resolution.second;
+	dataPtr->padding = 0.f;
 	deviceContext->Unmap(dataBuffer, 0);
 	deviceContext->PSSetConstantBuffers(0, 1, &dataBuffer);
 

@@ -10,7 +10,8 @@ cbuffer MatrixBuffer : register(b0)
 
 cbuffer DataBuffer : register(b1)
 {
-    int res;
+    int resX;
+    int resZ;
     float3 buffer;
 };
 
@@ -30,13 +31,14 @@ struct VS_Output
 
 float3 CalcNormals(float2 uv, float yPos, float scale)
 {
-    const float du = (1.f / res);
+    const float dx = (1.f / resX);
+    const float dz = (1.f / resZ);
 
 	//recalc normals
-    const float e = heightMapTexture.SampleLevel(heightMapSampler, float2(uv.x + du, uv.y), 0).x * scale;
-    const float w = heightMapTexture.SampleLevel(heightMapSampler, float2(uv.x - du, uv.y), 0).x * scale;
-    const float n = heightMapTexture.SampleLevel(heightMapSampler, float2(uv.x, uv.y + du), 0).x * scale;
-    const float s = heightMapTexture.SampleLevel(heightMapSampler, float2(uv.x, uv.y - du), 0).x * scale;
+    const float e = heightMapTexture.SampleLevel(heightMapSampler, float2(uv.x + dx, uv.y), 0).x * scale;
+    const float w = heightMapTexture.SampleLevel(heightMapSampler, float2(uv.x - dx, uv.y), 0).x * scale;
+    const float n = heightMapTexture.SampleLevel(heightMapSampler, float2(uv.x, uv.y + dz), 0).x * scale;
+    const float s = heightMapTexture.SampleLevel(heightMapSampler, float2(uv.x, uv.y - dz), 0).x * scale;
 
     const float3 vecn = float3(0, n - yPos, 1);
     const float3 vece = float3(1, e - yPos, 0);

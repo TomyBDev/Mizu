@@ -4,8 +4,9 @@ SamplerState solverSampler : register(s0);
 cbuffer DataBuffer : register(b0)
 {
     float dt;
-    int res;
-    float2 buffer;
+    int resX;
+    int resZ;
+    float padding;
 };
 
 struct PS_Input
@@ -40,14 +41,15 @@ float4 main(PS_Input input) : SV_TARGET
         return solverTexture.Sample(solverSampler, input.tex);
 
     // Determine time and displacement step.
-    const float dx = res * 0.004f;
-    const float dt2 = 0.000813802084 * res;
-    const float du = 1.f / res;
+    const float dx = resX * 0.004f;
+    const float dt2 = 0.000813802084 * resX;
+    const float du = 1.f / resX;
+    const float dv = 1.f / resZ;
 
     // Get neighbour values from previous pass.
-    const float3 un = solverTexture.Sample(solverSampler, input.tex + float2(0, du)).xyz;
+    const float3 un = solverTexture.Sample(solverSampler, input.tex + float2(0, dv)).xyz;
     const float3 ue = solverTexture.Sample(solverSampler, input.tex + float2(du, 0)).xyz;
-    const float3 us = solverTexture.Sample(solverSampler, input.tex + float2(0, -du)).xyz;
+    const float3 us = solverTexture.Sample(solverSampler, input.tex + float2(0, -dv)).xyz;
     const float3 uw = solverTexture.Sample(solverSampler, input.tex + float2(-du, 0)).xyz;
 
     //Calculate New values

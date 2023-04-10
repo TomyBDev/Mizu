@@ -5,8 +5,9 @@ SamplerState solverSampler : register(s0);
 cbuffer DataBuffer : register(b0)
 {
     float dt;
-    int res;
-    float2 buffer;
+    int resX;
+    int resZ;
+    float padding;
 };
 
 struct PS_Input
@@ -41,7 +42,8 @@ float4 Reflect(float2 uv, float2 offset)
 
 float4 main(PS_Input input) : SV_TARGET
 {
-    const float du = 1.f / res;
+    const float du = 1.f / resX;
+    const float dv = 1.f / resZ;
 
     // Left Boundary
     if (input.tex.x == 0.f)
@@ -51,20 +53,20 @@ float4 main(PS_Input input) : SV_TARGET
 		return Reflect(input.tex, float2(-du, 0.f));
     // Top Boundary
 	if (input.tex.y == 0.f)
-		return Reflect(input.tex, float2(0.f, du));
+		return Reflect(input.tex, float2(0.f, dv));
     // Bottom Boundary
 	if (input.tex.y == 1.f)
-		return Reflect(input.tex, float2(0.f, -du));
+		return Reflect(input.tex, float2(0.f, -dv));
     
     // Time and Displacement Step
-    const float dx = res * 0.004f;
-    const float dt2 = 0.000813802084*res;
+    const float dx = resX * 0.004f;
+    const float dt2 = 0.000813802084*resX;
 
     // Get neighbour values from previous pass.
     const float3 uOld = oldTexture.Sample(solverSampler, input.tex).xyz;
-    const float3 un = pass1Texture.Sample(solverSampler, input.tex + float2(0, du)).xyz;
+    const float3 un = pass1Texture.Sample(solverSampler, input.tex + float2(0, dv)).xyz;
     const float3 ue = pass1Texture.Sample(solverSampler, input.tex + float2(du, 0)).xyz;
-    const float3 us = pass1Texture.Sample(solverSampler, input.tex + float2(0, -du)).xyz;
+    const float3 us = pass1Texture.Sample(solverSampler, input.tex + float2(0, -dv)).xyz;
     const float3 uw = pass1Texture.Sample(solverSampler, input.tex + float2(-du, 0)).xyz;
 
     // Calculate New values

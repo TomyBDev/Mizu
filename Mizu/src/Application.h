@@ -69,13 +69,13 @@ private:
 	float cameraSpeed = 10.f;
 
 	// Water Resolution Control
-	std::tuple<int,int> resolution;
-	int resolutionItem = 0;
-	const std::unordered_map<int, std::tuple<int, int>> resolutions = { {0,{128, 128}}, {1,{256, 256}}, {2,{512, 512}}, {3,{1024, 1024}} };
+	std::pair<int,int> resolution;
+	int resolutionItem = 1;
+	const std::unordered_map<int, std::pair<int, int>> resolutions = { {0,{128, 128}}, {1,{160, 108}}, {2,{256, 256}}, {3,{512, 512}}, {4,{1024, 1024}} };
 
 	// Water Shader Control
 	float strength = 145.f;
 	float shallowColor[4] = { 0.1f, 0.37f, 0.55f, 0.85f };
 	float deepColor[4] = { 0.004f, 0.15f, 0.3f, 1.f };
-	float waterPosition[3] = { -5.f, -15.f, 30.f };
+	float waterPosition[3] = { -8.f, -15.f, 34.f };
 };

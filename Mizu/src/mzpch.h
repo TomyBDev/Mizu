@@ -6,7 +6,6 @@
 #include <memory>
 #include <wrl.h>
 #include <fstream>
-#include <tuple>
 
 // Resources
 #include <Resources/resource.h>
