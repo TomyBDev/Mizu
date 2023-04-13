@@ -48,8 +48,15 @@ Application::Application(InputManager* input, Graphics* gfx)
 
 	// Create Shaders
 	textureShader = new TextureShader(gfx->GetDevice(), gfx->GetDeviceContext());
-	solverShader = new SolverShader(gfx->GetDevice(), gfx->GetDeviceContext());
-	solverShader2 = new SolverShader2(gfx->GetDevice(), gfx->GetDeviceContext());
+
+	LW1SolverShader = new SolverShader(gfx->GetDevice(), gfx->GetDeviceContext(), L"Shaders/LW1SolverShader_vs.cso", L"Shaders/LW1SolverShader_ps.cso");
+	LW2SolverShader = new SolverShader2(gfx->GetDevice(), gfx->GetDeviceContext(), L"Shaders/LW2SolverShader_vs.cso", L"Shaders/LW2SolverShader_ps.cso");
+
+	MC1SolverShader = new SolverShader(gfx->GetDevice(), gfx->GetDeviceContext(), L"Shaders/MC1SolverShader_vs.cso", L"Shaders/MC1SolverShader_ps.cso");
+	MC2SolverShader = new SolverShader2(gfx->GetDevice(), gfx->GetDeviceContext(), L"Shaders/MC2SolverShader_vs.cso", L"Shaders/MC2SolverShader_ps.cso");
+
+	LFSolverShader = new SolverShader(gfx->GetDevice(), gfx->GetDeviceContext(), L"Shaders/LFSolverShader_vs.cso", L"Shaders/LFSolverShader_ps.cso");
+	
 	waterShader = new WaterShader(gfx->GetDevice(), gfx->GetDeviceContext());
 	materialObjectShader = new MaterialObjectShader(gfx->GetDevice(), gfx->GetDeviceContext());
 	skyShader = new SkyShader(gfx->GetDevice(), gfx->GetDeviceContext());
@@ -112,13 +119,15 @@ void Application::Update(float dt)
 	switch (currentSolver)
 	{
 		case LaxFriedrichs:
+			LFSolverPass(dt);
 			break;
 
 		case LaxWendroff:
+			LWSolverPass(dt);
 			break;
 
 		case MacCormack:
-			SolverPass(dt);
+			MCSolverPass(dt);
 			break;
 
 		default:
@@ -206,7 +215,31 @@ void Application::HandleInput(float dt)
 	camera->HandleInput(inputManager, dt);
 }
 
-void Application::SolverPass(float dt)
+void Application::LFSolverPass(float dt)
+{
+	if (!graphics)
+		return;
+
+	pass2RenderTexture->SetRenderTarget(graphics->GetDeviceContext());
+	// No need to clear render target, all pixels will be overwritten
+
+	XMMATRIX worldMatrix = graphics->GetWorldMatrix();
+	XMMATRIX orthoMatrix = oldRenderTexture->GetOrthoMatrix();
+	XMMATRIX orthoViewMatrix = camera->GetOrthoViewMatrix();
+
+	graphics->SetZBuffer(false);
+	graphics->SetAlpha(false);
+
+	orthoMesh->SendData(graphics->GetDeviceContext());
+	LFSolverShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, oldRenderTexture->GetShaderResourceView(), dt, resolution);
+	LFSolverShader->Render(orthoMesh->GetIndexCount());
+
+	graphics->SetZBuffer(true);
+	graphics->SetAlpha(true);
+	graphics->SetBackBufferRenderTarget();
+}
+
+void Application::LWSolverPass(float dt)
 {
 	if (!graphics)
 		return;
@@ -222,15 +255,46 @@ void Application::SolverPass(float dt)
 	graphics->SetAlpha(false);
 
 	orthoMesh->SendData(graphics->GetDeviceContext());
-	solverShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, oldRenderTexture->GetShaderResourceView(), dt, resolution);
-	solverShader->Render(orthoMesh->GetIndexCount());
+	LW1SolverShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, oldRenderTexture->GetShaderResourceView(), dt, resolution);
+	LW1SolverShader->Render(orthoMesh->GetIndexCount());
 
 	pass2RenderTexture->SetRenderTarget(graphics->GetDeviceContext());
 	// No need to clear render target, all pixels will be overwritten
 
 	orthoMesh->SendData(graphics->GetDeviceContext());
-	solverShader2->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, oldRenderTexture->GetShaderResourceView(), pass1RenderTexture->GetShaderResourceView(), dt, resolution);
-	solverShader2->Render(orthoMesh->GetIndexCount());
+	LW2SolverShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, oldRenderTexture->GetShaderResourceView(), pass1RenderTexture->GetShaderResourceView(), dt, resolution);
+	LW2SolverShader->Render(orthoMesh->GetIndexCount());
+
+	graphics->SetZBuffer(true);
+	graphics->SetAlpha(true);
+	graphics->SetBackBufferRenderTarget();
+}
+
+void Application::MCSolverPass(float dt)
+{
+	if (!graphics)
+		return;
+
+	pass1RenderTexture->SetRenderTarget(graphics->GetDeviceContext());
+	// No need to clear render target, all pixels will be overwritten
+
+	XMMATRIX worldMatrix = graphics->GetWorldMatrix();
+	XMMATRIX orthoMatrix = oldRenderTexture->GetOrthoMatrix();
+	XMMATRIX orthoViewMatrix = camera->GetOrthoViewMatrix();
+
+	graphics->SetZBuffer(false);
+	graphics->SetAlpha(false);
+
+	orthoMesh->SendData(graphics->GetDeviceContext());
+	MC1SolverShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, oldRenderTexture->GetShaderResourceView(), dt, resolution);
+	MC1SolverShader->Render(orthoMesh->GetIndexCount());
+
+	pass2RenderTexture->SetRenderTarget(graphics->GetDeviceContext());
+	// No need to clear render target, all pixels will be overwritten
+
+	orthoMesh->SendData(graphics->GetDeviceContext());
+	MC2SolverShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, oldRenderTexture->GetShaderResourceView(), pass1RenderTexture->GetShaderResourceView(), dt, resolution);
+	MC2SolverShader->Render(orthoMesh->GetIndexCount());
 
 	graphics->SetZBuffer(true);
 	graphics->SetAlpha(true);

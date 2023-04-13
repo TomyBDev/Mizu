@@ -6,7 +6,7 @@ using namespace DirectX;
 class SolverShader2 : public Shader
 {
 public:
-	SolverShader2(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
+	SolverShader2(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, const wchar_t* vsFileName, const wchar_t* psFileName);
 	~SolverShader2();
 	void SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* oldTexture, ID3D11ShaderResourceView* pass1Texture, float dt, std::pair<int, int> resolution);
 private:

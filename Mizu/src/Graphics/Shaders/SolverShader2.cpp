@@ -1,10 +1,10 @@
 ﻿#include <mzpch.h>
 #include <Graphics/Shaders/SolverShader2.h>
 
-SolverShader2::SolverShader2(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) : Shader(dev, context)
+SolverShader2::SolverShader2(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, const wchar_t* vsFileName, const wchar_t* psFileName) : Shader(dev, context)
 {
-	LoadVertexShader( L"Shaders/SolverShader2_vs.cso");
-	LoadPixelShader( L"Shaders/SolverShader2_ps.cso");
+	LoadVertexShader( vsFileName);
+	LoadPixelShader( psFileName);
 
 	D3D11_BUFFER_DESC matrixBufferDesc;
 	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;

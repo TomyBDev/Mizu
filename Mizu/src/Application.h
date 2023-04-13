@@ -17,7 +17,9 @@ private:
 
 	void HandleInput(float dt);
 
-	void SolverPass(float dt);
+	void LFSolverPass(float dt);
+	void LWSolverPass(float dt);
+	void MCSolverPass(float dt);
 
 	void SetRenderTexturePass(std::unique_ptr<RenderTexture>& renderTexture, ID3D11ShaderResourceView* srv);
 
@@ -38,8 +40,11 @@ private:
 
 	// Shaders
 	class TextureShader* textureShader;
-	class SolverShader* solverShader;
-	class SolverShader2* solverShader2;
+	class SolverShader* LFSolverShader; //Lax Friedrichs Solver
+	SolverShader* LW1SolverShader; //Lax Wendroff Step Solver
+	class SolverShader2* LW2SolverShader; //Lax Wendroff Full Step Solver
+	SolverShader* MC1SolverShader; //MacCormack Half Step Solver
+	SolverShader2* MC2SolverShader; //MacCormack Full Step Solver
 	class WaterShader* waterShader;
 	class MaterialObjectShader* materialObjectShader;
 	class SkyShader* skyShader;
@@ -74,7 +79,7 @@ private:
 	std::pair<int,int> resolution;
 	int resolutionItem = 1;
 	const std::unordered_map<int, std::pair<int, int>> resolutions = { {0,{128, 128}}, {1,{160, 108}}, {2,{256, 256}}, {3,{320, 216}}, {4,{512, 512}}, {5,{1024, 1024}} };
-	int currentSolver = 2;
+	int currentSolver = 1;
 
 	// Water Shader Control
 	float strength = 145.f;
