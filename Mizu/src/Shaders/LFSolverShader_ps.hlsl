@@ -42,9 +42,9 @@ float4 main(PS_Input input) : SV_TARGET
 
     // Determine time and displacement step.
     //const float dx = resX * 0.004f;
-    const float dx = resX * 0.004f;
+    const float dx = resX * 0.014f;
     //const float dt2 = 0.000813802084 * resX;
-    const float dt2 = 0.000813802084 * resX;
+    const float dt2 = 0.000013802084 * resX;
     const float du = 1.f / resX;
     const float dv = 1.f / resZ;
 

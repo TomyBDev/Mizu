@@ -78,7 +78,7 @@ void Shader::Render(int indexCount)
 void Shader::LoadVertexShader(const wchar_t* fileName)
 {
 	ComPtr<ID3DBlob> blob;
-	D3DReadFileToBlob(fileName, &blob);
+	CHECK_ERROR(D3DReadFileToBlob(fileName, &blob));
 	CHECK_ERROR(device->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &vertexShader));
 
 	const D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
@@ -117,7 +117,7 @@ void Shader::LoadVertexShader(const wchar_t* fileName)
 void Shader::LoadTextureVertexShader(const wchar_t* fileName)
 {
 	ComPtr<ID3DBlob> blob;
-	D3DReadFileToBlob(fileName, &blob);
+	CHECK_ERROR(D3DReadFileToBlob(fileName, &blob));
 	CHECK_ERROR(device->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &vertexShader));
 
 	const D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
@@ -149,7 +149,7 @@ void Shader::LoadTextureVertexShader(const wchar_t* fileName)
 void Shader::LoadMaterialVertexShader(const wchar_t* fileName)
 {
 	ComPtr<ID3DBlob> blob;
-	D3DReadFileToBlob(fileName, &blob);
+	CHECK_ERROR(D3DReadFileToBlob(fileName, &blob));
 	CHECK_ERROR(device->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &vertexShader));
 
 	const D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
@@ -244,7 +244,7 @@ void Shader::LoadMaterialVertexShader(const wchar_t* fileName)
 void Shader::Load3DVertexShader(const wchar_t* fileName)
 {
 	ComPtr<ID3DBlob> blob;
-	D3DReadFileToBlob(fileName, &blob);
+	CHECK_ERROR(D3DReadFileToBlob(fileName, &blob));
 	CHECK_ERROR(device->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &vertexShader));
 
 	const D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
@@ -283,8 +283,8 @@ void Shader::Load3DVertexShader(const wchar_t* fileName)
 void Shader::LoadPixelShader(const wchar_t* fileName)
 {
 	ComPtr<ID3DBlob> blob;
-	D3DReadFileToBlob(fileName, &blob);
-	device->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &pixelShader);
+	CHECK_ERROR(D3DReadFileToBlob(fileName, &blob));
+	CHECK_ERROR(device->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &pixelShader));
 }
 
 void Shader::LoadHullShader(const wchar_t* fileName)
