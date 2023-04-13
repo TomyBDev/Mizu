@@ -74,6 +74,31 @@ Application::Application(InputManager* input, Graphics* gfx)
 
 Application::~Application()
 {
+
+	if (ambient)
+	{
+		delete ambient;
+		ambient = nullptr;
+	}
+
+	if (ambient)
+	{
+		delete ambient;
+		ambient = nullptr;
+	}
+
+	if (ambient)
+	{
+		delete ambient;
+		ambient = nullptr;
+	}
+
+	if (ambient)
+	{
+		delete ambient;
+		ambient = nullptr;
+	}
+
 }
 
 void Application::Update(float dt)
@@ -84,7 +109,22 @@ void Application::Update(float dt)
 
 	camera->Update();
 
-	SolverPass(dt);
+	switch (currentSolver)
+	{
+		case LaxFriedrichs:
+			break;
+
+		case LaxWendroff:
+			break;
+
+		case MacCormack:
+			SolverPass(dt);
+			break;
+
+		default:
+			break;
+	}
+	;
 
 	Render();
 
@@ -118,7 +158,19 @@ void Application::Render()
 
 	// Render Water
 	planeMesh->SendData(graphics->GetDeviceContext(), D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
-	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale * XMMatrixTranslation(waterPosition[0], waterPosition[1], waterPosition[2]), viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength, resolution);
+	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale * XMMatrixTranslation(-8.f, -15.f, 34.f), viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength, resolution);
+	waterShader->Render(planeMesh->GetIndexCount());
+	// Render Water
+	planeMesh->SendData(graphics->GetDeviceContext(), D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
+	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale * XMMatrixTranslation(-8.f, -15.f, -24.f), viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength, resolution);
+	waterShader->Render(planeMesh->GetIndexCount());
+	// Render Water
+	planeMesh->SendData(graphics->GetDeviceContext(), D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
+	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale * XMMatrixTranslation(50.f, -15.f, 34.f), viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength, resolution);
+	waterShader->Render(planeMesh->GetIndexCount());
+	// Render Water
+	planeMesh->SendData(graphics->GetDeviceContext(), D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
+	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale * XMMatrixTranslation(50.f, -15.f, -24.f), viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength, resolution);
 	waterShader->Render(planeMesh->GetIndexCount());
 
 	Imgui();
@@ -255,6 +307,10 @@ void Application::Imgui()
 	if (ImGui::CollapsingHeader("Simulation Control"))
 	{
 		ImGui::SliderFloat3("Pos", waterPosition, -50, 50);
+
+		const char* solverLabels[] = { "LaxFriedrichs", "LaxWendroff", "MacCormack" };
+
+		ImGui::Combo("Solver", &currentSolver, solverLabels, IM_ARRAYSIZE(solverLabels));
 
 		const char* resolutionLabels[] = { "128x128", "160x108", "256x256", "320x216", "512x512", "1024x1024" };
 
