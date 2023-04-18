@@ -36,10 +36,6 @@ float3 G(float3 u)
 
 float4 main(PS_Input input) : SV_TARGET
 {
-    // If we are on boundary just keep what was there last pass.
-    if (input.tex.x == 0.f || input.tex.x == 1.f || input.tex.y == 0.f || input.tex.y == 1.f)
-        return solverTexture.Sample(solverSampler, input.tex);
-
     // Determine time and displacement step.
     //const float dx = resX * 0.004f;
     const float dx = resX * 0.014f;
@@ -49,10 +45,10 @@ float4 main(PS_Input input) : SV_TARGET
     const float dv = 1.f / resZ;
 
     // Get neighbour values from previous pass.
-    const float3 un = solverTexture.Sample(solverSampler, input.tex + float2(0, dv)).xyz;
-    const float3 ue = solverTexture.Sample(solverSampler, input.tex + float2(du, 0)).xyz;
-    const float3 us = solverTexture.Sample(solverSampler, input.tex + float2(0, -dv)).xyz;
-    const float3 uw = solverTexture.Sample(solverSampler, input.tex + float2(-du, 0)).xyz;
+    const float3 un = (input.tex.y + dv) <= 1.f ? solverTexture.Sample(solverSampler, input.tex + float2(0, dv)).xyz : float3(solverTexture.Sample(solverSampler, input.tex).x, 0, 0);
+    const float3 ue = (input.tex.x + du) <= 1.f ? solverTexture.Sample(solverSampler, input.tex + float2(du, 0)).xyz : float3(solverTexture.Sample(solverSampler, input.tex).x, 0, 0);
+    const float3 us = (input.tex.y - dv) >= 0.f ? solverTexture.Sample(solverSampler, input.tex + float2(0, -dv)).xyz : float3(solverTexture.Sample(solverSampler, input.tex).x, 0,0);
+    const float3 uw = (input.tex.x - du) >= 0.f ? solverTexture.Sample(solverSampler, input.tex + float2(-du, 0)).xyz : float3(solverTexture.Sample(solverSampler, input.tex).x, 0, 0);
 
     //Calculate New values
     const float3 val1 = 0.25f * (un + ue + us + uw);

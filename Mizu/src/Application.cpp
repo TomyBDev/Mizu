@@ -133,7 +133,6 @@ void Application::Update(float dt)
 		default:
 			break;
 	}
-	;
 
 	Render();
 
