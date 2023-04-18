@@ -44,19 +44,6 @@ float4 main(PS_Input input) : SV_TARGET
 {
     const float du = 1.f / resX;
     const float dv = 1.f / resZ;
-
-    // Left Boundary
-    if (input.tex.x == 0.f)
-        return Reflect(input.tex, float2(du, 0.f));
-    // Right Boundary
-    if (input.tex.x == 1.f)
-		return Reflect(input.tex, float2(-du, 0.f));
-    // Top Boundary
-	if (input.tex.y == 0.f)
-		return Reflect(input.tex, float2(0.f, dv));
-    // Bottom Boundary
-	if (input.tex.y == 1.f)
-		return Reflect(input.tex, float2(0.f, -dv));
     
     // Time and Displacement Step
     const float dx = resX * 0.004f;
@@ -65,8 +52,8 @@ float4 main(PS_Input input) : SV_TARGET
     // Get neighbour values from previous pass.
     const float3 uOld = oldTexture.Sample(solverSampler, input.tex).xyz;
     const float3 uHalf = pass1Texture.Sample(solverSampler, input.tex).xyz;
-    const float3 us = pass1Texture.Sample(solverSampler, input.tex + float2(0, -dv)).xyz;
-    const float3 uw = pass1Texture.Sample(solverSampler, input.tex + float2(-du, 0)).xyz;
+    const float3 us = (input.tex.y - dv) >= 0.f ? pass1Texture.Sample(solverSampler, input.tex + float2(0, -dv)).xyz : float3(pass1Texture.Sample(solverSampler, input.tex).x, 0, 0);
+    const float3 uw = (input.tex.x - du) >= 0.f ? pass1Texture.Sample(solverSampler, input.tex + float2(-du, 0)).xyz : float3(pass1Texture.Sample(solverSampler, input.tex).x, 0, 0);
 
     // Calculate New values
     const float3 val1 = 0.5f * (uOld + uHalf);
