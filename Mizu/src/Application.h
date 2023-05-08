@@ -17,16 +17,14 @@ private:
 
 	void HandleInput(float dt);
 
-	void LFSolverPass(float dt);
 	void LWSolverPass(float dt);
 	void MCSolverPass(float dt);
 
 	void SetRenderTexturePass(std::unique_ptr<RenderTexture>& renderTexture, ID3D11ShaderResourceView* srv);
 
 	void Imgui();
-	void Restart();
 
-	enum Solver { LaxFriedrichs, LaxWendroff, MacCormack };
+	enum Solver { LaxWendroff, MacCormack };
 
 	InputManager* inputManager;
 	Graphics* graphics;
@@ -40,8 +38,7 @@ private:
 
 	// Shaders
 	class TextureShader* textureShader;
-	class SolverShader* LFSolverShader; //Lax Friedrichs Solver
-	SolverShader* LW1SolverShader; //Lax Wendroff Step Solver
+	class SolverShader* LW1SolverShader; //Lax Wendroff Step Solver
 	class SolverShader2* LW2SolverShader; //Lax Wendroff Full Step Solver
 	SolverShader* MC1SolverShader; //MacCormack Half Step Solver
 	SolverShader2* MC2SolverShader; //MacCormack Full Step Solver
@@ -67,7 +64,7 @@ private:
 	DirectionalLight light;
 
 	// Matrices
-	DirectX::XMMATRIX waterScale;
+	std::vector<DirectX::XMMATRIX> waterMats;
 
 	// Frame rate to be displayed
 	float frameRate = 0;
@@ -76,18 +73,20 @@ private:
 	// Camera Control
 	float cameraSpeed = 10.f;
 
-	// Water Resolution Control
-	std::pair<int,int> resolution;
-	int resolutionItem = 0;
+	//Solver Control
 	int currentStartingCon = 0;
-	const std::unordered_map<int, std::pair<int, int>> resolutions = { {0,{160, 108}}, {1,{320, 216}}, {2,{640, 432}} };
-	int currentSolver = 1;
+	int currentSolver = 0;
+	std::pair<int, int> resolution = { 160, 108 }; // Set to size of starting condition texture;
 
 	// Water Shader Control
 	float strength = 145.f; // Controls the strength for changing between the shallow and depth colour.
 	float shallowColor[4] = { 0.1f, 0.37f, 0.55f, 0.85f }; // The colour that will be more prominent on shallow patches of water.
 	float deepColor[4] = { 0.004f, 0.15f, 0.3f, 0.77f }; // The colour that will be more prominent on deep patches of water.
+
 	bool waterReflections = true; // Whether first order water reflections are enabled or disabled.
+
 	bool onlyRenderOne = false; // Controls if the program should only render one patch of water (If having performance issues set this true)
+	int numToRender = 4;
+
 	int currentTessellation = 0; // Amount of tessellation the water shader will use.
 };

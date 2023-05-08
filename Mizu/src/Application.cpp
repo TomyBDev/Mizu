@@ -54,8 +54,6 @@ Application::Application(InputManager* input, Graphics* gfx)
 
 	MC1SolverShader = new SolverShader(gfx->GetDevice(), gfx->GetDeviceContext(), L"Shaders/MC1SolverShader_vs.cso", L"Shaders/MC1SolverShader_ps.cso");
 	MC2SolverShader = new SolverShader2(gfx->GetDevice(), gfx->GetDeviceContext(), L"Shaders/MC2SolverShader_vs.cso", L"Shaders/MC2SolverShader_ps.cso");
-
-	LFSolverShader = new SolverShader(gfx->GetDevice(), gfx->GetDeviceContext(), L"Shaders/LFSolverShader_vs.cso", L"Shaders/LFSolverShader_ps.cso");
 	
 	waterShader = new WaterShader(gfx->GetDevice(), gfx->GetDeviceContext());
 	materialObjectShader = new MaterialObjectShader(gfx->GetDevice(), gfx->GetDeviceContext());
@@ -68,9 +66,6 @@ Application::Application(InputManager* input, Graphics* gfx)
 	light.direction = XMFLOAT3(-1.f, -0.5f, 1.f);
 	light.ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.f);
 	light.diffuse = XMFLOAT4(0.375f, 0.375f, 0.5f, 1.f);
-
-	// Resolution of water mesh to be made.
-	resolution = resolutions.at(resolutionItem);
 
 	// Resolution specific initialisation.
 	Init();
@@ -121,33 +116,32 @@ void Application::Update(float dt)
 
 	if (timeElapsed > 0.01667f) // Only update the simulation sixty times a second.
 	{
-		for (int i = 0; i < resolutionItem + 1; i++)
+		switch (currentSolver) // Solve using the selected solver.
 		{
+		case LaxWendroff:
+			LWSolverPass(dt);
+			break;
 
-			switch (currentSolver)
-			{
-			case LaxFriedrichs:
-				LFSolverPass(dt);
-				break;
+		case MacCormack:
+			MCSolverPass(dt);
+			break;
 
-			case LaxWendroff:
-				LWSolverPass(dt);
-				break;
-
-			case MacCormack:
-				MCSolverPass(dt);
-				break;
-
-			default:
-				break;
-			}
-			oldRenderTexture.swap(pass2RenderTexture);
+		default:
+			LOG_ERROR("No valid solver selected!");
+			break;
 		}
+
+		// Time elapsed since last simulation update to zero!
 		timeElapsed = 0;
+
+		// Swap the new calculate water condition into the old render texture (as pass2 will be overwritten)
+		oldRenderTexture.swap(pass2RenderTexture);
 	}
 
+	// Render scene + water
 	Render();
 
+	// Increment time elapsed since last simulation update.
 	timeElapsed += dt;
 }
 
@@ -175,30 +169,19 @@ void Application::Render()
 	materialObjectShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * XMMatrixScaling(2.f, 2.f, 2.f) * XMMatrixTranslation(0.f, 0.f, 0.f), viewMatrix, projectionMatrix, light, onsenDiff->GetShaderResourceView(), onsenBump->GetShaderResourceView(), camera->GetPosition());
 	materialObjectShader->Render(onsen->GetIndexCount());
 	graphics->SetBothSides(false);
-	// Render Water
-	planeMesh->SendData(graphics->GetDeviceContext(), D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
-	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale * XMMatrixTranslation(50.f, -15.f, 34.f), viewMatrix, projectionMatrix, oldRenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength, resolution, currentTessellation, waterReflections);
-	waterShader->Render(planeMesh->GetIndexCount());
 
-	if (!onlyRenderOne)
+	// Render Water
+	for (int i = 0; i < numToRender; i++)
 	{
-		// Render Water
 		planeMesh->SendData(graphics->GetDeviceContext(), D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
-		waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale * XMMatrixTranslation(-8.f, -15.f, 34.f), viewMatrix, projectionMatrix, oldRenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength, resolution, currentTessellation, waterReflections);
-		waterShader->Render(planeMesh->GetIndexCount());
-		// Render Water
-		planeMesh->SendData(graphics->GetDeviceContext(), D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
-		waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale * XMMatrixTranslation(50.f, -15.f, -24.f), viewMatrix, projectionMatrix, oldRenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength, resolution, currentTessellation, waterReflections);
-		waterShader->Render(planeMesh->GetIndexCount());
-		// Render Water
-		planeMesh->SendData(graphics->GetDeviceContext(), D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
-		waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale * XMMatrixTranslation(-8.f, -15.f, -24.f), viewMatrix, projectionMatrix, oldRenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength, resolution, currentTessellation, waterReflections);
+		waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterMats[i], viewMatrix, projectionMatrix, oldRenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength, resolution, currentTessellation, waterReflections);
 		waterShader->Render(planeMesh->GetIndexCount());
 	}
 
+	// Render GUI
 	Imgui();
+
 	graphics->EndFrame();
-	
 }
 
 void Application::Init()
@@ -209,48 +192,27 @@ void Application::Init()
 
 	// Create Textures
 	std::string s = "StartingCondition/SC";
-	s.append(std::to_string(currentStartingCon) + "-" + std::to_string(resolution.first) + "x" + std::to_string(resolution.second) + ".png");
+	s.append(std::to_string(currentStartingCon) + ".png");
 	startingConditionTexture = new Texture(graphics->GetDevice(), graphics->GetDeviceContext(), StringConverter::StringToWide(s));
 
+	// Create render textures
 	pass1RenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), resolution.first, resolution.second, 0.1f, 200.f);
 	pass2RenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), resolution.first, resolution.second, 0.1f, 200.f);
 	oldRenderTexture = std::make_unique<RenderTexture>(graphics->GetDevice(), resolution.first, resolution.second, 0.1f, 200.f);
 
-	const float scaleX = 60.f / static_cast<float>(resolution.first);
-	const float scaleZ = 60.f / static_cast<float>(resolution.second);
-	XMMATRIX transMat = XMMatrixTranslation(-50.f, 0, -25.f);
-	XMMATRIX scaleMat = XMMatrixScaling(scaleX, 1.f, scaleX);
-	waterScale = scaleMat * transMat;
+	// Calculate and store matrices used for offsetting and scaling water meshes.
+	const float scale = 60.f / static_cast<float>(resolution.first);
+	XMMATRIX scaleMat = XMMatrixScaling(scale, 1.f, scale);
+	waterMats.push_back(scaleMat * XMMatrixTranslation(0, -15.f, 9.f));
+	waterMats.push_back(scaleMat * XMMatrixTranslation(-58.f, -15.f, 9.f));
+	waterMats.push_back(scaleMat * XMMatrixTranslation(0, -15.f, -49.f));
+	waterMats.push_back(scaleMat * XMMatrixTranslation(-58.f, -15.f, -49.f));
 }
 
 void Application::HandleInput(float dt)
 {
 	//Handles the input responses for the camera.
 	camera->HandleInput(inputManager, dt);
-}
-
-void Application::LFSolverPass(float dt)
-{
-	if (!graphics)
-		return;
-
-	pass2RenderTexture->SetRenderTarget(graphics->GetDeviceContext());
-	// No need to clear render target, all pixels will be overwritten
-
-	XMMATRIX worldMatrix = graphics->GetWorldMatrix();
-	XMMATRIX orthoMatrix = oldRenderTexture->GetOrthoMatrix();
-	XMMATRIX orthoViewMatrix = camera->GetOrthoViewMatrix();
-
-	graphics->SetZBuffer(false);
-	graphics->SetAlpha(false);
-
-	orthoMesh->SendData(graphics->GetDeviceContext());
-	LFSolverShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, oldRenderTexture->GetShaderResourceView(), dt, resolution);
-	LFSolverShader->Render(orthoMesh->GetIndexCount());
-
-	graphics->SetZBuffer(true);
-	graphics->SetAlpha(true);
-	graphics->SetBackBufferRenderTarget();
 }
 
 void Application::LWSolverPass(float dt)
@@ -356,11 +318,11 @@ void Application::Imgui()
 
 	if (ImGui::CollapsingHeader("Camera Settings"))
 	{
-
 		ImGui::Text("Camera Pos: x: %.1f, y: %.1f, z: %.1f", camera->GetPosition().m128_f32[0], camera->GetPosition().m128_f32[1], camera->GetPosition().m128_f32[2]);
 		ImGui::Text("Camera Rot: x: %.1f, y: %.1f, z: %.1f", camera->GetRotation().m128_f32[0], camera->GetRotation().m128_f32[1], camera->GetRotation().m128_f32[2]);
 
-		if (ImGui::SliderFloat("Camera Speed", &cameraSpeed, 0.1f, 1000.f))
+		// Slider to control camera speed.
+		if (ImGui::SliderFloat("Camera Speed", &cameraSpeed, 0.1f, 150.f))
 		{
 			camera->SetSpeed(cameraSpeed);
 		}
@@ -368,13 +330,18 @@ void Application::Imgui()
 
 	if (ImGui::CollapsingHeader("Water Shader Settings"))
 	{
+		// The depth strength determines the height at which the colour blends between shallow and deep.
 		ImGui::SliderFloat("Depth Strength", &strength, 0.1f, 200.f);
+
+		// Colour picker for shallow water colour.
 		if (ImGui::TreeNode("Shallow Water Color"))
 		{
 			ImGui::ColorPicker4("Shallow Color", shallowColor);
 			ImGui::TreePop();
 			ImGui::Separator();
 		}
+
+		// Colour picker for deep water colour.
 		if (ImGui::TreeNode("Deep Water Color"))
 		{
 			ImGui::ColorPicker4("Deep Color", deepColor);
@@ -382,45 +349,46 @@ void Application::Imgui()
 			ImGui::Separator();
 		}
 
+		// Checkbox for toggling first order reflections on water.
 		ImGui::Checkbox("Reflections", &waterReflections);
 
-		ImGui::Checkbox("Only Render One Water", &onlyRenderOne);
+		// If checkbox is ticked only render one water mesh, otherwise render all.
+		if (ImGui::Checkbox("Only Render One Water", &onlyRenderOne))
+		{
+			if (onlyRenderOne)
+				numToRender = 1;
+			else
+				numToRender = waterMats.size();
+		}
 
+		// Controls tessellation amount;
 		const char* tesselationLabels[] = { "None", "Low", "Medium", "High"};
-
-		ImGui::Combo("tesselation", &currentTessellation, tesselationLabels, IM_ARRAYSIZE(tesselationLabels));
+		ImGui::Combo("tessellation", &currentTessellation, tesselationLabels, IM_ARRAYSIZE(tesselationLabels));
 	}
 	
 	if (ImGui::CollapsingHeader("Simulation Control"))
 	{
-		const char* solverLabels[] = { "LaxFriedrichs", "LaxWendroff", "MacCormack" };
-
+		// Combobox to switch between solvers.
+		const char* solverLabels[] = { "LaxWendroff", "MacCormack" };
 		ImGui::Combo("Solver", &currentSolver, solverLabels, IM_ARRAYSIZE(solverLabels));
 
-		const char* resolutionLabels[] = { "160, 108", "320, 216", "640, 432" };
-
-		if (ImGui::Combo("Resolution", &resolutionItem, resolutionLabels, IM_ARRAYSIZE(resolutionLabels)))
-		{
-			resolution = resolutions.at(resolutionItem);
-			Restart();
-		}
-
+		// Combo box to switch starting condition
 		const char* startConLabels[] = { "Condition 1", "Condition 2", "Condition 3" };
-
 		if (ImGui::Combo("Starting Condition", &currentStartingCon, startConLabels, IM_ARRAYSIZE(startConLabels)))
 		{
-			// Create Textures
+			// Load new starting condition texture
 			delete startingConditionTexture;
 			std::string s = "StartingCondition/SC";
-			s.append(std::to_string(currentStartingCon) + "-" + std::to_string(resolution.first) + "x" + std::to_string(resolution.second) + ".png");
+			s.append(std::to_string(currentStartingCon) + ".png");
 			startingConditionTexture = new Texture(graphics->GetDevice(), graphics->GetDeviceContext(), StringConverter::StringToWide(s));
-			// Store initial condition in the old render texture buffer.
+			// Store new initial condition in the old render texture buffer.
 			SetRenderTexturePass(oldRenderTexture, startingConditionTexture->GetShaderResourceView());
 		}
 
+		// Resets the current state of the simulation back to the starting conditions state.
 		if (ImGui::Button("Reset"))
 		{
-			Restart();
+			SetRenderTexturePass(oldRenderTexture, startingConditionTexture->GetShaderResourceView());
 		}
 
 	}
@@ -429,42 +397,4 @@ void Application::Imgui()
 
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-}
-
-void Application::Restart()
-{
-	// Clean up
-	if (planeMesh)
-	{
-		delete planeMesh;
-		planeMesh = nullptr;
-	}
-
-	if (orthoMesh)
-	{
-		delete orthoMesh;
-		orthoMesh = nullptr;
-	}
-
-	if (startingConditionTexture)
-	{
-		delete startingConditionTexture;
-		startingConditionTexture = nullptr;
-	}
-
-	if (pass1RenderTexture)
-		pass1RenderTexture.release();
-	
-
-	if (pass2RenderTexture)
-		pass2RenderTexture.release();
-
-	if (oldRenderTexture)
-		oldRenderTexture.release();
-
-	// Re-Initialise
-	Init();
-
-	// Store initial condition in the old render texture buffer.
-	SetRenderTexturePass(oldRenderTexture, startingConditionTexture->GetShaderResourceView());
 }

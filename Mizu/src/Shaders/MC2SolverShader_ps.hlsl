@@ -46,7 +46,7 @@ float4 main(PS_Input input) : SV_TARGET
     const float dv = 1.f / resZ;
     
     // Time and Displacement Step
-    const float dx = (-(resX / 160.f) + 9.f) * 0.08f;
+    const float dx = 0.64f;
     const float dt2 = 0.5f;
 
     // Get neighbour values from previous pass.
