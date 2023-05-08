@@ -20,6 +20,7 @@ private:
 #define LOG_ERROR(...) SPDLOG_ERROR(__VA_ARGS__)
 #define LOG_CRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
 #define LOG_FLUSH() ::Log::GetLogger()->flush()
+#define LOG_INIT() ::Log::Init()
 #else
 #define LOG_TRACE()
 #define LOG_INFO()
@@ -27,5 +28,6 @@ private:
 #define LOG_ERROR()
 #define LOG_CRITICAL()
 #define LOG_FLUSH()
+#define LOG_INIT()
 #endif
 

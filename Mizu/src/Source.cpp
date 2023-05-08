@@ -8,7 +8,7 @@
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	// Initialise Logger
-	Log::Init();
+	LOG_INIT();
 
 	LOG_INFO("Initalising GDIPlus...");
 	static GDIPlusManager gdiPlusManager;
