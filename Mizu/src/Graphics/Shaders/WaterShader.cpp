@@ -133,7 +133,7 @@ WaterShader::~WaterShader()
 	}
 }
 
-void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightMapTexture, ID3D11ShaderResourceView* skyTextureCube, DirectionalLight dirLight, Camera* camera, float* shallowColor, float* deepColor, float strength, std::pair<int, int> res)
+void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightMapTexture, ID3D11ShaderResourceView* skyTextureCube, DirectionalLight dirLight, Camera* camera, float* shallowColor, float* deepColor, float strength, std::pair<int, int> res, int tess, bool waterReflections)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 
@@ -188,9 +188,10 @@ void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext
 	deviceContext->Map(controlBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	controlPtr = (ControlBufferType*)mappedResource.pData;
 	controlPtr->strength = strength;
+	controlPtr->reflections = waterReflections;
+	controlPtr->buffer = { 0.f, 0.f };
 	controlPtr->shallowColor = { shallowColor[0],shallowColor[1],shallowColor[2],shallowColor[3] };
 	controlPtr->deepColor = { deepColor[0],deepColor[1],deepColor[2],deepColor[3] };
-	controlPtr->buffer = { 0.f, 0.f, 0.f };
 	deviceContext->Unmap(controlBuffer, 0);
 	deviceContext->PSSetConstantBuffers(2, 1, &controlBuffer);
 
@@ -205,22 +206,24 @@ void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext
 	deviceContext->Map(tessellationBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	tessPtr = (TessellationBufferType*)mappedResource.pData;
 
-	int temp = res.first * res.second;
-	if (temp < 65536)
-	{
-		tessPtr->first = 5;
-		tessPtr->second = 5;
-	}
-	else if (temp < 262144)
-	{
-		tessPtr->first = 3;
-		tessPtr->second = 3;
-	}
-	else
-	{
-		tessPtr->first = 1;
-		tessPtr->second = 1;
-	}
+	//int temp = res.first * res.second;
+	//if (temp < 65536)
+	//{
+	//	tessPtr->first = 5;
+	//	tessPtr->second = 5;
+	//}
+	//else if (temp < 262144)
+	//{
+	//	tessPtr->first = 3;
+	//	tessPtr->second = 3;
+	//}
+	//else
+	//{
+	//	tessPtr->first = 1;
+	//	tessPtr->second = 1;
+	//}
+	tessPtr->first = tess + 1;
+	tessPtr->second = tess + 1;
 	tessPtr->buffer = {0.f, 0.f};
 	deviceContext->Unmap(tessellationBuffer, 0);
 	deviceContext->HSSetConstantBuffers(0, 1, &tessellationBuffer);

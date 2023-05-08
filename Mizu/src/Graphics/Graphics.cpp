@@ -102,7 +102,6 @@ Graphics::Graphics(HWND hwnd)
 	depthStencilViewDesc.Texture2D.MipSlice = 0u;
 	CHECK_ERROR(device->CreateDepthStencilView(depthStencilTexture.Get(), &depthStencilViewDesc, &depthStencilView));
 
-
 	// Bind depth stencil view
 	deviceContext->OMSetRenderTargets(1u, renderTarget.GetAddressOf(), depthStencilView.Get());
 	deviceContext->RSSetViewports(1u, &viewport);

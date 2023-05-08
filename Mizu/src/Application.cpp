@@ -166,19 +166,19 @@ void Application::Render()
 
 	// Render Water
 	planeMesh->SendData(graphics->GetDeviceContext(), D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
-	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale * XMMatrixTranslation(-8.f, -15.f, 34.f), viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength, resolution);
+	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale * XMMatrixTranslation(-8.f, -15.f, 34.f), viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength, resolution, currentTesselation, waterReflections);
 	waterShader->Render(planeMesh->GetIndexCount());
 	// Render Water
 	planeMesh->SendData(graphics->GetDeviceContext(), D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
-	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale * XMMatrixTranslation(-8.f, -15.f, -24.f), viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength, resolution);
+	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale * XMMatrixTranslation(-8.f, -15.f, -24.f), viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength, resolution, currentTesselation, waterReflections);
 	waterShader->Render(planeMesh->GetIndexCount());
 	// Render Water
 	planeMesh->SendData(graphics->GetDeviceContext(), D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
-	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale * XMMatrixTranslation(50.f, -15.f, 34.f), viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength, resolution);
+	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale * XMMatrixTranslation(50.f, -15.f, 34.f), viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength, resolution, currentTesselation, waterReflections);
 	waterShader->Render(planeMesh->GetIndexCount());
 	// Render Water
 	planeMesh->SendData(graphics->GetDeviceContext(), D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
-	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale * XMMatrixTranslation(50.f, -15.f, -24.f), viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength, resolution);
+	waterShader->SetShaderParameters(graphics->GetDeviceContext(), worldMatrix * waterScale * XMMatrixTranslation(50.f, -15.f, -24.f), viewMatrix, projectionMatrix, pass2RenderTexture->GetShaderResourceView(), skyTextureCube->GetShaderResourceView(), light, camera, shallowColor, deepColor, strength, resolution, currentTesselation, waterReflections);
 	waterShader->Render(planeMesh->GetIndexCount());
 
 	Imgui();
@@ -350,6 +350,7 @@ void Application::Imgui()
 			camera->SetSpeed(cameraSpeed);
 		}
 	}
+
 	if (ImGui::CollapsingHeader("Water Shader Settings"))
 	{
 		ImGui::SliderFloat("Depth Strength", &strength, 0.1f, 200.f);
@@ -365,12 +366,16 @@ void Application::Imgui()
 			ImGui::TreePop();
 			ImGui::Separator();
 		}
+
+		ImGui::Checkbox("Reflections", &waterReflections);
+
+		const char* tesselationLabels[] = { "None", "Low", "Medium", "High"};
+
+		ImGui::Combo("tesselation", &currentTesselation, tesselationLabels, IM_ARRAYSIZE(tesselationLabels));
 	}
 	
 	if (ImGui::CollapsingHeader("Simulation Control"))
 	{
-		ImGui::SliderFloat3("Pos", waterPosition, -50, 50);
-
 		const char* solverLabels[] = { "LaxFriedrichs", "LaxWendroff", "MacCormack" };
 
 		ImGui::Combo("Solver", &currentSolver, solverLabels, IM_ARRAYSIZE(solverLabels));

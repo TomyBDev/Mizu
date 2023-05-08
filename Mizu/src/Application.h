@@ -85,5 +85,6 @@ private:
 	float strength = 145.f;
 	float shallowColor[4] = { 0.1f, 0.37f, 0.55f, 0.85f };
 	float deepColor[4] = { 0.004f, 0.15f, 0.3f, 0.77f };
-	float waterPosition[3] = { -8.f, -15.f, 34.f };
+	bool waterReflections = true;
+	int currentTesselation = 0;
 };

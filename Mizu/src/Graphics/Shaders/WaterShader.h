@@ -8,7 +8,7 @@ class WaterShader : public Shader
 public:
 	WaterShader(Microsoft::WRL::ComPtr<ID3D11Device> dev, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
 	~WaterShader();
-	void SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightMapTexture, ID3D11ShaderResourceView* skyTextureCube, DirectionalLight dirLight, class Camera* camera, float* shallowColor, float* deepColor, float strength = 1.f, std::pair<int, int> res = { 128,128 });
+	void SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, ID3D11ShaderResourceView* heightMapTexture, ID3D11ShaderResourceView* skyTextureCube, DirectionalLight dirLight, class Camera* camera, float* shallowColor, float* deepColor, float strength = 1.f, std::pair<int, int> res = { 128,128 }, int tess = 1, bool waterReflections = false);
 private:
 	struct MatrixBufferType
 	{
@@ -35,7 +35,8 @@ private:
 	struct ControlBufferType
 	{
 		float strength;
-		XMFLOAT3 buffer;
+		uint32_t reflections;
+		XMFLOAT2 buffer;
 		XMFLOAT4 shallowColor;
 		XMFLOAT4 deepColor;
 	};

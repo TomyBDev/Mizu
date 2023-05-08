@@ -43,10 +43,10 @@ float4 main(PS_Input input) : SV_TARGET
     const float dv = 1.f / resZ;
 
     // Get neighbour values from previous pass.
-    const float3 un = (input.tex.y + dv) <= 1.f ? solverTexture.Sample(solverSampler, input.tex + float2(0, dv)).xyz : float3(solverTexture.Sample(solverSampler, input.tex).x, 0, 0);
-    const float3 ue = (input.tex.x + du) <= 1.f ? solverTexture.Sample(solverSampler, input.tex + float2(du, 0)).xyz : float3(solverTexture.Sample(solverSampler, input.tex).x, 0, 0);
-    const float3 us = (input.tex.y - dv) >= 0.f ? solverTexture.Sample(solverSampler, input.tex + float2(0, -dv)).xyz : float3(solverTexture.Sample(solverSampler, input.tex).x, 0, 0);
-    const float3 uw = (input.tex.x - du) >= 0.f ? solverTexture.Sample(solverSampler, input.tex + float2(-du, 0)).xyz : float3(solverTexture.Sample(solverSampler, input.tex).x, 0, 0);
+    const float3 un = (input.tex.y + dv) <= 1.f ? solverTexture.Sample(solverSampler, input.tex + float2(0, dv)).xyz : solverTexture.Sample(solverSampler, input.tex).rgb * float3(1, 1, 0);
+    const float3 ue = (input.tex.x + du) <= 1.f ? solverTexture.Sample(solverSampler, input.tex + float2(du, 0)).xyz : solverTexture.Sample(solverSampler, input.tex).rgb * float3(1, 0, 1);
+    const float3 us = (input.tex.y - dv) >= 0.f ? solverTexture.Sample(solverSampler, input.tex + float2(0, -dv)).xyz : solverTexture.Sample(solverSampler, input.tex).rgb * float3(1, 1, 0);
+    const float3 uw = (input.tex.x - du) >= 0.f ? solverTexture.Sample(solverSampler, input.tex + float2(-du, 0)).xyz : solverTexture.Sample(solverSampler, input.tex).rgb * float3(1, 0, 1);
 
     //Calculate New values
     const float3 val1 = 0.25f * (un + ue + us + uw);

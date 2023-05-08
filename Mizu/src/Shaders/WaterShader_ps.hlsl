@@ -20,7 +20,8 @@ cbuffer CameraBuffer : register(b1)
 cbuffer ControlBuffer : register(b2)
 {
     float cStrength;
-    float3 cBuffer;
+    uint reflection;
+    float2 cBuffer;
     float4 shallowColor;
     float4 deepColor;
 };
@@ -67,5 +68,8 @@ float4 main(PS_Input input) : SV_TARGET
     const float3 light = lerp(refractionColor, reflectionColor, frenselWeight);*/
 
     // Combine depth color and reflected color
-    return float4(lerp(depthColor.xyz, reflectionColor.xyz, 0.2f), depthColor.w);
+    if (reflection)
+		return float4(lerp(depthColor.xyz, reflectionColor.xyz, 0.2f), depthColor.w);
+
+    return depthColor;
 }
