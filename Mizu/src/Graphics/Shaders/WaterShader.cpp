@@ -157,7 +157,7 @@ void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext
 	resPtr = (ResolutionBufferType*)mappedResource.pData;
 	resPtr->resX = res.first;
 	resPtr->resY = res.second;
-	resPtr->buffer = {0.f, 0.f};
+	resPtr->buffer = { (float)tess, 0.f};
 	deviceContext->Unmap(resolutionBuffer, 0);
 	deviceContext->VSSetConstantBuffers(1, 1, &resolutionBuffer);
 
@@ -205,23 +205,6 @@ void WaterShader::SetShaderParameters(Microsoft::WRL::ComPtr<ID3D11DeviceContext
 	TessellationBufferType* tessPtr;
 	deviceContext->Map(tessellationBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	tessPtr = (TessellationBufferType*)mappedResource.pData;
-
-	//int temp = res.first * res.second;
-	//if (temp < 65536)
-	//{
-	//	tessPtr->first = 5;
-	//	tessPtr->second = 5;
-	//}
-	//else if (temp < 262144)
-	//{
-	//	tessPtr->first = 3;
-	//	tessPtr->second = 3;
-	//}
-	//else
-	//{
-	//	tessPtr->first = 1;
-	//	tessPtr->second = 1;
-	//}
 	tessPtr->first = tess + 1;
 	tessPtr->second = tess + 1;
 	tessPtr->buffer = {0.f, 0.f};

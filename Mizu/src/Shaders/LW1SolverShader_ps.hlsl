@@ -37,8 +37,8 @@ float3 G(float3 u)
 float4 main(PS_Input input) : SV_TARGET
 {
     // Determine time and displacement step.
-    const float dx = resX * 0.004f;
-    const float dt2 = 0.000813802084 * resX;
+    const float dx = (-(resX / 160.f) + 9.f) * 0.04f;
+    const float dt2 = 0.5f;
     const float du = 1.f / resX;
     const float dv = 1.f / resZ;
 

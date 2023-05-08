@@ -71,20 +71,23 @@ private:
 
 	// Frame rate to be displayed
 	float frameRate = 0;
+	float timeElapsed = 0;
 
 	// Camera Control
 	float cameraSpeed = 10.f;
 
 	// Water Resolution Control
 	std::pair<int,int> resolution;
-	int resolutionItem = 1;
-	const std::unordered_map<int, std::pair<int, int>> resolutions = { {0,{128, 128}}, {1,{160, 108}}, {2,{256, 256}}, {3,{320, 216}}, {4,{512, 512}}, {5,{1024, 1024}} };
+	int resolutionItem = 0;
+	int currentStartingCon = 0;
+	const std::unordered_map<int, std::pair<int, int>> resolutions = { {0,{160, 108}}, {1,{320, 216}}, {2,{640, 432}} };
 	int currentSolver = 1;
 
 	// Water Shader Control
-	float strength = 145.f;
-	float shallowColor[4] = { 0.1f, 0.37f, 0.55f, 0.85f };
-	float deepColor[4] = { 0.004f, 0.15f, 0.3f, 0.77f };
-	bool waterReflections = true;
-	int currentTesselation = 0;
+	float strength = 145.f; // Controls the strength for changing between the shallow and depth colour.
+	float shallowColor[4] = { 0.1f, 0.37f, 0.55f, 0.85f }; // The colour that will be more prominent on shallow patches of water.
+	float deepColor[4] = { 0.004f, 0.15f, 0.3f, 0.77f }; // The colour that will be more prominent on deep patches of water.
+	bool waterReflections = true; // Whether first order water reflections are enabled or disabled.
+	bool onlyRenderOne = false; // Controls if the program should only render one patch of water (If having performance issues set this true)
+	int currentTessellation = 0; // Amount of tessellation the water shader will use.
 };
